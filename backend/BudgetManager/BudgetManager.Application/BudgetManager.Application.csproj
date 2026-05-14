@@ -11,4 +11,8 @@
     <ProjectReference Include="..\BudgetManager.SharedLibrary\BudgetManager.SharedLibrary.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Services\" />
+  </ItemGroup>
+
 </Project>
