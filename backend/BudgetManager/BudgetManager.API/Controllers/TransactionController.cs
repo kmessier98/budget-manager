@@ -20,7 +20,8 @@ namespace BudgetManager.API.Controllers
         {
             var result = await _transactionService.Create(dto);
 
-            return StatusCode(StatusCodes.Status201Created, result);
+            //TODO CreatedAtaction (location!!!)
+            return StatusCode(StatusCodes.Status201Created, result); 
         }
     }
 }
