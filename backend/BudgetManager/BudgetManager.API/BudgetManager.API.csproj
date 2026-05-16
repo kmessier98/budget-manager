@@ -21,6 +21,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\BudgetManager.Domain\BudgetManager.Domain.csproj" />
     <ProjectReference Include="..\BudgetManager.Infrastructure\BudgetManager.Infrastructure.csproj" />
   </ItemGroup>
 
