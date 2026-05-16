@@ -24,7 +24,7 @@ namespace BudgetManager.Application.Services
             var category = await _categoryRepository.FindByIdAsync(dto.CategoryId);
             if (category == null)
             {
-                throw new Exception("Category not found");
+                throw new Exception("Category not found"); //todo custom exception ?
             }
 
             var entity = _mapper.Map<Transaction>(dto);
