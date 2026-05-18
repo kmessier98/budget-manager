@@ -1,4 +1,5 @@
-﻿using BudgetManager.Application.Interfaces.Transaction;
+﻿using BudgetManager.Application.Common;
+using BudgetManager.Application.Interfaces.Transaction;
 using BudgetManager.Application.Queries;
 using BudgetManager.Domain.Entities;
 using BudgetManager.Infrastructure.Data;
@@ -48,12 +49,14 @@ namespace BudgetManager.Infrastructure.Repositories
                 .ToListAsync(); 
         }
 
-        public async Task<IReadOnlyList<Transaction>> GetAllAsync(GetTransactionsQuery query)
+        public async Task<PagedResult<Transaction>> GetAllAsync(GetTransactionsQuery query)
         {
             var transactions = await _dbContext.Transactions
                 .AsNoTracking()
                 .Include(c => c.Category)
                 .ToListAsync();
+
+            int totalItems = transactions.Count;
 
             if (query.CategoryId.HasValue)
             {
@@ -75,8 +78,18 @@ namespace BudgetManager.Infrastructure.Repositories
                 transactions = transactions.Where(t => t.Date.Year == query.Year.Value).ToList();
             }
 
+            transactions = transactions
+                .Skip((query.PageNumber - 1) * query.PageSize)
+                .Take(query.PageSize)
+                .ToList();
 
-            return transactions;
+            return new PagedResult<Transaction>
+            {
+                Items = transactions,
+                PageNumber = query.PageNumber,
+                PageSize = query.PageSize,
+                TotalItems = totalItems
+            };
         }
 
         public Task<Transaction?> GetByAsync(Expression<Func<Transaction, bool>> predicate)

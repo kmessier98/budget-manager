@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using BudgetManager.Application.Common;
 using BudgetManager.Application.DTOs.Category;
 using BudgetManager.Application.DTOs.Transaction;
 using BudgetManager.Application.Interfaces;
@@ -26,8 +27,8 @@ namespace BudgetManager.Application.Services
 
         public async Task<TransactionResponseDTO> GetAll(GetTransactionsQuery query)
         {
-            var entities = await _transactionRepository.GetAllAsync(query);
-            var transactionDTOs = _mapper.Map<IReadOnlyList<TransactionDTO>>(entities);
+            var pagedResult = await _transactionRepository.GetAllAsync(query);
+            var transactionDTOs = _mapper.Map<IReadOnlyList<TransactionDTO>>(pagedResult.Items);
 
             var totalAmount = transactionDTOs.Sum(t => t.Amount);
             var categoryDTO = query.CategoryId.HasValue ? transactionDTOs.FirstOrDefault(t => t.Category.Id == query.CategoryId)?.Category : null;
@@ -40,16 +41,23 @@ namespace BudgetManager.Application.Services
                     Amount = g.Sum(t => t.Amount)
                 })
                 .ToList();
-
-            return new TransactionResponseDTO(transactionDTOs, new TransactionSummaryDTO
+            var metadata = new PaginationMetada
+            {
+                PageNumber = pagedResult.PageNumber,
+                PageSize = pagedResult.PageSize,
+                TotalItems = pagedResult.TotalItems,
+            };
+            var summary = new TransactionSummaryDTO
             {
                 TotalAmount = totalAmount,
-                Day = query.Day.HasValue ? query.Day.Value : null,
-                Month = query.Month.HasValue ? query.Month.Value : null,
-                Year = query.Year.HasValue ? query.Year.Value : null,
+                Day = query.Day,
+                Month = query.Month,
+                Year = query.Year,
                 Category = categoryDTO,
                 AmountByCategory = amountByCategory
-            });
+            };
+
+            return new TransactionResponseDTO(transactionDTOs, metadata, summary);
         }
 
         public async Task<TransactionDTO> GetById(Guid id)
