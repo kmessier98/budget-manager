@@ -30,6 +30,7 @@ namespace BudgetManager.Infrastructure.Repositories
         public async Task<Transaction?> FindByIdAsync(Guid id)
         {
             return await _dbContext.Transactions
+                .AsNoTracking()
                 .Include(c => c.Category)
                 .FirstOrDefaultAsync(t => t.Id == id);
         }
@@ -44,9 +45,12 @@ namespace BudgetManager.Infrastructure.Repositories
             throw new NotImplementedException();
         }
 
-        public Task<Transaction> UpdateAsync(Transaction entity)
+        public async Task<Transaction> UpdateAsync(Transaction entity)
         {
-            throw new NotImplementedException();
+            _dbContext.Transactions.Update(entity);     
+            await _dbContext.SaveChangesAsync();
+
+            return entity;        
         }
     }
 }

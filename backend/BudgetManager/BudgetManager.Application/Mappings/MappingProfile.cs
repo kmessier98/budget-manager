@@ -8,7 +8,8 @@ namespace BudgetManager.Application.Mappings
     {
         public MappingProfile() 
         {
-            CreateMap<CreateTransactionDto, Transaction>();
+            CreateMap<CreateTransactionDTO, Transaction>();
+            CreateMap<UpdateTransactionDTO, Transaction>();
             CreateMap<TransactionDTO, Transaction>().ReverseMap();
             CreateMap<CategoryDTO, Category>().ReverseMap();
         }

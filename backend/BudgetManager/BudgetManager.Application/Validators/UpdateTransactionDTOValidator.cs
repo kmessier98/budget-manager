@@ -3,9 +3,9 @@ using FluentValidation;
 
 namespace BudgetManager.Application.Validators
 {
-    public class CreateTransactionDTOValidator : AbstractValidator<CreateTransactionDTO>
+    public class UpdateTransactionDTOValidator : AbstractValidator<UpdateTransactionDTO>
     {
-        public CreateTransactionDTOValidator() 
+        public UpdateTransactionDTOValidator()
         {
             RuleFor(x => x.Amount)
                 .GreaterThan(0).WithMessage("Amount must be greater than 0.");

@@ -24,11 +24,19 @@ namespace BudgetManager.API.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Create(CreateTransactionDto dto)
+        public async Task<IActionResult> Create(CreateTransactionDTO dto)
         {
             var result = await _transactionService.Create(dto);
 
             return CreatedAtAction(nameof(GetById), new { id = result.Id }, result);
+        }
+
+        [HttpPut]
+        public async Task<IActionResult> Update(UpdateTransactionDTO dto)
+        {
+            var result = await _transactionService.Update(dto);
+
+            return Ok(result);
         }
     }
 }
