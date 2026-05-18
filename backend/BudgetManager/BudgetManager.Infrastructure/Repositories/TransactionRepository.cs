@@ -1,6 +1,7 @@
 ﻿using BudgetManager.Application.Interfaces.Transaction;
 using BudgetManager.Domain.Entities;
 using BudgetManager.Infrastructure.Data;
+using Microsoft.EntityFrameworkCore;
 using System.Linq.Expressions;
 
 namespace BudgetManager.Infrastructure.Repositories
@@ -15,11 +16,10 @@ namespace BudgetManager.Infrastructure.Repositories
         }
         public async Task<Transaction> CreateAsync(Transaction entity)
         {
-            //todo juste retourné entity (tracker)
-            var createdTransaction = (await _dbContext.Transactions.AddAsync(entity)).Entity;
+            await _dbContext.Transactions.AddAsync(entity);
             await _dbContext.SaveChangesAsync();
 
-            return createdTransaction;
+            return entity;
         }
 
         public Task DeleteAsync(Guid id)
@@ -27,9 +27,11 @@ namespace BudgetManager.Infrastructure.Repositories
             throw new NotImplementedException();
         }
 
-        public Task<Transaction?> FindByIdAsync(Guid id)
+        public async Task<Transaction?> FindByIdAsync(Guid id)
         {
-            throw new NotImplementedException();
+            return await _dbContext.Transactions
+                .Include(c => c.Category)
+                .FirstOrDefaultAsync(t => t.Id == id);
         }
 
         public Task<IEnumerable<Transaction>> GetAllAsync()

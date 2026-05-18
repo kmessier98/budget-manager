@@ -12,8 +12,11 @@ namespace BudgetManager.Infrastructure.Data
         {
             base.OnModelCreating(modelBuilder);
 
+            modelBuilder.Entity<Category>().ToTable("Category");
+            modelBuilder.Entity<Transaction>().ToTable("Transaction");
+
             modelBuilder.Entity<Transaction>()
-                .HasOne<Category>()
+                .HasOne(t => t.Category)
                 .WithMany()
                 .HasForeignKey(b => b.CategoryId)
                 .OnDelete(DeleteBehavior.Restrict); // BLOQUE la suppression de la catégorie

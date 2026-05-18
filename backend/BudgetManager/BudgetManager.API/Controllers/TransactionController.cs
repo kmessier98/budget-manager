@@ -15,13 +15,20 @@ namespace BudgetManager.API.Controllers
             _transactionService = transactionService;
         }
 
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetById(Guid id)
+        {
+            var result = await _transactionService.GetById(id);
+
+            return Ok(result);
+        }
+
         [HttpPost]
         public async Task<IActionResult> Create(CreateTransactionDto dto)
         {
             var result = await _transactionService.Create(dto);
 
-            //TODO CreatedAtaction (location!!!)
-            return StatusCode(StatusCodes.Status201Created, result); 
+            return CreatedAtAction(nameof(GetById), new { id = result.Id }, result);
         }
     }
 }

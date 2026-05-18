@@ -7,5 +7,6 @@
         public DateTime Date { get; set; }
         public string Description { get; set; } = null!;
         public Guid CategoryId { get; set; }
+        public Category Category { get; set; } = null!;
     }
 }

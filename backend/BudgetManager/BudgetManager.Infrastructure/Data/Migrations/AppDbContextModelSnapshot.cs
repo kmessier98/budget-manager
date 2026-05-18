@@ -34,7 +34,7 @@ namespace BudgetManager.Infrastructure.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Category");
+                    b.ToTable("Category", (string)null);
                 });
 
             modelBuilder.Entity("BudgetManager.Domain.Entities.Transaction", b =>
@@ -60,7 +60,7 @@ namespace BudgetManager.Infrastructure.Data.Migrations
 
                     b.HasIndex("CategoryId");
 
-                    b.ToTable("Transaction");
+                    b.ToTable("Transaction", (string)null);
                 });
 
             modelBuilder.Entity("BudgetManager.Domain.Entities.Transaction", b =>

@@ -3,6 +3,7 @@ using BudgetManager.Application.DTOs.Transaction;
 using BudgetManager.Application.Interfaces;
 using BudgetManager.Application.Interfaces.Transaction;
 using BudgetManager.Domain.Entities;
+using BudgetManager.Domain.Exceptions;
 
 namespace BudgetManager.Application.Services
 {
@@ -19,12 +20,23 @@ namespace BudgetManager.Application.Services
             _categoryRepository = categoryRepository;
         }
 
+        public async Task<TransactionDTO> GetById(Guid id)
+        {
+            var entity = await _transactionRepository.FindByIdAsync(id);
+            if (entity == null)
+            {
+                throw new NotFoundException("Transaction not found");
+            }
+
+            return _mapper.Map<TransactionDTO>(entity);
+        }
+
         public async Task<TransactionDTO> Create(CreateTransactionDto dto)
         {
             var category = await _categoryRepository.FindByIdAsync(dto.CategoryId);
             if (category == null)
             {
-                throw new Exception("Category not found"); //todo custom exception ?
+                throw new NotFoundException("Category not found"); 
             }
 
             var entity = _mapper.Map<Transaction>(dto);
