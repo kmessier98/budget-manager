@@ -49,7 +49,7 @@ namespace BudgetManager.Infrastructure.Repositories
                 .ToListAsync(); 
         }
 
-        public async Task<PagedResult<Transaction>> GetAllAsync(GetTransactionsQuery query)
+        public async Task<PagedResult<Transaction>> GetPagedAsync(GetTransactionsQuery query)
         {
             var transactions = await _dbContext.Transactions
                 .AsNoTracking()
@@ -58,6 +58,49 @@ namespace BudgetManager.Infrastructure.Repositories
 
             int totalItems = transactions.Count;
 
+            transactions = ApplyFilters(transactions, query);
+
+            transactions = transactions
+                .Skip((query.PageNumber - 1) * query.PageSize)
+                .Take(query.PageSize)
+                .ToList();
+
+            return new PagedResult<Transaction>
+            {
+                Items = transactions,
+                PageNumber = query.PageNumber,
+                PageSize = query.PageSize,
+                TotalItems = totalItems
+            };
+        }
+
+        public async Task<IReadOnlyList<Transaction>> GetAllAsync(GetTransactionsQuery query)
+        {
+            var transactions = await _dbContext.Transactions
+                .AsNoTracking()
+                .Include(c => c.Category)
+                .ToListAsync();
+
+            transactions = ApplyFilters(transactions, query);
+
+            return transactions;
+        }
+
+        public Task<Transaction?> GetByAsync(Expression<Func<Transaction, bool>> predicate)
+        {
+            throw new NotImplementedException();
+        }
+
+        public async Task<Transaction> UpdateAsync(Transaction entity)
+        {
+            _dbContext.Transactions.Update(entity);     
+            await _dbContext.SaveChangesAsync();
+
+            return entity;        
+        }
+
+        private List<Transaction> ApplyFilters(List<Transaction> transactions, GetTransactionsQuery query)
+        {
             if (query.CategoryId.HasValue)
             {
                 transactions = transactions.Where(t => t.CategoryId == query.CategoryId.Value).ToList();
@@ -78,31 +121,7 @@ namespace BudgetManager.Infrastructure.Repositories
                 transactions = transactions.Where(t => t.Date.Year == query.Year.Value).ToList();
             }
 
-            transactions = transactions
-                .Skip((query.PageNumber - 1) * query.PageSize)
-                .Take(query.PageSize)
-                .ToList();
-
-            return new PagedResult<Transaction>
-            {
-                Items = transactions,
-                PageNumber = query.PageNumber,
-                PageSize = query.PageSize,
-                TotalItems = totalItems
-            };
-        }
-
-        public Task<Transaction?> GetByAsync(Expression<Func<Transaction, bool>> predicate)
-        {
-            throw new NotImplementedException();
-        }
-
-        public async Task<Transaction> UpdateAsync(Transaction entity)
-        {
-            _dbContext.Transactions.Update(entity);     
-            await _dbContext.SaveChangesAsync();
-
-            return entity;        
+            return transactions;
         }
     }
 }

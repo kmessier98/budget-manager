@@ -27,35 +27,15 @@ namespace BudgetManager.Application.Services
 
         public async Task<TransactionResponseDTO> GetAll(GetTransactionsQuery query)
         {
-            var pagedResult = await _transactionRepository.GetAllAsync(query);
-            var transactionDTOs = _mapper.Map<IReadOnlyList<TransactionDTO>>(pagedResult.Items);
-
-            var totalAmount = transactionDTOs.Sum(t => t.Amount);
-            var categoryDTO = query.CategoryId.HasValue ? transactionDTOs.FirstOrDefault(t => t.Category.Id == query.CategoryId)?.Category : null;
-            var amountByCategory = transactionDTOs
-                .GroupBy(t => t.Category.Id)
-                .Select(g => new CategoryAmountDTO
-                {
-                    Id = g.Key,
-                    Name = g.First().Category.Name,
-                    Amount = g.Sum(t => t.Amount)
-                })
-                .ToList();
+            var pagedResult = await _transactionRepository.GetPagedAsync(query);
+            var transactionDTOs = _mapper.Map<IReadOnlyList<TransactionDTO>>(pagedResult.Items);  
             var metadata = new PaginationMetada
             {
                 PageNumber = pagedResult.PageNumber,
                 PageSize = pagedResult.PageSize,
                 TotalItems = pagedResult.TotalItems,
             };
-            var summary = new TransactionSummaryDTO
-            {
-                TotalAmount = totalAmount,
-                Day = query.Day,
-                Month = query.Month,
-                Year = query.Year,
-                Category = categoryDTO,
-                AmountByCategory = amountByCategory
-            };
+            var summary = await GetTransactionsSummaryDTO(query);
 
             return new TransactionResponseDTO(transactionDTOs, metadata, summary);
         }
@@ -111,6 +91,34 @@ namespace BudgetManager.Application.Services
             {
                 throw new NotFoundException("Transaction not found");
             }
+        }
+
+        private async Task<TransactionSummaryDTO> GetTransactionsSummaryDTO(GetTransactionsQuery query)
+        {
+            var transactions = await _transactionRepository.GetAllAsync(query);
+
+            var transactionDTOs = _mapper.Map<IReadOnlyList<TransactionDTO>>(transactions);
+            var totalAmount = transactionDTOs.Sum(t => t.Amount);
+            var categoryDTO = query.CategoryId.HasValue ? transactionDTOs.FirstOrDefault(t => t.Category.Id == query.CategoryId)?.Category : null;
+            var amountByCategory = transactionDTOs
+                .GroupBy(t => t.Category.Id)
+                .Select(g => new CategoryAmountDTO
+                {
+                    Id = g.Key,
+                    Name = g.First().Category.Name,
+                    Amount = g.Sum(t => t.Amount)
+                })
+                .ToList();
+
+            return new TransactionSummaryDTO
+            {
+                TotalAmount = totalAmount,
+                Day = query.Day,
+                Month = query.Month,
+                Year = query.Year,
+                Category = categoryDTO,
+                AmountByCategory = amountByCategory
+            };
         }
     }
 }

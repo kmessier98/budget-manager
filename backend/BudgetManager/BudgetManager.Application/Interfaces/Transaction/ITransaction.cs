@@ -6,6 +6,7 @@ namespace BudgetManager.Application.Interfaces.Transaction
 {
     public interface ITransaction : IGenericInterface<Domain.Entities.Transaction>
     {
-        Task<PagedResult<Domain.Entities.Transaction>> GetAllAsync(GetTransactionsQuery query);
+        Task<PagedResult<Domain.Entities.Transaction>> GetPagedAsync(GetTransactionsQuery query);
+        Task<IReadOnlyList<Domain.Entities.Transaction>> GetAllAsync(GetTransactionsQuery query);
     }
 }
