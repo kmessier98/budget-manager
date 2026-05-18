@@ -2,11 +2,11 @@
 {
     public class TransactionResponseDTO
     {
-        public TransactionDTO Transaction { get; }
+        public IReadOnlyList<TransactionDTO> Transactions { get; }
         public TransactionSummaryDTO Summary { get; }
-        public TransactionResponseDTO(TransactionDTO transaction, TransactionSummaryDTO summary)
+        public TransactionResponseDTO(IReadOnlyList<TransactionDTO> transactions, TransactionSummaryDTO summary)
         {
-            Transaction = transaction;
+            Transactions = transactions;
             Summary = summary;
         }
     }

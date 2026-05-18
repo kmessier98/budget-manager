@@ -1,9 +1,12 @@
 ﻿using AutoMapper;
+using BudgetManager.Application.DTOs.Category;
 using BudgetManager.Application.DTOs.Transaction;
 using BudgetManager.Application.Interfaces;
 using BudgetManager.Application.Interfaces.Transaction;
+using BudgetManager.Application.Queries;
 using BudgetManager.Domain.Entities;
 using BudgetManager.Domain.Exceptions;
+using System.Reflection.Metadata.Ecma335;
 
 namespace BudgetManager.Application.Services
 {
@@ -18,6 +21,35 @@ namespace BudgetManager.Application.Services
             _mapper = mapper;
             _transactionRepository = transactionRepository;
             _categoryRepository = categoryRepository;
+        }
+
+
+        public async Task<TransactionResponseDTO> GetAll(GetTransactionsQuery query)
+        {
+            var entities = await _transactionRepository.GetAllAsync(query);
+            var transactionDTOs = _mapper.Map<IReadOnlyList<TransactionDTO>>(entities);
+
+            var totalAmount = transactionDTOs.Sum(t => t.Amount);
+            var categoryDTO = query.CategoryId.HasValue ? transactionDTOs.FirstOrDefault(t => t.Category.Id == query.CategoryId)?.Category : null;
+            var amountByCategory = transactionDTOs
+                .GroupBy(t => t.Category.Id)
+                .Select(g => new CategoryAmountDTO
+                {
+                    Id = g.Key,
+                    Name = g.First().Category.Name,
+                    Amount = g.Sum(t => t.Amount)
+                })
+                .ToList();
+
+            return new TransactionResponseDTO(transactionDTOs, new TransactionSummaryDTO
+            {
+                TotalAmount = totalAmount,
+                Day = query.Day.HasValue ? query.Day.Value : null,
+                Month = query.Month.HasValue ? query.Month.Value : null,
+                Year = query.Year.HasValue ? query.Year.Value : null,
+                Category = categoryDTO,
+                AmountByCategory = amountByCategory
+            });
         }
 
         public async Task<TransactionDTO> GetById(Guid id)
@@ -62,6 +94,15 @@ namespace BudgetManager.Application.Services
             var updatedEntity = await _transactionRepository.UpdateAsync(entity);
 
             return _mapper.Map<TransactionDTO>(updatedEntity);
+        }
+
+        public async Task Delete(Guid id)
+        {
+            bool isDeleted = await _transactionRepository.DeleteAsync(id);
+            if (!isDeleted)
+            {
+                throw new NotFoundException("Transaction not found");
+            }
         }
     }
 }

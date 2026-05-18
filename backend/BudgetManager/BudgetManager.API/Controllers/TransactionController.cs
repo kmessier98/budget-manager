@@ -1,5 +1,6 @@
 ﻿using BudgetManager.Application.DTOs.Transaction;
 using BudgetManager.Application.Interfaces.Transaction;
+using BudgetManager.Application.Queries;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BudgetManager.API.Controllers
@@ -13,6 +14,14 @@ namespace BudgetManager.API.Controllers
         public TransactionController(ITransactionService transactionService)
         {
             _transactionService = transactionService;
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> GetAll([FromQuery] GetTransactionsQuery query)
+        {
+            var result = await _transactionService.GetAll(query);
+
+            return Ok(result);
         }
 
         [HttpGet("{id}")]
@@ -37,6 +46,14 @@ namespace BudgetManager.API.Controllers
             var result = await _transactionService.Update(dto);
 
             return Ok(result);
+        }
+
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> Delete(Guid id)
+        {
+            await _transactionService.Delete(id);
+
+            return NoContent();
         }
     }
 }

@@ -20,7 +20,7 @@ namespace BudgetManager.Infrastructure.Repositories
             throw new NotImplementedException();
         }
 
-        public Task DeleteAsync(Guid id)
+        public Task<bool> DeleteAsync(Guid id)
         {
             throw new NotImplementedException();
         }
@@ -30,7 +30,7 @@ namespace BudgetManager.Infrastructure.Repositories
             return await _dbContext.Categories.FindAsync(id);
         }
 
-        public Task<IEnumerable<Category>> GetAllAsync()
+        public Task<IReadOnlyList<Category>> GetAllAsync()
         {
             throw new NotImplementedException();
         }

@@ -1,12 +1,15 @@
-﻿namespace BudgetManager.Application.DTOs.Transaction
+﻿using BudgetManager.Application.DTOs.Category;
+
+namespace BudgetManager.Application.DTOs.Transaction
 {
     public class TransactionSummaryDTO
     {
         public decimal TotalAmount { get; set; }
-        public decimal TodayTotal { get; set; }
-        public decimal MonthTotal { get; set; }
-        public decimal YearTotal { get; set; }
+        public int? Day { get; set; }
+        public int? Month { get; set; }
+        public int? Year { get; set; }
+        public CategoryDTO? Category { get; set; }
 
-        public Dictionary<string, decimal> AmountByCategory { get; set; } = new Dictionary<string, decimal>();
+        public List<CategoryAmountDTO> AmountByCategory { get; set; } = new List<CategoryAmountDTO>();
     }
 }

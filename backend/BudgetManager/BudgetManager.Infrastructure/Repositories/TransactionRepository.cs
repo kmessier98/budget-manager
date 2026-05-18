@@ -1,4 +1,5 @@
 ﻿using BudgetManager.Application.Interfaces.Transaction;
+using BudgetManager.Application.Queries;
 using BudgetManager.Domain.Entities;
 using BudgetManager.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
@@ -22,9 +23,13 @@ namespace BudgetManager.Infrastructure.Repositories
             return entity;
         }
 
-        public Task DeleteAsync(Guid id)
+        public async Task<bool> DeleteAsync(Guid id)
         {
-            throw new NotImplementedException();
+            int rowsDeleted = await _dbContext.Transactions
+                .Where(t => t.Id == id)
+                .ExecuteDeleteAsync();
+
+            return rowsDeleted > 0;
         }
 
         public async Task<Transaction?> FindByIdAsync(Guid id)
@@ -35,9 +40,43 @@ namespace BudgetManager.Infrastructure.Repositories
                 .FirstOrDefaultAsync(t => t.Id == id);
         }
 
-        public Task<IEnumerable<Transaction>> GetAllAsync()
+        public async Task<IReadOnlyList<Transaction>> GetAllAsync()
         {
-            throw new NotImplementedException();
+            return await _dbContext.Transactions
+                .AsNoTracking()
+                .Include(c => c.Category)
+                .ToListAsync(); 
+        }
+
+        public async Task<IReadOnlyList<Transaction>> GetAllAsync(GetTransactionsQuery query)
+        {
+            var transactions = await _dbContext.Transactions
+                .AsNoTracking()
+                .Include(c => c.Category)
+                .ToListAsync();
+
+            if (query.CategoryId.HasValue)
+            {
+                transactions = transactions.Where(t => t.CategoryId == query.CategoryId.Value).ToList();
+            }
+
+            if (query.Day.HasValue)
+            {
+                transactions = transactions.Where(t => t.Date.Day == query.Day.Value).ToList();
+            }
+
+            if (query.Month.HasValue)
+            {
+                transactions = transactions.Where(t => t.Date.Month == query.Month.Value).ToList();
+            }
+
+            if (query.Year.HasValue)
+            {
+                transactions = transactions.Where(t => t.Date.Year == query.Year.Value).ToList();
+            }
+
+
+            return transactions;
         }
 
         public Task<Transaction?> GetByAsync(Expression<Func<Transaction, bool>> predicate)
