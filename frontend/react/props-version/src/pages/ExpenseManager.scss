@@ -1,0 +1,20 @@
+@import "../index.scss";
+
+.expense-manager {
+  background-color: $background-color-1;
+  flex: 1; // Le parent (main-content) doit être un flex container pour que cela fonctionne
+  display: flex;
+
+  .expense-manager-content {
+    background-color: $background-color-2;
+    margin: 20px;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    flex: 1;
+
+    h1 {
+      @include text-style(1.5rem, $color-1, 600);
+    }
+  }
+}

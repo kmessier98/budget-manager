@@ -1,0 +1,51 @@
+$font-family-primary: "Poppins", sans-serif;
+$body-bg: #ffffff;
+$body-color: #333333;
+$background-color-1: #a2b2f5;
+$background-color-2: #cdd7ff;
+$background-color-3: #334155;
+$color-1: #092b50;
+
+@mixin text-style($size, $color, $weight: 400) {
+  font-size: $size;
+  color: $color;
+  font-weight: $weight;
+}
+
+@import "bootstrap/scss/bootstrap";
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  font-size: 16px;
+  user-select: none;
+}
+
+body {
+  font-family: $font-family-primary;
+  background-color: $body-bg;
+  color: $body-color;
+  line-height: 1.6;
+}
+
+img,
+picture,
+video,
+canvas,
+svg {
+  display: block;
+  max-width: 100%;
+}
+
+input,
+button,
+textarea,
+select {
+  font: inherit;
+}

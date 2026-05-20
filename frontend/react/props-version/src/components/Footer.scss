@@ -1,0 +1,17 @@
+@import "../index.scss";
+
+.footer {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
+  background-color: $background-color-3;
+  color: #f1f1f1;
+  position: sticky;
+  bottom: 0;
+  z-index: 1000;
+
+  p {
+    margin: 0;
+  }
+}
