@@ -1,0 +1,15 @@
+nav {
+  /* background-color: var(--color-bg-color-3); */
+
+  a:not(.navbar-brand) {
+    &:hover {
+      background-color: rgba(241, 241, 241, 0.1);
+      border-radius: 4px;
+    }
+  }
+  img {
+    height: 40px;
+    width: auto;
+    object-fit: contain;
+  }
+}

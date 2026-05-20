@@ -1,0 +1,55 @@
+@import "tailwindcss";
+
+@theme {
+  --font-primary: "Poppins", sans-serif;
+  --color-body-bg: #ffffff;
+  --color-body-color: #333333;
+  --color-bg-color-1: #a2b2f5;
+  --color-bg-color-2: #cdd7ff;
+  --color-bg-color-3: #334155;
+  --color-color-1: #092b50;
+}
+
+/*
+@mixin --text-style($size, $color, $weight: 400) {
+  font-size: $size;
+  color: $color;
+  font-weight: $weight;
+}
+  */
+@layer base {
+  *,
+  *::before,
+  *::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+  }
+
+  html {
+    font-size: 16px;
+  }
+
+  body {
+    font-family: var(--font-primary);
+    background-color: var(--color-body-bg);
+    color: var(--color-body-color);
+    line-height: 1.6;
+  }
+
+  img,
+  picture,
+  video,
+  canvas,
+  svg {
+    display: block;
+    max-width: 100%;
+  }
+
+  input,
+  button,
+  textarea,
+  select {
+    font: inherit;
+  }
+}

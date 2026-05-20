@@ -1,0 +1,10 @@
+.app {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+
+  .main-content {
+    flex: 1; /* Le parent (app) doit être un flex container pour que cela fonctionne */
+    display: flex;
+  }
+}
