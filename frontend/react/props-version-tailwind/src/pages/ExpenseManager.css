@@ -6,10 +6,15 @@
   .expense-manager-content {
     background-color: var(--color-bg-color-2);
     margin: 20px;
-    padding: 20px;
     border-radius: 8px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     flex: 1;
+
+    img {
+      height: 60px;
+      width: 60px;
+      mix-blend-mode: multiply;
+    }
 
     h1 {
       color: var(--color-color-1);
