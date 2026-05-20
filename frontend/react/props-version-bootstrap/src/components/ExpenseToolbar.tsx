@@ -1,93 +1,150 @@
 import { useState } from "react";
 import "./ExpenseToolbar.scss";
 
+const currentYear = new Date().getFullYear();
+const startYear = 1900;
+const years = [
+  { value: currentYear.toString(), label: currentYear.toString() },
+];
+const months = [
+  { value: "", label: "Aucun" },
+  { value: 1, label: "Janvier" },
+  { value: 2, label: "Février" },
+  { value: 3, label: "Mars" },
+  { value: 4, label: "Avril" },
+  { value: 5, label: "Mai" },
+  { value: 6, label: "Juin" },
+  { value: 7, label: "Juillet" },
+  { value: 8, label: "Août" },
+  { value: 9, label: "Septembre" },
+  { value: 10, label: "Octobre" },
+  { value: 11, label: "Novembre" },
+  { value: 12, label: "Décembre" },
+];
+
+for (let year = currentYear - 1; year >= startYear; year--) {
+  years.push({
+    value: year.toString(),
+    label: year.toString(),
+  });
+}
+
+const categories = [
+  { value: "", label: "Aucune" },
+  { value: "Food", label: "Food" },
+  { value: "Transport", label: "Transport" },
+  { value: "Entertainment", label: "Entertainment" },
+];
+
 const ExpenseToolbar = () => {
   const [selectedMonth, setSelectedMonth] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("");
-  const [selectedYear, setSelectedYear] = useState("");
+  const [selectedYear, setSelectedYear] = useState(currentYear.toString());
   const [selectedDay, setSelectedDay] = useState("");
+  const [days, setDaysInMonth] = useState([{ value: "", label: "Aucun" }]);
+
+  //TODO parent aura un callback: onDatecChange(year, month, day) et onCategoryChange(category)
+
+  const handleYearChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    setSelectedYear(e.target.value);
+    setSelectedDay("");
+
+    if (selectedMonth !== "") {
+      resetDaysInMonth(parseInt(selectedMonth), parseInt(e.target.value));
+    }
+
+    //todo call parent with empty day
+  };
+
+  const handleMonthChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    setSelectedMonth(e.target.value);
+    setSelectedDay("");
+
+    if (e.target.value == "") {
+      setDaysInMonth([{ value: "", label: "Aucun" }]);
+    } else {
+      resetDaysInMonth(parseInt(e.target.value), parseInt(selectedYear));
+    }
+
+    //todo call parent with empty day
+  };
+
+  const handleDayChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    setSelectedDay(e.target.value);
+    //todo call parent
+  };
+
+  const handleCategoryChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    setSelectedCategory(e.target.value);
+    //todo call parent
+  };
+
+  const resetDaysInMonth = (month: number, year: number) => {
+    const numberOfDays = new Date(year, month, 0).getDate();
+
+    const newDays = [{ value: "", label: "Aucun" }];
+    for (let day = 1; day <= numberOfDays; day++) {
+      newDays.push({ value: day.toString(), label: day.toString() });
+    }
+    setDaysInMonth(newDays);
+  };
 
   return (
-    <div className="expense-toolbar">
-      <div className="form-group">
-        <label htmlFor="month">Mois</label>
-        <select
-          id="month"
-          value={selectedMonth}
-          onChange={(e) => setSelectedMonth(e.target.value)}
-          className="border rounded px-2 py-1"
-        >
-          <option value="">Sélectionner un mois</option>
-          <option value="January">January</option>
-        </select>
-      </div>
-      <div className="form-group">
-        <label htmlFor="category">Catégorie</label>
-        <select
-          id="category"
-          value={selectedCategory}
-          onChange={(e) => setSelectedCategory(e.target.value)}
-        >
-          <option value="">Sélectionner une catégorie</option>
-          <option value="Food">Food</option>
-          <option value="Transport">Transport</option>
-          <option value="Entertainment">Entertainment</option>
-        </select>
-      </div>
-      <div className="form-group">
-        <label htmlFor="year">Année</label>
-        <select
-          id="year"
-          value={selectedYear}
-          onChange={(e) => setSelectedYear(e.target.value)}
-        >
-          <option value="">Sélectionner une année</option>
-          <option value="2024">2024</option>
-        </select>
-      </div>
-      <div className="form-group">
-        <label htmlFor="day">Jour</label>
-        <select
-          id="day"
-          value={selectedDay}
-          onChange={(e) => setSelectedDay(e.target.value)}
-        >
-          <option value="">Sélectionner une journée</option>
-          <option value="1">1</option>
-          <option value="2">2</option>
-          <option value="3">3</option>
-          <option value="4">4</option>
-          <option value="5">5</option>
-          <option value="6">6</option>
-          <option value="7">7</option>
-          <option value="8">8</option>
-          <option value="9">9</option>
-          <option value="10">10</option>
-          <option value="11">11</option>
-          <option value="12">12</option>
-          <option value="13">13</option>
-          <option value="14">14</option>
-          <option value="15">15</option>
-          <option value="16">16</option>
-          <option value="17">17</option>
-          <option value="18">18</option>
-          <option value="19">19</option>
-          <option value="20">20</option>
-          <option value="21">21</option>
-          <option value="22">22</option>
-          <option value="23">23</option>
-          <option value="24">24</option>
-          <option value="25">25</option>
-          <option value="26">26</option>
-          <option value="27">27</option>
-          <option value="28">28</option>
-          <option value="29">29</option>
-          <option value="30">30</option>
-          <option value="31">31</option>
-        </select>
-      </div>
-      <div className="form-group">
-        <button>Ajouter une dépense</button>
+    <div className="expense-toolbar-container">
+      <div className="expense-toolbar">
+        <div className="form-group">
+          <label htmlFor="year">Année</label>
+          <select id="year" value={selectedYear} onChange={handleYearChange}>
+            {years.map((year) => (
+              <option key={year.value} value={year.value}>
+                {year.label}
+              </option>
+            ))}
+          </select>
+        </div>
+        <div className="form-group">
+          <label htmlFor="month">Mois</label>
+          <select
+            id="month"
+            value={selectedMonth}
+            onChange={handleMonthChange}
+            className="border rounded px-2 py-1"
+          >
+            {months.map((month) => (
+              <option key={month.value} value={month.value}>
+                {month.label}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        <div className="form-group">
+          <label htmlFor="day">Jour</label>
+          <select id="day" value={selectedDay} onChange={handleDayChange}>
+            {days.map((day) => (
+              <option key={day.value} value={day.value}>
+                {day.label}
+              </option>
+            ))}
+          </select>
+        </div>
+        <div className="form-group">
+          <label htmlFor="category">Catégorie</label>
+          <select
+            id="category"
+            value={selectedCategory}
+            onChange={handleCategoryChange}
+          >
+            {categories.map((category) => (
+              <option key={category.value} value={category.value}>
+                {category.label}
+              </option>
+            ))}
+          </select>
+        </div>
+        <div className="form-group">
+          <button>Ajouter une dépense</button>
+        </div>
       </div>
     </div>
   );
