@@ -24,6 +24,17 @@ builder.Services.AddControllers(options =>
     options.Filters.Add<ValidationFilter>(); // Ajout notre filtre automatiquement
 });
 
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("frontend", policy =>
+    {
+        policy
+            .WithOrigins("http://localhost:5173")
+            .AllowAnyHeader()
+            .AllowAnyMethod();
+    });
+});
+
 //  Enregistrement de TOUS les validateurs du projet Application (via le package moderne)
 builder.Services.AddValidatorsFromAssemblyContaining<CreateTransactionDTOValidator>();
 
@@ -54,6 +65,8 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+
+app.UseCors("frontend");
 
 app.UseAuthorization();
 

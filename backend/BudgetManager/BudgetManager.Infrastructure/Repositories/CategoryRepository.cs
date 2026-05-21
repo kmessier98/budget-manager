@@ -33,7 +33,10 @@ namespace BudgetManager.Infrastructure.Repositories
 
         public async Task<IReadOnlyList<Category>> GetAllAsync()
         {
-            return await _dbContext.Categories.AsNoTracking().ToListAsync();
+            return await _dbContext.Categories
+                .OrderBy(c => c.Name == "Autres" ? 1 : 0) // Place "Autres" at the end of the list
+                .AsNoTracking()
+                .ToListAsync();
         }
 
         public Task<Category?> GetByAsync(Expression<Func<Category, bool>> predicate)

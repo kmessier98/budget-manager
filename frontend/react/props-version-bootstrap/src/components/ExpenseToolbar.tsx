@@ -1,6 +1,6 @@
 import { useState } from "react";
 import "./ExpenseToolbar.scss";
-import type { Filters } from "../types/expenses";
+import type { Filters } from "../models/expenses";
 
 const startYear = 1900;
 const currentYear = new Date().getFullYear();
@@ -30,23 +30,17 @@ for (let year = currentYear - 1; year >= startYear; year--) {
   });
 }
 
-//tpdp va provenir du parent (fetch des categories)
-const categories = [
-  { value: "", label: "Toutes les catégories" },
-  { value: "Food", label: "Food" },
-  { value: "Transport", label: "Transport" },
-  { value: "Entertainment", label: "Entertainment" },
-];
-
 type ExpenseToolbarProps = {
   filters: Filters;
   daysInMonth: { value: string; label: string }[];
+  categories: { value: string; label: string }[];
   onFiltersChange: (newFilters: Filters) => void;
 };
 
 const ExpenseToolbar = ({
   filters,
   daysInMonth,
+  categories,
   onFiltersChange,
 }: ExpenseToolbarProps) => {
   const handleYearChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
