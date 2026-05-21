@@ -2,7 +2,7 @@
 using BudgetManager.Application.Common;
 using BudgetManager.Application.DTOs.Category;
 using BudgetManager.Application.DTOs.Transaction;
-using BudgetManager.Application.Interfaces;
+using BudgetManager.Application.Interfaces.Category;
 using BudgetManager.Application.Interfaces.Transaction;
 using BudgetManager.Application.Queries;
 using BudgetManager.Domain.Entities;

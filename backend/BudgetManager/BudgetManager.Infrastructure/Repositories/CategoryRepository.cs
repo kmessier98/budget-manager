@@ -1,6 +1,7 @@
-﻿using BudgetManager.Application.Interfaces;
+﻿using BudgetManager.Application.Interfaces.Category;
 using BudgetManager.Domain.Entities;
 using BudgetManager.Infrastructure.Data;
+using Microsoft.EntityFrameworkCore;
 using System.Diagnostics;
 using System.Linq.Expressions;
 
@@ -30,9 +31,9 @@ namespace BudgetManager.Infrastructure.Repositories
             return await _dbContext.Categories.FindAsync(id);
         }
 
-        public Task<IReadOnlyList<Category>> GetAllAsync()
+        public async Task<IReadOnlyList<Category>> GetAllAsync()
         {
-            throw new NotImplementedException();
+            return await _dbContext.Categories.AsNoTracking().ToListAsync();
         }
 
         public Task<Category?> GetByAsync(Expression<Func<Category, bool>> predicate)

@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using BudgetManager.Application.DTOs.Category;
 using BudgetManager.Application.DTOs.Transaction;
 using BudgetManager.Domain.Entities;
 

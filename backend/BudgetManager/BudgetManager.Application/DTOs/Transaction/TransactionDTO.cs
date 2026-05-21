@@ -1,4 +1,6 @@
-﻿namespace BudgetManager.Application.DTOs.Transaction
+﻿using BudgetManager.Application.DTOs.Category;
+
+namespace BudgetManager.Application.DTOs.Transaction
 {
     public class TransactionDTO
     {

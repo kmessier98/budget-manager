@@ -1,7 +1,7 @@
 using BudgetManager.API.Filters;
 using BudgetManager.API.Filters.BudgetManager.API.Filters;
 using BudgetManager.API.Middlewares;
-using BudgetManager.Application.Interfaces;
+using BudgetManager.Application.Interfaces.Category;
 using BudgetManager.Application.Interfaces.Transaction;
 using BudgetManager.Application.Mappings;
 using BudgetManager.Application.Services;
@@ -35,6 +35,7 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 builder.Services.AddScoped<ITransaction, TransactionRepository>();
 builder.Services.AddScoped<ICategory, CategoryRepository>();
 builder.Services.AddScoped<ITransactionService, TransactionService>();
+builder.Services.AddScoped<ICategoryService, CategoryService>();
 
 
 // On cible l'assembly du validateur pour être sûr de scanner le projet Application
