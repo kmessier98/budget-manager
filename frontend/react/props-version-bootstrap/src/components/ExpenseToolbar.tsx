@@ -1,8 +1,9 @@
 import { useState } from "react";
 import "./ExpenseToolbar.scss";
+import type { Filters } from "../types/expenses";
 
-const currentYear = new Date().getFullYear();
 const startYear = 1900;
+const currentYear = new Date().getFullYear();
 const years = [
   { value: currentYear.toString(), label: currentYear.toString() },
 ];
@@ -29,64 +30,53 @@ for (let year = currentYear - 1; year >= startYear; year--) {
   });
 }
 
+//tpdp va provenir du parent (fetch des categories)
 const categories = [
-  { value: "", label: "Aucune" },
+  { value: "", label: "Toutes les catégories" },
   { value: "Food", label: "Food" },
   { value: "Transport", label: "Transport" },
   { value: "Entertainment", label: "Entertainment" },
 ];
 
-const ExpenseToolbar = () => {
-  const [selectedMonth, setSelectedMonth] = useState("");
-  const [selectedCategory, setSelectedCategory] = useState("");
-  const [selectedYear, setSelectedYear] = useState(currentYear.toString());
-  const [selectedDay, setSelectedDay] = useState("");
-  const [days, setDaysInMonth] = useState([{ value: "", label: "Aucun" }]);
+type ExpenseToolbarProps = {
+  filters: Filters;
+  daysInMonth: { value: string; label: string }[];
+  onFiltersChange: (newFilters: Filters) => void;
+};
 
-  //TODO parent aura un callback: onDatecChange(year, month, day) et onCategoryChange(category)
-
+const ExpenseToolbar = ({
+  filters,
+  daysInMonth,
+  onFiltersChange,
+}: ExpenseToolbarProps) => {
   const handleYearChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    setSelectedYear(e.target.value);
-    setSelectedDay("");
-
-    if (selectedMonth !== "") {
-      resetDaysInMonth(parseInt(selectedMonth), parseInt(e.target.value));
-    }
-
-    //todo call parent with empty day
+    onFiltersChange({
+      ...filters,
+      year: e.target.value,
+      day: "",
+    });
   };
 
   const handleMonthChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    setSelectedMonth(e.target.value);
-    setSelectedDay("");
-
-    if (e.target.value == "") {
-      setDaysInMonth([{ value: "", label: "Aucun" }]);
-    } else {
-      resetDaysInMonth(parseInt(e.target.value), parseInt(selectedYear));
-    }
-
-    //todo call parent with empty day
+    onFiltersChange({
+      ...filters,
+      month: e.target.value,
+      day: "",
+    });
   };
 
   const handleDayChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    setSelectedDay(e.target.value);
-    //todo call parent
+    onFiltersChange({
+      ...filters,
+      day: e.target.value,
+    });
   };
 
   const handleCategoryChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    setSelectedCategory(e.target.value);
-    //todo call parent
-  };
-
-  const resetDaysInMonth = (month: number, year: number) => {
-    const numberOfDays = new Date(year, month, 0).getDate();
-
-    const newDays = [{ value: "", label: "Aucun" }];
-    for (let day = 1; day <= numberOfDays; day++) {
-      newDays.push({ value: day.toString(), label: day.toString() });
-    }
-    setDaysInMonth(newDays);
+    onFiltersChange({
+      ...filters,
+      categoryId: e.target.value,
+    });
   };
 
   return (
@@ -94,7 +84,7 @@ const ExpenseToolbar = () => {
       <div className="expense-toolbar">
         <div className="form-group">
           <label htmlFor="year">Année</label>
-          <select id="year" value={selectedYear} onChange={handleYearChange}>
+          <select id="year" value={filters.year} onChange={handleYearChange}>
             {years.map((year) => (
               <option key={year.value} value={year.value}>
                 {year.label}
@@ -106,7 +96,7 @@ const ExpenseToolbar = () => {
           <label htmlFor="month">Mois</label>
           <select
             id="month"
-            value={selectedMonth}
+            value={filters.month}
             onChange={handleMonthChange}
             className="border rounded px-2 py-1"
           >
@@ -120,8 +110,8 @@ const ExpenseToolbar = () => {
 
         <div className="form-group">
           <label htmlFor="day">Jour</label>
-          <select id="day" value={selectedDay} onChange={handleDayChange}>
-            {days.map((day) => (
+          <select id="day" value={filters.day} onChange={handleDayChange}>
+            {daysInMonth.map((day) => (
               <option key={day.value} value={day.value}>
                 {day.label}
               </option>
@@ -132,7 +122,7 @@ const ExpenseToolbar = () => {
           <label htmlFor="category">Catégorie</label>
           <select
             id="category"
-            value={selectedCategory}
+            value={filters.categoryId}
             onChange={handleCategoryChange}
           >
             {categories.map((category) => (
