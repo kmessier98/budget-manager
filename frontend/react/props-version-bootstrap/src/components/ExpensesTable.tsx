@@ -127,6 +127,11 @@ const ExpensesTable = ({
           </tr>
         ))}
       </tbody>
+      <tfoot>
+        <tr>
+          <td colSpan={5}>- Page 1 sur 1 -</td>
+        </tr>
+      </tfoot>
     </table>
   );
 };

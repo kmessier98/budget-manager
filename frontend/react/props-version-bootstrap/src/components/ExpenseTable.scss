@@ -29,6 +29,17 @@ table {
       color: $color-1;
     }
   }
+
+  tfoot {
+    background-color: #e1e6f7;
+    td {
+      padding: 12px 8px;
+      font-size: 1rem;
+      font-weight: 600;
+      color: $color-1;
+      text-align: center;
+    }
+  }
   .actions {
     display: flex;
     gap: 8px;
