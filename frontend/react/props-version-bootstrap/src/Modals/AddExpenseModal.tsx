@@ -86,7 +86,7 @@ const AddExpenseModal = ({
               <span
                 className={`error-message ${errors.amount ? "visible" : ""}`}
               >
-                {errors.amount?.message || <>&nbsp;</>}
+                {errors.amount?.message}
               </span>
             </div>
           </div>
@@ -108,7 +108,7 @@ const AddExpenseModal = ({
               <span
                 className={`error-message ${errors.categoryId ? "visible" : ""}`}
               >
-                {errors.categoryId?.message || <>&nbsp;</>}
+                {errors.categoryId?.message}
               </span>
             </div>
           </div>
@@ -123,7 +123,7 @@ const AddExpenseModal = ({
                 })}
               />
               <span className={`error-message ${errors.date ? "visible" : ""}`}>
-                {errors.date?.message || <>&nbsp;</>}
+                {errors.date?.message}
               </span>
             </div>
           </div>
@@ -145,7 +145,7 @@ const AddExpenseModal = ({
               <span
                 className={`error-message ${errors.description ? "visible" : ""}`}
               >
-                {errors.description?.message || <>&nbsp;</>}
+                {errors.description?.message}
               </span>
             </div>
           </div>
