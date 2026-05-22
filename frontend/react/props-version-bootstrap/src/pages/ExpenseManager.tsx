@@ -1,7 +1,7 @@
 import "./ExpenseManager.scss";
 import avatar from "../assets/user-avatar.png";
 import ExpenseToolbar from "../components/ExpenseToolbar";
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import type { Filters } from "../models/expense/expenses";
 import type { Category } from "../models/category/category";
 import { fetchCategories } from "../services/categoryService";
@@ -22,8 +22,10 @@ const ExpenseManager = () => {
   });
   const [categories, setCategories] = useState<Category[]>([]);
   const [expense, setExpense] = useState<ExpenseResponse | null>(null);
-  const [loading, setLoading] = useState(false);
+  const [loadingExpenses, setLoadingExpenses] = useState(false);
+  const [loadingCategories, setLoadingCategories] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [refreshKey, setRefreshKey] = useState(0);
 
   const daysInMonth = useMemo(() => {
     const month = parseInt(filters.month);
@@ -53,7 +55,7 @@ const ExpenseManager = () => {
   // Ca aurait pu se loader dans le composant ExpenseToolbar, mais on en aura besoin dans le composant table (pour modifier les dépenses)
   useEffect(() => {
     const loadCategories = async () => {
-      setLoading(true);
+      setLoadingCategories(true);
       setError(null);
       try {
         const data = await fetchCategories();
@@ -62,16 +64,23 @@ const ExpenseManager = () => {
       } catch (err) {
         setError((err as Error).message);
       } finally {
-        setLoading(false);
+        setLoadingCategories(false);
       }
     };
 
     loadCategories();
   }, []);
 
+  // Facon de forcer le reload des dépenses après l'ajout d'une dépense dans le composant ExpenseToolbar (callback)
+  // Car sinon ya un erreur eslint
+  // Ne pas essayé de comprendre, cest juste pour pouvoir reload la liste (useEffect est loader quand refreshKey change)
+  const loadExpenses = useCallback(() => {
+    setRefreshKey((k) => k + 1);
+  }, []);
+
   useEffect(() => {
-    const loadExpenses = async () => {
-      setLoading(true);
+    const fetch = async () => {
+      setLoadingExpenses(true);
       setError(null);
       try {
         const data = await fetchExpenses(filters);
@@ -80,14 +89,13 @@ const ExpenseManager = () => {
       } catch (err) {
         setError((err as Error).message);
       } finally {
-        setLoading(false);
+        setLoadingExpenses(false);
       }
     };
+    fetch();
+  }, [filters, refreshKey]);
 
-    loadExpenses();
-  }, [filters]);
-
-  if (loading) {
+  if (loadingExpenses || loadingCategories) {
     return <div className="expense-manager">Loading...</div>;
   }
 
@@ -109,6 +117,7 @@ const ExpenseManager = () => {
             daysInMonth={daysInMonth}
             categories={categoriesOptions}
             onFiltersChange={(newFilters: Filters) => setFilters(newFilters)}
+            onAddExpenseSuccess={loadExpenses}
           />
           <hr />
           <div className="middle">

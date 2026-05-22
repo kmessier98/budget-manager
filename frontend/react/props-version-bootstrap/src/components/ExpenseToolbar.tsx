@@ -37,6 +37,7 @@ type ExpenseToolbarProps = {
   daysInMonth: { value: string; label: string }[];
   categories: { value: string; label: string }[];
   onFiltersChange: (newFilters: Filters) => void;
+  onAddExpenseSuccess: () => void;
 };
 
 const ExpenseToolbar = ({
@@ -44,6 +45,7 @@ const ExpenseToolbar = ({
   daysInMonth,
   categories,
   onFiltersChange,
+  onAddExpenseSuccess,
 }: ExpenseToolbarProps) => {
   const [open, setOpen] = useState(false);
 
@@ -80,6 +82,7 @@ const ExpenseToolbar = ({
   const handleSaveSuccess = () => {
     setOpen(false);
     toast.success("Dépense ajoutée avec succès !");
+    onAddExpenseSuccess();
   };
 
   return (
