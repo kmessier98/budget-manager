@@ -123,7 +123,7 @@ const ExpenseManager = () => {
           <div className="middle">
             <div className="left">
               {expense && <TotalAmount summaryExpense={expense.summary} />}
-              <ExpensesTable />
+              {expense && <ExpensesTable expenseResponse={expense} />}
             </div>
             <div className="right"></div>
           </div>

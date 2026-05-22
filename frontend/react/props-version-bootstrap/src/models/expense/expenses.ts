@@ -13,7 +13,7 @@ export type ExpenseFormValues = {
 };
 
 export interface ExpenseResponse {
-  expenses: Expense[];
+  transactions: Expense[];
   pagination: PaginationMetadata;
   summary: ExpenseSummary;
 }

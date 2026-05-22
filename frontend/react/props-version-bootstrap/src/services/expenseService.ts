@@ -1,8 +1,11 @@
-import { type ExpenseFormValues } from "../models/expense/expenses";
+import {
+  type ExpenseFormValues,
+  type ExpenseResponse,
+} from "../models/expense/expenses";
 
 export const fetchExpenses = async (
   queryParams: Record<string, string | number>,
-) => {
+): Promise<ExpenseResponse> => {
   const queryString = new URLSearchParams(
     queryParams as Record<string, string>,
   ).toString();

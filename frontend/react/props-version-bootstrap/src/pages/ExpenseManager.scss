@@ -37,7 +37,10 @@
         padding: 10px 0;
 
         .left {
+          display: flex;
+          flex-direction: column;
           width: 70%;
+          gap: 10px;
         }
 
         .right {
