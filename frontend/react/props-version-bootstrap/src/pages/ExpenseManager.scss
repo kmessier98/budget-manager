@@ -31,6 +31,18 @@
 
     .content {
       padding: 0 30px;
+
+      .middle {
+        display: flex;
+        padding: 10px 0;
+
+        .left {
+          width: 70%;
+        }
+
+        .right {
+        }
+      }
     }
   }
 }

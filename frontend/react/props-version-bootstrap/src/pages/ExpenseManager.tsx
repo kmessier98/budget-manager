@@ -5,6 +5,10 @@ import { useEffect, useMemo, useState } from "react";
 import type { Filters } from "../models/expense/expenses";
 import type { Category } from "../models/category/category";
 import { fetchCategories } from "../services/categoryService";
+import { fetchExpenses } from "../services/expenseService";
+import TotalAmount from "../components/TotalAmount";
+import ExpensesTable from "../components/ExpensesTable";
+import { type ExpenseResponse } from "../models/expense/expenses";
 
 const ExpenseManager = () => {
   const [filters, setFilters] = useState<Filters>(() => {
@@ -17,6 +21,7 @@ const ExpenseManager = () => {
     };
   });
   const [categories, setCategories] = useState<Category[]>([]);
+  const [expense, setExpense] = useState<ExpenseResponse | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -64,7 +69,23 @@ const ExpenseManager = () => {
     loadCategories();
   }, []);
 
-  useEffect(() => {}, [filters]);
+  useEffect(() => {
+    const loadExpenses = async () => {
+      setLoading(true);
+      setError(null);
+      try {
+        const data = await fetchExpenses(filters);
+        setExpense(data);
+        console.log("Fetched expenses:", data);
+      } catch (err) {
+        setError((err as Error).message);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadExpenses();
+  }, [filters]);
 
   if (loading) {
     return <div className="expense-manager">Loading...</div>;
@@ -90,6 +111,13 @@ const ExpenseManager = () => {
             onFiltersChange={(newFilters: Filters) => setFilters(newFilters)}
           />
           <hr />
+          <div className="middle">
+            <div className="left">
+              {expense && <TotalAmount summaryExpense={expense.summary} />}
+              <ExpensesTable />
+            </div>
+            <div className="right"></div>
+          </div>
         </div>
       </div>
     </div>
