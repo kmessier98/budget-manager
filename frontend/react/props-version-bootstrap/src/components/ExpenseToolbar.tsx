@@ -2,6 +2,7 @@ import "./ExpenseToolbar.scss";
 import type { Filters } from "../models/expense/expenses";
 import { useState } from "react";
 import AddExpenseModal from "../Modals/AddExpenseModal";
+import { toast } from "react-hot-toast";
 
 const startYear = 1900;
 const currentYear = new Date().getFullYear();
@@ -78,7 +79,7 @@ const ExpenseToolbar = ({
 
   const handleSaveSuccess = () => {
     setOpen(false);
-    // show success message
+    toast.success("Dépense ajoutée avec succès !");
   };
 
   return (

@@ -2,8 +2,6 @@ import "./AddExpenseModal.scss";
 import { useForm } from "react-hook-form";
 import { addExpense } from "../services/expenseService";
 import type { ExpenseFormValues } from "../models/expense/expenses";
-
-import React, { useState } from "react";
 import Modal from "./Modal";
 
 type AddExpenseModalProps = {
@@ -37,6 +35,7 @@ const AddExpenseModal = ({
       await addExpense(data);
       reset();
       onSaveSuccess();
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (error) {
       setError("root.serverError", {
         type: "server",
