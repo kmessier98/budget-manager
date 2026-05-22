@@ -17,16 +17,25 @@ const AddExpenseModal = ({
 }: AddExpenseModalProps) => {
   const {
     register,
+    setValue,
     handleSubmit,
     reset,
     setError,
     formState: { isSubmitting, errors },
   } = useForm<ExpenseFormValues>({
     defaultValues: {
-      amount: 0,
+      amount: (0).toFixed(2),
       date: new Date().toISOString().split("T")[0],
     },
   });
+
+  const handleAmountBlur = (e: React.FocusEvent<HTMLInputElement>) => {
+    const value = parseFloat(e.target.value);
+
+    if (!isNaN(value)) {
+      setValue("amount", value.toFixed(2));
+    }
+  };
 
   const handleFormSubmit = async (data: ExpenseFormValues) => {
     console.log("Saving expense:", data);
@@ -62,6 +71,7 @@ const AddExpenseModal = ({
               <input
                 type="number"
                 id="amount"
+                step="0.01"
                 min="0"
                 {...register("amount", {
                   valueAsNumber: true,
@@ -70,6 +80,7 @@ const AddExpenseModal = ({
                     value: 0.01,
                     message: "Le montant doit être supérieur à zéro",
                   },
+                  onBlur: handleAmountBlur,
                 })}
               />
               <span

@@ -6,7 +6,7 @@ export type Filters = {
 };
 
 export type ExpenseFormValues = {
-  amount: number;
+  amount: string;
   categoryId: string;
   date: string;
   description: string;
