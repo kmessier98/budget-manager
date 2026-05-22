@@ -1,6 +1,7 @@
-import { useState } from "react";
 import "./ExpenseToolbar.scss";
-import type { Filters } from "../models/expenses";
+import type { Filters } from "../models/expense/expenses";
+import { useState } from "react";
+import AddExpenseModal from "../Modals/AddExpenseModal";
 
 const startYear = 1900;
 const currentYear = new Date().getFullYear();
@@ -43,6 +44,8 @@ const ExpenseToolbar = ({
   categories,
   onFiltersChange,
 }: ExpenseToolbarProps) => {
+  const [open, setOpen] = useState(false);
+
   const handleYearChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     onFiltersChange({
       ...filters,
@@ -71,6 +74,11 @@ const ExpenseToolbar = ({
       ...filters,
       categoryId: e.target.value,
     });
+  };
+
+  const handleSaveSuccess = () => {
+    setOpen(false);
+    // show success message
   };
 
   return (
@@ -127,9 +135,18 @@ const ExpenseToolbar = ({
           </select>
         </div>
         <div className="form-group">
-          <button>Ajouter une dépense</button>
+          <button onClick={() => setOpen(true)}>Ajouter une dépense</button>
         </div>
       </div>
+      {open && (
+        <AddExpenseModal
+          categories={categories}
+          onClose={() => setOpen(false)}
+          onSaveSuccess={() => {
+            handleSaveSuccess();
+          }}
+        />
+      )}
     </div>
   );
 };

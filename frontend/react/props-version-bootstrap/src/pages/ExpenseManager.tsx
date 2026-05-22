@@ -2,7 +2,7 @@ import "./ExpenseManager.scss";
 import avatar from "../assets/user-avatar.png";
 import ExpenseToolbar from "../components/ExpenseToolbar";
 import { useEffect, useMemo, useState } from "react";
-import type { Filters } from "../models/expenses";
+import type { Filters } from "../models/expense/expenses";
 import type { Category } from "../models/category/category";
 import { fetchCategories } from "../services/categoryService";
 
@@ -45,6 +45,7 @@ const ExpenseManager = () => {
     return options;
   }, [categories]);
 
+  // Ca aurait pu se loader dans le composant ExpenseToolbar, mais on en aura besoin dans le composant table (pour modifier les dépenses)
   useEffect(() => {
     const loadCategories = async () => {
       setLoading(true);
@@ -54,7 +55,7 @@ const ExpenseManager = () => {
         setCategories(data);
         console.log("Fetched categories:", data);
       } catch (err) {
-        setError("Failed to load categories");
+        setError((err as Error).message);
       } finally {
         setLoading(false);
       }
