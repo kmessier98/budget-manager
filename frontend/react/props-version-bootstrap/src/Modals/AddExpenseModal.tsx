@@ -6,15 +6,24 @@ import Modal from "./Modal";
 
 type AddExpenseModalProps = {
   categories: { value: string; label: string }[];
+  categoryId: string;
+  date: string;
   onClose: () => void;
   onSaveSuccess: () => void;
 };
 
 const AddExpenseModal = ({
   categories,
+  categoryId,
+  date,
   onClose,
   onSaveSuccess,
 }: AddExpenseModalProps) => {
+  const defaultCategoryId =
+    categories.find((cat) => cat.value === categoryId)?.value !== ""
+      ? categories.find((cat) => cat.value === categoryId)?.value
+      : categories.find((cat) => cat.value !== "")?.value;
+
   const {
     register,
     setValue,
@@ -25,7 +34,8 @@ const AddExpenseModal = ({
   } = useForm<ExpenseFormValues>({
     defaultValues: {
       amount: (0).toFixed(2),
-      date: new Date().toISOString().split("T")[0],
+      date: date,
+      categoryId: defaultCategoryId,
     },
   });
 

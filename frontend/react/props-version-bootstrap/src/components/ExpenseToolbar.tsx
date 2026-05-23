@@ -85,6 +85,12 @@ const ExpenseToolbar = ({
     onAddExpenseSuccess();
   };
 
+  const createDateString = () => {
+    const day = filters.day ? String(filters.day).padStart(2, "0") : "01";
+    const month = filters.month ? String(filters.month).padStart(2, "0") : "01";
+    return `${filters.year}-${month}-${day}`;
+  };
+
   return (
     <div className="expense-toolbar-container">
       <div className="expense-toolbar">
@@ -145,6 +151,8 @@ const ExpenseToolbar = ({
       {open && (
         <AddExpenseModal
           categories={categories}
+          categoryId={filters.categoryId}
+          date={createDateString()}
           onClose={() => setOpen(false)}
           onSaveSuccess={() => {
             handleSaveSuccess();
