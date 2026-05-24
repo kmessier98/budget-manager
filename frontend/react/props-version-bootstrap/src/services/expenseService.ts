@@ -46,3 +46,19 @@ export const deleteExpense = async (id: string) => {
     throw new Error("Failed to delete expense");
   }
 };
+
+export const updateExpense = async (formData: ExpenseFormValues) => { 
+  const response = await fetch(`https://localhost:7208/api/transaction`, {
+    method: "PUT",
+    body: JSON.stringify(formData),
+    headers: {
+      "Content-Type": "application/json",
+    },
+  });
+
+  if (!response.ok) {
+    throw new Error("Failed to update expense");
+  }
+
+  return response.json();
+};

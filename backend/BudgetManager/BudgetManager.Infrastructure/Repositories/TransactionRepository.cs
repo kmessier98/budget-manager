@@ -54,11 +54,11 @@ namespace BudgetManager.Infrastructure.Repositories
             var transactions = await _dbContext.Transactions
                 .AsNoTracking()
                 .Include(c => c.Category)
+                .OrderByDescending(t => t.Date)
                 .ToListAsync();
 
-            int totalItems = transactions.Count;
-
             transactions = ApplyFilters(transactions, query);
+            int totalItems = transactions.Count;
 
             transactions = transactions
                 .Skip((query.PageNumber - 1) * query.PageSize)

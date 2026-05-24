@@ -1,3 +1,5 @@
+import { type PaginationMetadata } from "../pagination";
+
 export type Filters = {
   year: string;
   month: string;
@@ -6,6 +8,7 @@ export type Filters = {
 };
 
 export type ExpenseFormValues = {
+  id?: string;
   amount: string;
   categoryId: string;
   date: string;
@@ -14,7 +17,7 @@ export type ExpenseFormValues = {
 
 export interface ExpenseResponse {
   transactions: Expense[];
-  pagination: PaginationMetadata;
+  metadata: PaginationMetadata;
   summary: ExpenseSummary;
 }
 
@@ -29,14 +32,6 @@ interface Expense {
   };
 }
 
-interface PaginationMetadata {
-  pageNumber: number;
-  pageSize: number;
-  totalItems: number;
-  totalPages: number;
-  hasPreviousPage: boolean;
-  hasNextPage: boolean;
-}
 
 export interface ExpenseSummary {
   totalAmount: number;

@@ -29,6 +29,10 @@ const ExpenseManager = () => {
   const [loadingCategories, setLoadingCategories] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [refreshKey, setRefreshKey] = useState(0);
+  const [pagination, setPagination] = useState({
+    pageNumber: 1,
+    pageSize: 10,
+  });
 
   const daysInMonth = useMemo(() => {
     const month = parseInt(filters.month);
@@ -72,6 +76,11 @@ const ExpenseManager = () => {
     );
   };
 
+  const handleUpdateSuccess = () => {
+    toast.success("Dépense modifiée avec succès !");
+    loadExpenses();
+  };
+
   // Ca aurait pu se loader dans le composant ExpenseToolbar, mais on en aura besoin dans le composant table (pour modifier les dépenses)
   useEffect(() => {
     const loadCategories = async () => {
@@ -104,7 +113,12 @@ const ExpenseManager = () => {
       setLoadingExpenses(true);
       setError(null);
       try {
-        const data = await fetchExpenses(filters);
+        const queryFilters = {
+          ...filters,
+          pageNumber: pagination.pageNumber,
+          pageSize: pagination.pageSize,
+        };
+        const data = await fetchExpenses(queryFilters);
         setExpense(data);
         console.log("Fetched expenses:", data);
       } catch (err) {
@@ -114,7 +128,7 @@ const ExpenseManager = () => {
       }
     };
     fetch();
-  }, [filters, refreshKey]);
+  }, [filters, refreshKey, pagination]);
 
   if ((loadingExpenses || loadingCategories) && !expense) {
     return (
@@ -157,6 +171,20 @@ const ExpenseManager = () => {
                 <ExpensesTable
                   expenseResponse={expense}
                   onDelete={handleDelete}
+                  categories={categories}
+                  onUpdateSuccess={() => {
+                    handleUpdateSuccess();
+                  }}
+                  onPaginationChange={(newPagination) => {
+                    setPagination({
+                      pageNumber: newPagination.pageIndex + 1,
+                      pageSize: newPagination.pageSize,
+                    });
+                  }}
+                  pagination={{
+                    pageIndex: pagination.pageNumber - 1,
+                    pageSize: pagination.pageSize,
+                  }}
                 />
               )}
             </div>

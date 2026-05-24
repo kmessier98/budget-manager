@@ -6,9 +6,11 @@ import {
   useReactTable,
 } from "@tanstack/react-table";
 import type { ExpenseResponse } from "../models/expense/expenses";
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPencil, faTrash } from "@fortawesome/free-solid-svg-icons";
+import ModifyExpenseModal from "../Modals/ModifyExpenseModal";
+import type { Category } from "../models/category/category";
 
 type Expense = {
   id: string;
@@ -26,15 +28,38 @@ const columnHelper = createColumnHelper<Expense>();
 const ExpensesTable = ({
   expenseResponse,
   onDelete,
+  categories,
+  onUpdateSuccess,
+  pagination,
+  onPaginationChange,
 }: {
   expenseResponse: ExpenseResponse;
   onDelete: (id: string) => void;
+  categories: Category[];
+  onUpdateSuccess: () => void;
+  pagination: {
+    pageIndex: number;
+    pageSize: number;
+  };
+  onPaginationChange: (newPagination: {
+    pageIndex: number;
+    pageSize: number;
+  }) => void;
 }) => {
+  const [editingExpense, setEditingExpense] = useState<Expense | null>(null);
+
   const columns = useMemo(
     () => [
       columnHelper.accessor("date", {
         header: "Date",
-        cell: (info) => info.getValue(),
+        cell: (info) => {
+          const date = new Date(info.getValue());
+          return new Intl.DateTimeFormat("fr-CA", {
+            day: "2-digit",
+            month: "long",
+            year: "numeric",
+          }).format(date);
+        },
       }),
       columnHelper.accessor("categorie", {
         header: "Catégorie",
@@ -46,7 +71,13 @@ const ExpensesTable = ({
       }),
       columnHelper.accessor("amount", {
         header: "Montant",
-        cell: (info) => `${info.getValue()}`,
+        cell: (info) => {
+          const amount = parseFloat(info.getValue());
+          return new Intl.NumberFormat("fr-CA", {
+            style: "currency",
+            currency: "CAD",
+          }).format(amount);
+        },
       }),
       columnHelper.display({
         id: "actions",
@@ -72,31 +103,15 @@ const ExpensesTable = ({
     [],
   );
 
-  const formatedAmount = (amount: number) => {
-    const formatted = new Intl.NumberFormat("fr-CA", {
-      style: "currency",
-      currency: "CAD",
-    }).format(amount);
-    return formatted;
-  };
-
   const data = useMemo(() => {
-    console.log("Received ExpenseResponse in ExpensesTable:", expenseResponse);
-
     console.log("ExpenseResponse in ExpensesTable:", expenseResponse);
     return expenseResponse.transactions.map((expense) => {
-      const date = new Date(expense.date);
-      const formatedDate = new Intl.DateTimeFormat("fr-CA", {
-        day: "2-digit",
-        month: "long",
-        year: "numeric",
-      }).format(date);
       return {
         id: expense.id,
-        date: formatedDate,
+        date: expense.date,
         categorie: expense.category,
         description: expense.description,
-        amount: formatedAmount(expense.amount),
+        amount: expense.amount.toFixed(2),
       };
     });
   }, [expenseResponse]);
@@ -105,45 +120,110 @@ const ExpensesTable = ({
     data,
     columns,
     getCoreRowModel: getCoreRowModel(),
+    manualPagination: true,
+    rowCount: expenseResponse.metadata.totalItems,
+    onPaginationChange: (updater) => {
+      const newPagination =
+        typeof updater === "function"
+          ? updater(table.getState().pagination)
+          : updater;
+      onPaginationChange(newPagination);
+    },
+    state: {
+      pagination,
+    },
   });
 
   const handleEdit = (row: Expense) => {
-    console.log("Edit row:", row);
+    setEditingExpense(row);
+    console.log("Editing expense:", row);
   };
 
   return (
-    <table>
-      <thead>
-        {table.getHeaderGroups().map((hg) => (
-          <tr key={hg.id}>
-            {hg.headers.map((header) => (
-              <th key={header.id}>
-                {flexRender(
-                  header.column.columnDef.header,
-                  header.getContext(),
-                )}
-              </th>
-            ))}
-          </tr>
-        ))}
-      </thead>
-      <tbody>
-        {table.getRowModel().rows.map((row) => (
-          <tr key={row.id}>
-            {row.getVisibleCells().map((cell) => (
-              <td key={cell.id}>
-                {flexRender(cell.column.columnDef.cell, cell.getContext())}
-              </td>
-            ))}
-          </tr>
-        ))}
-      </tbody>
-      <tfoot>
-        <tr>
-          <td colSpan={5}>- Page 1 sur 1 -</td>
-        </tr>
-      </tfoot>
-    </table>
+    <>
+      <table>
+        <thead>
+          {table.getHeaderGroups().map((hg) => (
+            <tr key={hg.id}>
+              {hg.headers.map((header) => (
+                <th key={header.id}>
+                  {flexRender(
+                    header.column.columnDef.header,
+                    header.getContext(),
+                  )}
+                </th>
+              ))}
+            </tr>
+          ))}
+        </thead>
+        <tbody>
+          {table.getRowModel().rows.map((row) => (
+            <tr key={row.id}>
+              {row.getVisibleCells().map((cell) => (
+                <td key={cell.id}>
+                  {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                </td>
+              ))}
+            </tr>
+          ))}
+        </tbody>
+      </table>
+      <div className="pagination-table">
+        <button
+          onClick={() => table.firstPage()}
+          disabled={!table.getCanPreviousPage()}
+        >
+          {"<<"}
+        </button>
+        <button
+          onClick={() => table.previousPage()}
+          disabled={!table.getCanPreviousPage()}
+        >
+          {"<"}
+        </button>
+        Page {table.getState().pagination.pageIndex + 1} sur{" "}
+        {table.getPageCount()}
+        <button
+          onClick={() => table.nextPage()}
+          disabled={!table.getCanNextPage()}
+        >
+          {">"}
+        </button>
+        <button
+          onClick={() => table.lastPage()}
+          disabled={!table.getCanNextPage()}
+        >
+          {">>"}
+        </button>
+        <select
+          value={table.getState().pagination.pageSize}
+          onChange={(e) => {
+            table.setPageSize(Number(e.target.value));
+          }}
+        >
+          {[10, 20, 30, 40, 50].map((pageSize) => (
+            <option key={pageSize} value={pageSize}>
+              {pageSize}
+            </option>
+          ))}
+        </select>
+      </div>
+      {editingExpense && (
+        <ModifyExpenseModal
+          id={editingExpense.id}
+          categories={categories}
+          categoryId={editingExpense.categorie.id}
+          date={editingExpense.date}
+          description={editingExpense.description}
+          amount={editingExpense.amount}
+          onClose={() => setEditingExpense(null)}
+          onUpdateSuccess={() => {
+            setEditingExpense(null);
+            onUpdateSuccess();
+          }}
+        />
+      )}
+    </>
   );
 };
 
