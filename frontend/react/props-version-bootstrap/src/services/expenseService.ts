@@ -36,3 +36,13 @@ export const addExpense = async (formData: ExpenseFormValues) => {
 
   return response.json();
 };
+
+export const deleteExpense = async (id: string) => {
+  const response = await fetch(`https://localhost:7208/api/transaction/${id}`, {
+    method: "DELETE",
+  });
+
+  if (!response.ok) {
+    throw new Error("Failed to delete expense");
+  }
+};

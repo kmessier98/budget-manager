@@ -11,8 +11,12 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPencil, faTrash } from "@fortawesome/free-solid-svg-icons";
 
 type Expense = {
+  id: string;
   date: string;
-  categorie: string;
+  categorie: {
+    id: string;
+    name: string;
+  };
   description: string;
   amount: string;
 };
@@ -21,8 +25,10 @@ const columnHelper = createColumnHelper<Expense>();
 
 const ExpensesTable = ({
   expenseResponse,
+  onDelete,
 }: {
   expenseResponse: ExpenseResponse;
+  onDelete: (id: string) => void;
 }) => {
   const columns = useMemo(
     () => [
@@ -32,7 +38,7 @@ const ExpensesTable = ({
       }),
       columnHelper.accessor("categorie", {
         header: "Catégorie",
-        cell: (info) => info.getValue(),
+        cell: (info) => info.getValue().name,
       }),
       columnHelper.accessor("description", {
         header: "Description",
@@ -40,7 +46,7 @@ const ExpensesTable = ({
       }),
       columnHelper.accessor("amount", {
         header: "Montant",
-        cell: (info) => `${info.getValue()} $`,
+        cell: (info) => `${info.getValue()}`,
       }),
       columnHelper.display({
         id: "actions",
@@ -54,7 +60,7 @@ const ExpensesTable = ({
               </button>
               <button
                 className="delete-button"
-                onClick={() => handleDelete(row)}
+                onClick={() => onDelete(row.id)}
               >
                 <FontAwesomeIcon icon={faTrash} />
               </button>
@@ -65,6 +71,14 @@ const ExpensesTable = ({
     ],
     [],
   );
+
+  const formatedAmount = (amount: number) => {
+    const formatted = new Intl.NumberFormat("fr-CA", {
+      style: "currency",
+      currency: "CAD",
+    }).format(amount);
+    return formatted;
+  };
 
   const data = useMemo(() => {
     console.log("Received ExpenseResponse in ExpensesTable:", expenseResponse);
@@ -78,10 +92,11 @@ const ExpensesTable = ({
         year: "numeric",
       }).format(date);
       return {
+        id: expense.id,
         date: formatedDate,
-        categorie: expense.category.name,
+        categorie: expense.category,
         description: expense.description,
-        amount: expense.amount.toFixed(2),
+        amount: formatedAmount(expense.amount),
       };
     });
   }, [expenseResponse]);
@@ -94,10 +109,6 @@ const ExpensesTable = ({
 
   const handleEdit = (row: Expense) => {
     console.log("Edit row:", row);
-  };
-
-  const handleDelete = (row: Expense) => {
-    console.log("Delete row:", row);
   };
 
   return (

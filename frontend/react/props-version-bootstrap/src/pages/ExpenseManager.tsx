@@ -9,6 +9,9 @@ import { fetchExpenses } from "../services/expenseService";
 import TotalAmount from "../components/TotalAmount";
 import ExpensesTable from "../components/ExpensesTable";
 import { type ExpenseResponse } from "../models/expense/expenses";
+import { ClipLoader } from "react-spinners";
+import { toast } from "react-hot-toast";
+import { deleteExpense } from "../services/expenseService";
 
 const ExpenseManager = () => {
   const [filters, setFilters] = useState<Filters>(() => {
@@ -52,12 +55,30 @@ const ExpenseManager = () => {
     return options;
   }, [categories]);
 
+  const handleDelete = async (id: string) => {
+    await toast.promise(
+      (async () => {
+        await new Promise((resolve) => setTimeout(resolve, 1000));
+        await deleteExpense(id);
+
+        loadExpenses();
+      })(),
+      {
+        loading: "Suppression de la dépense en cours...",
+        success: "Dépense supprimée avec succès",
+        error: (err) =>
+          `Échec de la suppression : ${err instanceof Error ? err.message : ""}`,
+      },
+    );
+  };
+
   // Ca aurait pu se loader dans le composant ExpenseToolbar, mais on en aura besoin dans le composant table (pour modifier les dépenses)
   useEffect(() => {
     const loadCategories = async () => {
       setLoadingCategories(true);
       setError(null);
       try {
+        //simulate loading
         const data = await fetchCategories();
         setCategories(data);
         console.log("Fetched categories:", data);
@@ -95,8 +116,17 @@ const ExpenseManager = () => {
     fetch();
   }, [filters, refreshKey]);
 
-  if (loadingExpenses || loadingCategories) {
-    return <div className="expense-manager">Loading...</div>;
+  if ((loadingExpenses || loadingCategories) && !expense) {
+    return (
+      <div className="spinner">
+        <ClipLoader
+          color="#36d7b7"
+          loading={loadingExpenses || loadingCategories}
+          size={150}
+          aria-label="Chargement en cours"
+        />
+      </div>
+    );
   }
 
   if (error) {
@@ -123,7 +153,12 @@ const ExpenseManager = () => {
           <div className="middle">
             <div className="left">
               {expense && <TotalAmount summaryExpense={expense.summary} />}
-              {expense && <ExpensesTable expenseResponse={expense} />}
+              {expense && (
+                <ExpensesTable
+                  expenseResponse={expense}
+                  onDelete={handleDelete}
+                />
+              )}
             </div>
             <div className="right"></div>
           </div>
