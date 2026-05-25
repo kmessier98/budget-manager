@@ -11,6 +11,8 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPencil, faTrash } from "@fortawesome/free-solid-svg-icons";
 import ModifyExpenseModal from "../Modals/ModifyExpenseModal";
 import type { Category } from "../models/category/category";
+import { toast } from "react-hot-toast";
+import { useDeleteExpenseMutation } from "../hooks/useExpense";
 
 type Expense = {
   id: string;
@@ -27,16 +29,12 @@ const columnHelper = createColumnHelper<Expense>();
 
 const ExpensesTable = ({
   expenseResponse,
-  onDelete,
   categories,
-  onUpdateSuccess,
   pagination,
   onPaginationChange,
 }: {
   expenseResponse: ExpenseResponse;
-  onDelete: (id: string) => void;
   categories: Category[];
-  onUpdateSuccess: () => void;
   pagination: {
     pageIndex: number;
     pageSize: number;
@@ -47,6 +45,21 @@ const ExpensesTable = ({
   }) => void;
 }) => {
   const [editingExpense, setEditingExpense] = useState<Expense | null>(null);
+  const deleteExpenseMutation = useDeleteExpenseMutation();
+
+  const handleDelete = async (id: string) => {
+    await toast.promise(
+      (async () => {
+        await deleteExpenseMutation.mutateAsync(id);
+      })(),
+      {
+        loading: "Suppression de la dépense en cours...",
+        success: "Dépense supprimée avec succès",
+        error: (err) =>
+          `Échec de la suppression : ${err instanceof Error ? err.message : ""}`,
+      },
+    );
+  };
 
   const columns = useMemo(
     () => [
@@ -91,7 +104,7 @@ const ExpensesTable = ({
               </button>
               <button
                 className="delete-button"
-                onClick={() => onDelete(row.id)}
+                onClick={() => handleDelete(row.id)}
               >
                 <FontAwesomeIcon icon={faTrash} />
               </button>
@@ -136,7 +149,11 @@ const ExpensesTable = ({
 
   const handleEdit = (row: Expense) => {
     setEditingExpense(row);
-    console.log("Editing expense:", row);
+  };
+
+  const handleUpdateSuccess = () => {
+    toast.success("Dépense modifiée avec succès !");
+    setEditingExpense(null);
   };
 
   return (
@@ -218,8 +235,7 @@ const ExpensesTable = ({
           amount={editingExpense.amount}
           onClose={() => setEditingExpense(null)}
           onUpdateSuccess={() => {
-            setEditingExpense(null);
-            onUpdateSuccess();
+            handleUpdateSuccess();
           }}
         />
       )}

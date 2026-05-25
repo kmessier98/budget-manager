@@ -1,9 +1,9 @@
 import "./ModifyExpenseModal.scss";
 import { useForm } from "react-hook-form";
-import { expenseService } from "../services/expenseService";
 import type { ExpenseFormValues } from "../models/expense/expenses";
 import Modal from "./Modal";
 import type { Category } from "../models/category/category";
+import { useUpdateExpenseMutation } from "../hooks/useExpense";
 
 type ModifyExpenseModal = {
   id: string;
@@ -53,11 +53,13 @@ const ModifyExpenseModal = ({
     }
   };
 
+  const updateExpenseMutation = useUpdateExpenseMutation();
+
   const handleFormSubmit = async (data: ExpenseFormValues) => {
     console.log("Saving expense:", data);
 
     try {
-      await expenseService.updateExpense(data);
+      await updateExpenseMutation.mutateAsync(data);
       reset();
       onUpdateSuccess();
       // eslint-disable-next-line @typescript-eslint/no-unused-vars

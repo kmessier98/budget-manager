@@ -4,7 +4,7 @@ import {
 } from "../models/expense/expenses";
 
 export const expenseService = {
-  fetchExpense: async (queryParams: Record<string, string | number>): Promise<ExpenseResponse> => {
+  fetchExpenses: async (queryParams: Record<string, string | number>): Promise<ExpenseResponse> => {
     const queryString = new URLSearchParams(queryParams as Record<string, string>,).toString();
     const response = await fetch(
       `https://localhost:7208/api/transaction?${queryString}`,

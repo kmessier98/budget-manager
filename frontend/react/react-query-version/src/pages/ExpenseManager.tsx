@@ -1,17 +1,14 @@
 import "./ExpenseManager.scss";
 import avatar from "../assets/user-avatar.png";
 import ExpenseToolbar from "../components/ExpenseToolbar";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import type { Filters } from "../models/expense/expenses";
-import type { Category } from "../models/category/category";
-import { categoryService } from "../services/categoryService";
 import TotalAmount from "../components/TotalAmount";
 import ExpensesTable from "../components/ExpensesTable";
-import { type ExpenseResponse } from "../models/expense/expenses";
 import { ClipLoader } from "react-spinners";
-import { toast } from "react-hot-toast";
 import ExpenseChart from "../components/ExpenseChart";
-import { expenseService } from "../services/expenseService";
+import { useExpense } from "../hooks/useExpense";
+import { useCategories } from "../hooks/useCategory";
 
 const ExpenseManager = () => {
   const [filters, setFilters] = useState<Filters>(() => {
@@ -23,16 +20,18 @@ const ExpenseManager = () => {
       categoryId: "",
     };
   });
-  const [categories, setCategories] = useState<Category[]>([]);
-  const [expense, setExpense] = useState<ExpenseResponse | null>(null);
-  const [loadingExpenses, setLoadingExpenses] = useState(false);
-  const [loadingCategories, setLoadingCategories] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [refreshKey, setRefreshKey] = useState(0);
+
   const [pagination, setPagination] = useState({
     pageNumber: 1,
     pageSize: 10,
   });
+
+  const expenseQuery = useExpense({
+    ...filters,
+    pageNumber: pagination.pageNumber,
+    pageSize: pagination.pageSize,
+  });
+  const categoriesQuery = useCategories();
 
   const daysInMonth = useMemo(() => {
     const month = parseInt(filters.month);
@@ -52,90 +51,20 @@ const ExpenseManager = () => {
 
   const categoriesOptions = useMemo(() => {
     const options = [{ value: "", label: "Toutes les catégories" }];
-    categories.forEach((cat) => {
+    categoriesQuery.data?.forEach((cat) => {
       options.push({ value: cat.id, label: cat.name });
     });
 
     return options;
-  }, [categories]);
+  }, [categoriesQuery.data]);
 
-  const handleDelete = async (id: string) => {
-    await toast.promise(
-      (async () => {
-        await new Promise((resolve) => setTimeout(resolve, 1000));
-        await expenseService.deleteExpense(id);
-
-        loadExpenses();
-      })(),
-      {
-        loading: "Suppression de la dépense en cours...",
-        success: "Dépense supprimée avec succès",
-        error: (err) =>
-          `Échec de la suppression : ${err instanceof Error ? err.message : ""}`,
-      },
-    );
-  };
-
-  const handleUpdateSuccess = () => {
-    toast.success("Dépense modifiée avec succès !");
-    loadExpenses();
-  };
-
-  // Ca aurait pu se loader dans le composant ExpenseToolbar, mais on en aura besoin dans le composant table (pour modifier les dépenses)
-  useEffect(() => {
-    const loadCategories = async () => {
-      setLoadingCategories(true);
-      setError(null);
-      try {
-        //simulate loading
-        const data = await categoryService.fetchCategories();
-        setCategories(data);
-        console.log("Fetched categories:", data);
-      } catch (err) {
-        setError((err as Error).message);
-      } finally {
-        setLoadingCategories(false);
-      }
-    };
-
-    loadCategories();
-  }, []);
-
-  // Facon de forcer le reload des dépenses après l'ajout d'une dépense dans le composant ExpenseToolbar (callback)
-  // Car sinon ya un erreur eslint
-  // Ne pas essayé de comprendre, cest juste pour pouvoir reload la liste (useEffect est loader quand refreshKey change)
-  const loadExpenses = useCallback(() => {
-    setRefreshKey((k) => k + 1);
-  }, []);
-
-  useEffect(() => {
-    const fetch = async () => {
-      setLoadingExpenses(true);
-      setError(null);
-      try {
-        const queryFilters = {
-          ...filters,
-          pageNumber: pagination.pageNumber,
-          pageSize: pagination.pageSize,
-        };
-        const data = await expenseService.fetchExpense(queryFilters);
-        setExpense(data);
-        console.log("Fetched expenses:", data);
-      } catch (err) {
-        setError((err as Error).message);
-      } finally {
-        setLoadingExpenses(false);
-      }
-    };
-    fetch();
-  }, [filters, refreshKey, pagination]);
-
-  if ((loadingExpenses || loadingCategories) && !expense) {
+  const isLoading = expenseQuery.isLoading || categoriesQuery.isLoading;
+  if (isLoading && !expenseQuery.data && !categoriesQuery.data) {
     return (
       <div className="spinner">
         <ClipLoader
           color="#36d7b7"
-          loading={loadingExpenses || loadingCategories}
+          loading={isLoading}
           size={150}
           aria-label="Chargement en cours"
         />
@@ -143,8 +72,24 @@ const ExpenseManager = () => {
     );
   }
 
-  if (error) {
-    return <div className="expense-manager">Error: {error}</div>;
+  if (expenseQuery.isError) {
+    return (
+      <div className="expense-manager">
+        Error:{" "}
+        {expenseQuery.error instanceof Error ? expenseQuery.error.message : ""}
+      </div>
+    );
+  }
+
+  if (categoriesQuery.isError) {
+    return (
+      <div className="expense-manager">
+        Error:{" "}
+        {categoriesQuery.error instanceof Error
+          ? categoriesQuery.error.message
+          : ""}
+      </div>
+    );
   }
 
   return (
@@ -161,20 +106,17 @@ const ExpenseManager = () => {
             daysInMonth={daysInMonth}
             categories={categoriesOptions}
             onFiltersChange={(newFilters: Filters) => setFilters(newFilters)}
-            onAddExpenseSuccess={loadExpenses}
           />
           <hr />
           <div className="middle">
             <div className="left">
-              {expense && <TotalAmount summaryExpense={expense.summary} />}
-              {expense && (
+              {expenseQuery.data && (
+                <TotalAmount summaryExpense={expenseQuery.data.summary} />
+              )}
+              {expenseQuery.data && categoriesQuery.data && (
                 <ExpensesTable
-                  expenseResponse={expense}
-                  onDelete={handleDelete}
-                  categories={categories}
-                  onUpdateSuccess={() => {
-                    handleUpdateSuccess();
-                  }}
+                  expenseResponse={expenseQuery.data}
+                  categories={categoriesQuery.data}
                   onPaginationChange={(newPagination) => {
                     setPagination({
                       pageNumber: newPagination.pageIndex + 1,
@@ -189,8 +131,10 @@ const ExpenseManager = () => {
               )}
             </div>
             <div className="right">
-              {expense && (
-                <ExpenseChart data={expense.summary.amountByCategory} />
+              {expenseQuery.data && (
+                <ExpenseChart
+                  data={expenseQuery.data.summary.amountByCategory}
+                />
               )}
             </div>
           </div>

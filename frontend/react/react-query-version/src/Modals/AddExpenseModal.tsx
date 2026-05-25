@@ -1,8 +1,8 @@
 import "./AddExpenseModal.scss";
 import { useForm } from "react-hook-form";
-import { expenseService } from "../services/expenseService";
 import type { ExpenseFormValues } from "../models/expense/expenses";
 import Modal from "./Modal";
+import { useAddExpenseMutation } from "../hooks/useExpense";
 
 type AddExpenseModalProps = {
   categories: { value: string; label: string }[];
@@ -47,11 +47,13 @@ const AddExpenseModal = ({
     }
   };
 
+  const addExpenseMutation = useAddExpenseMutation();
+
   const handleFormSubmit = async (data: ExpenseFormValues) => {
     console.log("Saving expense:", data);
 
     try {
-      await expenseService.addExpense(data);
+      await addExpenseMutation.mutateAsync(data);
       reset();
       onSaveSuccess();
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
