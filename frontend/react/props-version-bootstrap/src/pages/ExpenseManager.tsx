@@ -4,14 +4,13 @@ import ExpenseToolbar from "../components/ExpenseToolbar";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import type { Filters } from "../models/expense/expenses";
 import type { Category } from "../models/category/category";
-import { fetchCategories } from "../services/categoryService";
-import { fetchExpenses } from "../services/expenseService";
+import { categoryService } from "../services/categoryService";
+import { expenseService } from "../services/expenseService";
 import TotalAmount from "../components/TotalAmount";
 import ExpensesTable from "../components/ExpensesTable";
 import { type ExpenseResponse } from "../models/expense/expenses";
 import { ClipLoader } from "react-spinners";
 import { toast } from "react-hot-toast";
-import { deleteExpense } from "../services/expenseService";
 import ExpenseChart from "../components/ExpenseChart";
 
 const ExpenseManager = () => {
@@ -64,7 +63,7 @@ const ExpenseManager = () => {
     await toast.promise(
       (async () => {
         await new Promise((resolve) => setTimeout(resolve, 1000));
-        await deleteExpense(id);
+        await expenseService.deleteExpense(id);
 
         loadExpenses();
       })(),
@@ -89,7 +88,7 @@ const ExpenseManager = () => {
       setError(null);
       try {
         //simulate loading
-        const data = await fetchCategories();
+        const data = await categoryService.fetchCategories();
         setCategories(data);
         console.log("Fetched categories:", data);
       } catch (err) {
@@ -119,7 +118,7 @@ const ExpenseManager = () => {
           pageNumber: pagination.pageNumber,
           pageSize: pagination.pageSize,
         };
-        const data = await fetchExpenses(queryFilters);
+        const data = await expenseService.fetchExpenses(queryFilters);
         setExpense(data);
         console.log("Fetched expenses:", data);
       } catch (err) {

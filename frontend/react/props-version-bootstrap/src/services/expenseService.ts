@@ -3,62 +3,56 @@ import {
   type ExpenseResponse,
 } from "../models/expense/expenses";
 
-export const fetchExpenses = async (
-  queryParams: Record<string, string | number>,
-): Promise<ExpenseResponse> => {
-  const queryString = new URLSearchParams(
-    queryParams as Record<string, string>,
-  ).toString();
+export const expenseService = {
+  fetchExpenses: async (queryParams: Record<string, string | number>): Promise<ExpenseResponse> => {
+    const queryString = new URLSearchParams(queryParams as Record<string, string>,).toString();
+    const response = await fetch(
+      `https://localhost:7208/api/transaction?${queryString}`,
+    );
+    if (!response.ok) {
+      throw new Error("Failed to fetch expenses");
+    }
+    return response.json();
+  },
+  addExpense: async (formData: ExpenseFormValues) => {
+    const response = await fetch("https://localhost:7208/api/transaction", {
+      method: "POST",
+      body: JSON.stringify(formData),
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
 
-  const response = await fetch(
-    `https://localhost:7208/api/transaction?${queryString}`,
-  );
+    if (!response.ok) {
+      throw new Error("Failed to add expense");
+    }
 
-  if (!response.ok) {
-    throw new Error("Failed to fetch expenses");
-  }
+    return response.json();
+  },
+  deleteExpense: async (id: string) => {
+    const response = await fetch(`https://localhost:7208/api/transaction/${id}`, {
+      method: "DELETE",
+    });
 
-  return response.json();
+    if (!response.ok) {
+      throw new Error("Failed to delete expense");
+    }
+  },
+  updateExpense: async (formData: ExpenseFormValues) => {
+    const response = await fetch(`https://localhost:7208/api/transaction`, {
+      method: "PUT",
+      body: JSON.stringify(formData),
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+
+    if (!response.ok) {
+      throw new Error("Failed to update expense");
+    }
+
+    return response.json();
+  },
 };
 
-export const addExpense = async (formData: ExpenseFormValues) => {
-  const response = await fetch("https://localhost:7208/api/transaction", {
-    method: "POST",
-    body: JSON.stringify(formData),
-    headers: {
-      "Content-Type": "application/json",
-    },
-  });
 
-  if (!response.ok) {
-    throw new Error("Failed to add expense");
-  }
-
-  return response.json();
-};
-
-export const deleteExpense = async (id: string) => {
-  const response = await fetch(`https://localhost:7208/api/transaction/${id}`, {
-    method: "DELETE",
-  });
-
-  if (!response.ok) {
-    throw new Error("Failed to delete expense");
-  }
-};
-
-export const updateExpense = async (formData: ExpenseFormValues) => { 
-  const response = await fetch(`https://localhost:7208/api/transaction`, {
-    method: "PUT",
-    body: JSON.stringify(formData),
-    headers: {
-      "Content-Type": "application/json",
-    },
-  });
-
-  if (!response.ok) {
-    throw new Error("Failed to update expense");
-  }
-
-  return response.json();
-};

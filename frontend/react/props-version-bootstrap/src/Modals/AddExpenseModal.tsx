@@ -1,6 +1,6 @@
 import "./AddExpenseModal.scss";
 import { useForm } from "react-hook-form";
-import { addExpense } from "../services/expenseService";
+import { expenseService } from "../services/expenseService";
 import type { ExpenseFormValues } from "../models/expense/expenses";
 import Modal from "./Modal";
 
@@ -51,7 +51,7 @@ const AddExpenseModal = ({
     console.log("Saving expense:", data);
 
     try {
-      await addExpense(data);
+      await expenseService.addExpense(data);
       reset();
       onSaveSuccess();
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
