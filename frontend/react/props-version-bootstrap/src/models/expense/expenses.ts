@@ -42,7 +42,7 @@ export interface ExpenseSummary {
   amountByCategory: CategoryAmount[];
 }
 
-interface CategoryAmount {
+export interface CategoryAmount {
   id: string;
   name: string;
   amount: number;

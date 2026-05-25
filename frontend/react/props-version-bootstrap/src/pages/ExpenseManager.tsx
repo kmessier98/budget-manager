@@ -12,6 +12,7 @@ import { type ExpenseResponse } from "../models/expense/expenses";
 import { ClipLoader } from "react-spinners";
 import { toast } from "react-hot-toast";
 import { deleteExpense } from "../services/expenseService";
+import ExpenseChart from "../components/ExpenseChart";
 
 const ExpenseManager = () => {
   const [filters, setFilters] = useState<Filters>(() => {
@@ -188,7 +189,11 @@ const ExpenseManager = () => {
                 />
               )}
             </div>
-            <div className="right"></div>
+            <div className="right">
+              {expense && (
+                <ExpenseChart data={expense.summary.amountByCategory} />
+              )}
+            </div>
           </div>
         </div>
       </div>
