@@ -7,7 +7,7 @@
         optionLabel="label"
         optionValue="value"
         class="select"
-        [(ngModel)]="filters.year"
+        [(ngModel)]="filters().year"
         (onChange)="handleYearChange()"
       />
     </div>
@@ -18,7 +18,7 @@
         optionLabel="label"
         optionValue="value"
         class="select"
-        [(ngModel)]="filters.month"
+        [(ngModel)]="filters().month"
         (onChange)="handleMonthChange()"
       />
     </div>
@@ -30,7 +30,7 @@
         optionLabel="label"
         optionValue="value"
         class="select"
-        [(ngModel)]="filters.day"
+        [(ngModel)]="filters().day"
         (onChange)="handleDayChange()"
       />
     </div>
@@ -47,7 +47,7 @@
 
     <div class="form-group">
       <label for="category">Catégorie</label>
-      <p-select [options]="categories" optionLabel="label" class="select" />
+      <p-select [options]="categories" optionLabel="label" class="select" [(ngModel)]="filters().categoryId" (onChange)="handleCategoryChange()" />
       <!--
           <select
             id="category"

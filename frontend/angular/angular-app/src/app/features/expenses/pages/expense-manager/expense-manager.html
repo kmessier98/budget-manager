@@ -7,9 +7,9 @@
     <hr />
     <div class="content">
       <app-expense-toolbar
-        [filters]="filters"
+        [filters]="filters()"
         (onFiltersChange)="onFiltersChange($event)"
-        [daysInMonth]="daysInMonth"
+        [daysInMonth]="daysInMonth()"
       ></app-expense-toolbar>
       <!-- 
           <ExpenseToolbar

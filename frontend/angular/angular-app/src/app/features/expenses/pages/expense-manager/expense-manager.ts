@@ -1,4 +1,4 @@
-import { Component, computed } from '@angular/core';
+import { Component, computed, signal, WritableSignal } from '@angular/core';
 import { ExpenseToolbar } from '../../components/expense-toolbar/expense-toolbar';
 import { ExpenseTotalAmount } from '../../components/expense-total-amount/expense-total-amount';
 import { ExpenseTable } from '../../components/expense-table/expense-table';
@@ -14,23 +14,16 @@ import { Filters } from '../../models/expense/expense';
 })
 export class ExpenseManager {
   avatar = '/assets/user-avatar.png';
-  filters: Filters = {
+  filters: WritableSignal<Filters> = signal({
     year: new Date().getFullYear().toString(),
     month: new Date().getMonth().toString(),
     day: new Date().getDay().toString(),
     categoryId: '',
-  };
+  });
 
-  onFiltersChange = (filters: Filters) => {
-    this.filters = filters;
-    console.log('parent!!!:', this.filters);
-  };
-
-  //todo a déplacé dans l'enfant... mais aavnt comprendre comment ma rappelé l'enfant apres un changement de filtre (peut etre que ca ne va pas retoruenr dans lenfant au final)
-  //filter devra etre un signal pour qu ewceci marche...
   daysInMonth = computed(() => {
-    const month = parseInt(this.filters.month);
-    const year = parseInt(this.filters.year);
+    const month = parseInt(this.filters().month);
+    const year = parseInt(this.filters().year);
 
     if (!month) return [{ value: '', label: 'Aucun' }];
 
@@ -40,7 +33,11 @@ export class ExpenseManager {
     for (let day = 1; day <= numberOfDays; day++) {
       newDays.push({ value: day.toString(), label: day.toString() });
     }
-    console.log('days in month:', newDays);
+
     return newDays;
   });
+
+  onFiltersChange = (filters: Filters) => {
+    this.filters.set(filters);
+  };
 }

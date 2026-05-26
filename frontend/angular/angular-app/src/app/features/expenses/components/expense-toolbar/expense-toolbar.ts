@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, Output, Signal, signal } from '@angular/core';
+import { Component, EventEmitter, Input, Output, input} from '@angular/core';
 import { SelectModule } from 'primeng/select';
 import { Filters } from '../../models/expense/expense';
 import { Button } from 'primeng/button';
@@ -11,13 +11,13 @@ import { FormsModule } from '@angular/forms';
   styleUrl: './expense-toolbar.scss',
 })
 export class ExpenseToolbar {
-  @Input() filters: Filters = {
+   filters = input({
     year: '',
     month: '',
     day: '',
     categoryId: '',
-  };
-  @Input() daysInMonth: Signal<{ value: string; label: string }[]> = signal([]);
+  })
+  daysInMonth = input<{ value: string; label: string }[]>([]);
   @Input() categories: { value: string; label: string }[] = [];
   @Output() onFiltersChange = new EventEmitter<Filters>();
   @Output() onAddExpenseSuccess = new EventEmitter<void>();
@@ -43,7 +43,6 @@ export class ExpenseToolbar {
 
   ngOnInit() {
     this.initYears();
-    console.log('filters in toolbar:', this.filters);
   }
 
   initYears() {
@@ -56,28 +55,28 @@ export class ExpenseToolbar {
   }
 
   handleYearChange = () => {
-    this.filters.day = '';
     this.onFiltersChange.emit({
-      ...this.filters,
+      ...this.filters(),
+      day: ''
     });
   };
 
   handleMonthChange = () => {
-    this.filters.day = '';
     this.onFiltersChange.emit({
-      ...this.filters,
+      ...this.filters(),
+      day: '',
     });
   };
 
   handleDayChange = () => {
     this.onFiltersChange.emit({
-      ...this.filters,
+      ...this.filters(),
     });
   };
 
   handleCategoryChange = () => {
     this.onFiltersChange.emit({
-      ...this.filters,
+      ...this.filters(),
     });
   };
 }
