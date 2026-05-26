@@ -1,0 +1,21 @@
+@import '../../../../../styles.scss';
+
+.expense-chart {
+  width: 100%;
+  padding: 10px 20px;
+
+  h2 {
+    @include text-style(1.5rem, $color-1, 700);
+    margin-bottom: 7px;
+  }
+
+  .chart-container {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+
+    .legend-item {
+      color: #555;
+    }
+  }
+}

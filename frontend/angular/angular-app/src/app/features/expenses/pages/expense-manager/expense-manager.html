@@ -6,6 +6,7 @@
     </div>
     <hr />
     <div class="content">
+      <app-expense-toolbar></app-expense-toolbar>
       <!-- 
           <ExpenseToolbar
             filters={filters}
@@ -18,6 +19,9 @@
       <hr />
       <div class="middle">
         <div class="left">
+          <app-expense-total-amount></app-expense-total-amount>
+          <app-expense-table></app-expense-table>
+          <!--
           <!--
               {expense && <TotalAmount summaryExpense={expense.summary} />}
               {expense && (
@@ -43,6 +47,7 @@
                 -->
         </div>
         <div class="right">
+          <app-expense-chart></app-expense-chart>
           <!--
               {expense && (
                 <ExpenseChart data={expense.summary.amountByCategory} />

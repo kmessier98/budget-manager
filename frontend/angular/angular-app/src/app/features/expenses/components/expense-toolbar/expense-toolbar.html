@@ -1,0 +1,79 @@
+<div class="expense-toolbar-container">
+  <div class="expense-toolbar">
+    <div class="form-group">
+      <label for="year">Année</label>
+      <!--
+          <select id="year" value={filters.year} onChange={handleYearChange}>
+            {years.map((year) => (
+              <option key={year.value} value={year.value}>
+                {year.label}
+              </option>
+            ))}
+          </select>
+          -->
+    </div>
+    <div class="form-group">
+      <label for="month">Mois</label>
+      <!--
+          <select
+            id="month"
+            value={filters.month}
+            onChange={handleMonthChange}
+            className="border rounded px-2 py-1"
+          >
+            {months.map((month) => (
+              <option key={month.value} value={month.value}>
+                {month.label}
+              </option>
+            ))}
+          </select>
+          -->
+    </div>
+
+    <div class="form-group">
+      <label for="day">Jour</label>
+      <!--
+          <select id="day" value={filters.day} onChange={handleDayChange}>
+            {daysInMonth.map((day) => (
+              <option key={day.value} value={day.value}>
+                {day.label}
+              </option>
+            ))}
+          </select>
+        </div>
+        <div className="form-group">
+          <label htmlFor="category">Catégorie</label>
+          <!--
+          <select
+            id="category"
+            value={filters.categoryId}
+            onChange={handleCategoryChange}
+          >
+            {categories.map((category) => (
+              <option key={category.value} value={category.value}>
+                {category.label}
+              </option>
+            ))}
+          </select>
+          -->
+    </div>
+    <div class="form-group">
+      <!--
+          <button onClick={() => setOpen(true)}>Ajouter une dépense</button>
+        -->
+    </div>
+  </div>
+  <!--
+      {open && (
+        <AddExpenseModal
+          categories={categories}
+          categoryId={filters.categoryId}
+          date={createDateString()}
+          onClose={() => setOpen(false)}
+          onSaveSuccess={() => {
+            handleSaveSuccess();
+          }}
+        />
+      )}
+        -->
+</div>

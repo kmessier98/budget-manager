@@ -1,0 +1,14 @@
+@import '../../../../../styles.scss';
+
+.total-expense-container {
+  background-color: white;
+  padding: 10px 20px;
+  border-radius: 4px;
+  box-shadow: 0 5px 4px rgba(0, 0, 0, 0.1);
+
+  h2 {
+    margin: 0;
+    padding: 0;
+    @include text-style(1.5rem, $color-1, 700);
+  }
+}
