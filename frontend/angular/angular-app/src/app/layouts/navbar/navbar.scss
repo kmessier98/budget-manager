@@ -1,0 +1,41 @@
+@import '../../../styles.scss';
+
+nav {
+  background-color: $background-color-3;
+
+  .navbar-toggler {
+    border: none;
+
+    &:focus,
+    &:active,
+    &:focus-visible {
+      outline: none !important;
+      box-shadow: none !important;
+    }
+
+    &:hover {
+      background-color: rgba(245, 245, 245, 0.1);
+      border-radius: 4px;
+    }
+  }
+
+  .navbar-toggler-icon {
+    // Rend l'icône complètement blanche
+    filter: invert(1) brightness(100%);
+  }
+
+  a:not(.navbar-brand) {
+    color: #f1f1f1 !important;
+    text-decoration: none;
+
+    &:hover {
+      background-color: rgba(241, 241, 241, 0.1);
+      border-radius: 4px;
+    }
+  }
+  img {
+    height: 40px;
+    width: auto;
+    object-fit: contain;
+  }
+}

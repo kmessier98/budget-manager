@@ -1,0 +1,55 @@
+<div class="expense-manager">
+  <div class="expense-manager-content">
+    <div class="top">
+      <img [src]="avatar" alt="User Avatar" />
+      <h1>Gestionnaire de dépenses</h1>
+    </div>
+    <hr />
+    <div class="content">
+      <!-- 
+          <ExpenseToolbar
+            filters={filters}
+            daysInMonth={daysInMonth}
+            categories={categoriesOptions}
+            onFiltersChange={(newFilters: Filters) => setFilters(newFilters)}
+            onAddExpenseSuccess={loadExpenses}
+          />
+        -->
+      <hr />
+      <div class="middle">
+        <div class="left">
+          <!--
+              {expense && <TotalAmount summaryExpense={expense.summary} />}
+              {expense && (
+                <ExpensesTable
+                  expenseResponse={expense}
+                  onDelete={handleDelete}
+                  categories={categories}
+                  onUpdateSuccess={() => {
+                    handleUpdateSuccess();
+                  }}
+                  onPaginationChange={(newPagination) => {
+                    setPagination({
+                      pageNumber: newPagination.pageIndex + 1,
+                      pageSize: newPagination.pageSize,
+                    });
+                  }}
+                  pagination={{
+                    pageIndex: pagination.pageNumber - 1,
+                    pageSize: pagination.pageSize,
+                  }}
+                />
+              )}
+                -->
+        </div>
+        <div class="right">
+          <!--
+              {expense && (
+                <ExpenseChart data={expense.summary.amountByCategory} />
+              )}
+              -->
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
