@@ -1,7 +1,7 @@
 import "./ExpenseManager.scss";
 import avatar from "../assets/user-avatar.png";
 import ExpenseToolbar from "../components/ExpenseToolbar";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import type { Filters } from "../models/expense/expenses";
 import type { Category } from "../models/category/category";
 import { categoryService } from "../services/categoryService";
@@ -9,7 +9,6 @@ import { categoryService } from "../services/categoryService";
 import TotalAmount from "../components/TotalAmount";
 import ExpensesTable from "../components/ExpensesTable";
 import { ClipLoader } from "react-spinners";
-import { toast } from "react-hot-toast";
 import ExpenseChart from "../components/ExpenseChart";
 import { useGetExpensesQuery } from "../api/expenseApiSlice";
 
