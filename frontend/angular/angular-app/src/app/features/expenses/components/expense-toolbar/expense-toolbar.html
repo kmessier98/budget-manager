@@ -2,37 +2,39 @@
   <div class="expense-toolbar">
     <div class="form-group">
       <label for="year">Année</label>
-      <!--
-          <select id="year" value={filters.year} onChange={handleYearChange}>
-            {years.map((year) => (
-              <option key={year.value} value={year.value}>
-                {year.label}
-              </option>
-            ))}
-          </select>
-          -->
+      <p-select
+        [options]="years"
+        optionLabel="label"
+        optionValue="value"
+        class="select"
+        [(ngModel)]="filters.year"
+        (onChange)="handleYearChange()"
+      />
     </div>
     <div class="form-group">
       <label for="month">Mois</label>
-      <!--
-          <select
-            id="month"
-            value={filters.month}
-            onChange={handleMonthChange}
-            className="border rounded px-2 py-1"
-          >
-            {months.map((month) => (
-              <option key={month.value} value={month.value}>
-                {month.label}
-              </option>
-            ))}
-          </select>
-          -->
+      <p-select
+        [options]="months"
+        optionLabel="label"
+        optionValue="value"
+        class="select"
+        [(ngModel)]="filters.month"
+        (onChange)="handleMonthChange()"
+      />
     </div>
 
     <div class="form-group">
       <label for="day">Jour</label>
-      <!--
+      <p-select
+        [options]="daysInMonth()"
+        optionLabel="label"
+        optionValue="value"
+        class="select"
+        [(ngModel)]="filters.day"
+        (onChange)="handleDayChange()"
+      />
+    </div>
+    <!--
           <select id="day" value={filters.day} onChange={handleDayChange}>
             {daysInMonth.map((day) => (
               <option key={day.value} value={day.value}>
@@ -41,9 +43,12 @@
             ))}
           </select>
         </div>
-        <div className="form-group">
-          <label htmlFor="category">Catégorie</label>
-          <!--
+    -->
+
+    <div class="form-group">
+      <label for="category">Catégorie</label>
+      <p-select [options]="categories" optionLabel="label" class="select" />
+      <!--
           <select
             id="category"
             value={filters.categoryId}

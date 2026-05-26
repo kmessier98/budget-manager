@@ -6,7 +6,11 @@
     </div>
     <hr />
     <div class="content">
-      <app-expense-toolbar></app-expense-toolbar>
+      <app-expense-toolbar
+        [filters]="filters"
+        (onFiltersChange)="onFiltersChange($event)"
+        [daysInMonth]="daysInMonth"
+      ></app-expense-toolbar>
       <!-- 
           <ExpenseToolbar
             filters={filters}
