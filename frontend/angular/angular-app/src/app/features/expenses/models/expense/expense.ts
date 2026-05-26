@@ -1,4 +1,4 @@
-import { type PaginationMetadata } from '../../../models/pagination';
+import { type PaginationMetadata } from '../../../../models/pagination';
 
 export type Filters = {
   year: string;
