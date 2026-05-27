@@ -3,10 +3,11 @@ import { SelectModule } from 'primeng/select';
 import { Filters } from '../../models/expense/expense';
 import { FormsModule } from '@angular/forms';
 import { CategoryService } from '../../../categories/services/category-service';
+import { AddExpenseModal } from '../add-expense-modal/add-expense-modal';
 
 @Component({
   selector: 'app-expense-toolbar',
-  imports: [SelectModule, FormsModule],
+  imports: [SelectModule, FormsModule, AddExpenseModal],
   templateUrl: './expense-toolbar.html',
   styleUrl: './expense-toolbar.scss',
 })
@@ -53,6 +54,14 @@ export class ExpenseToolbar {
       { value: '', label: 'Toutes les catégories' },
       ...categories.map((category) => ({ value: category.id, label: category.name })),
     ];
+  });
+  isModalOpen = false;
+  categoryId = computed(() => this.filters().categoryId);
+  date = computed(() => {
+    const year = this.filters().year;
+    const day = this.filters().day ? String(this.filters().day).padStart(2, '0') : '01';
+    const month = this.filters().month ? String(this.filters().month).padStart(2, '0') : '01';
+    return `${year}-${month}-${day}`;
   });
 
   ngOnInit() {

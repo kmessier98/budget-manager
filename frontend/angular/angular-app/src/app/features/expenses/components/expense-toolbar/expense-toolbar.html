@@ -34,16 +34,6 @@
         (onChange)="handleDayChange($event)"
       />
     </div>
-    <!--
-          <select id="day" value={filters.day} onChange={handleDayChange}>
-            {daysInMonth.map((day) => (
-              <option key={day.value} value={day.value}>
-                {day.label}
-              </option>
-            ))}
-          </select>
-        </div>
-    -->
 
     <div class="form-group">
       <label for="category">Catégorie</label>
@@ -55,37 +45,25 @@
         [ngModel]="filters().categoryId"
         (onChange)="handleCategoryChange($event)"
       />
-      <!--
-          <select
-            id="category"
-            value={filters.categoryId}
-            onChange={handleCategoryChange}
-          >
-            {categories.map((category) => (
-              <option key={category.value} value={category.value}>
-                {category.label}
-              </option>
-            ))}
-          </select>
-          -->
     </div>
     <div class="form-group">
-      <!--
-          <button onClick={() => setOpen(true)}>Ajouter une dépense</button>
-        -->
+      <button (click)="isModalOpen = true">Ajouter une dépense</button>
     </div>
   </div>
-  <!--
-      {open && (
-        <AddExpenseModal
-          categories={categories}
-          categoryId={filters.categoryId}
-          date={createDateString()}
-          onClose={() => setOpen(false)}
-          onSaveSuccess={() => {
-            handleSaveSuccess();
-          }}
-        />
-      )}
-        -->
+  @if (isModalOpen) {
+    <app-add-expense-modal
+      [categoryId]="categoryId()"
+      [date]="date()"
+      (onClose)="isModalOpen = false"
+    ></app-add-expense-modal>
+    <!--
+    <app-add-expense-modal
+      [categories]="categories()"
+      [categoryId]="filters().categoryId"
+      [date]="createDateString()"
+      (close)="isModalOpen = false"
+      (saveSuccess)="handleSaveSuccess()"
+    ></app-add-expense-modal>
+    -->
+  }
 </div>
