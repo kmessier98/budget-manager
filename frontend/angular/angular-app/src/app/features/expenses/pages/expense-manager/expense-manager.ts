@@ -1,10 +1,11 @@
-import { Component, computed, signal, WritableSignal } from '@angular/core';
+import { Component, computed, inject, signal, WritableSignal } from '@angular/core';
 import { ExpenseToolbar } from '../../components/expense-toolbar/expense-toolbar';
 import { ExpenseTotalAmount } from '../../components/expense-total-amount/expense-total-amount';
 import { ExpenseTable } from '../../components/expense-table/expense-table';
 import { ExpenseChart } from '../../components/expense-chart/expense-chart';
 import { ButtonModule } from 'primeng/button';
 import { Filters } from '../../models/expense/expense';
+import { CategoryService } from '../../../categories/services/category-service';
 
 @Component({
   selector: 'app-expense-manager',
@@ -13,6 +14,8 @@ import { Filters } from '../../models/expense/expense';
   styleUrl: './expense-manager.scss',
 })
 export class ExpenseManager {
+  private readonly _categoryService = inject(CategoryService);
+
   avatar = '/assets/user-avatar.png';
   filters: WritableSignal<Filters> = signal({
     year: new Date().getFullYear().toString(),
@@ -36,6 +39,10 @@ export class ExpenseManager {
 
     return newDays;
   });
+
+  ngOnInit() {
+    this._categoryService.fetchCategories();
+  }
 
   onFiltersChange = (filters: Filters) => {
     this.filters.set(filters);
