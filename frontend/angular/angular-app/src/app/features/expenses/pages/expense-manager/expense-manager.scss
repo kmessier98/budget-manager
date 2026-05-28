@@ -1,4 +1,4 @@
-@import '../../../../../styles.scss';
+@use '../../../../../styles/variables' as *;
 
 .expense-manager {
   background-color: $background-color-1;

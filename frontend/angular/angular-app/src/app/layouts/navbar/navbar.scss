@@ -1,4 +1,4 @@
-@import '../../../styles.scss';
+@use '../../../styles/variables' as *;
 
 nav {
   background-color: $background-color-3;
