@@ -1,6 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { inject, Injectable, signal } from '@angular/core';
-import { Category } from './models/category/category';
+import { Category } from '../models/category/category';
 import { finalize } from 'rxjs';
 
 @Injectable({
@@ -11,9 +11,11 @@ export class CategoryService {
 
   private _categories = signal<Category[]>([]);
   private _loading = signal<boolean>(false);
+  private _error = signal<string | null>(null);
 
   readonly categories = this._categories.asReadonly();
   readonly loading = this._loading.asReadonly();
+  readonly error = this._error.asReadonly();
 
   fetchCategories() {
     this._loading.set(true);
@@ -28,6 +30,7 @@ export class CategoryService {
         },
         error: (err) => {
           console.log('Failed to fetch categories', err);
+          this._error.set('Failed to fetch categories');
         },
       });
   }

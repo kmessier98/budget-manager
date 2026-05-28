@@ -1,9 +1,21 @@
-import { Component, computed, effect, EventEmitter, inject, input, Output } from '@angular/core';
+import {
+  Component,
+  computed,
+  DestroyRef,
+  effect,
+  EventEmitter,
+  inject,
+  input,
+  Output,
+} from '@angular/core';
 import { DialogModule } from 'primeng/dialog';
 import { ButtonModule } from 'primeng/button';
 import { FormBuilder, Validators, ReactiveFormsModule } from '@angular/forms';
 import { CategoryService } from '../../../categories/services/category-service';
 import { SelectModule } from 'primeng/select';
+import { ExpenseService } from '../../services/expense-service';
+import { ExpenseFormValues } from '../../models/expense/expense';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 @Component({
   selector: 'app-add-expense-modal',
@@ -19,6 +31,7 @@ export class AddExpenseModal {
 
   private _fb = inject(FormBuilder);
   private _categoryService = inject(CategoryService);
+  private _destroyRef = inject(DestroyRef);
 
   readonly expenseForm = this._fb.group({
     amount: [0, [Validators.required, Validators.min(0.01)]],
@@ -26,6 +39,8 @@ export class AddExpenseModal {
     date: ['', Validators.required],
     description: ['', [Validators.required, Validators.maxLength(255)]],
   });
+
+  expenseService = inject(ExpenseService);
 
   constructor() {
     // Explication : Reactive Forms ne surveille pas les variables d'entrée (qu'elles soient des signaux ou des variables normales).
@@ -75,9 +90,20 @@ export class AddExpenseModal {
   });
 
   handleFormSubmit() {
+    console.log('Form submitted with values:', this.expenseForm.value);
     if (this.expenseForm.invalid) {
       this.expenseForm.markAllAsTouched();
       return;
     }
+    const newExpense = this.expenseForm.value as ExpenseFormValues;
+    this.expenseService
+      .addExpense(newExpense)
+      .pipe(takeUntilDestroyed(this._destroyRef))
+      .subscribe({
+        next: () => {
+          this.onExpenseAdded.emit();
+        },
+        error: (err) => {},
+      });
   }
 }

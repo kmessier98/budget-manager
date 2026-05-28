@@ -9,7 +9,7 @@ export type Filters = {
 
 export type ExpenseFormValues = {
   id?: string;
-  amount: string;
+  amount: number;
   categoryId: string;
   date: string;
   description: string;

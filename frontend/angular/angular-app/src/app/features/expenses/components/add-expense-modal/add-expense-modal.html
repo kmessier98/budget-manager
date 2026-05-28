@@ -79,12 +79,10 @@
       <button type="submit">Enregistrer</button>
       <button type="button" (click)="onClose.emit()">Annuler</button>
     </div>
-    <!--
-          <span
-            className={`error-message-global ${errors.root?.serverError ? "visible" : ""}`}
-          >
-            {errors.root?.serverError?.message}
-          </span>
-          -->
+    @if (expenseService.error()) {
+      <span class="error-message-global visible">
+        {{ expenseService.error()}}
+      </span>
+    }
   </form>
 </p-dialog>

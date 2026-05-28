@@ -27,7 +27,6 @@ export class ExpenseToolbar {
   });
   daysInMonth = input<{ value: string; label: string }[]>([]);
   @Output() onFiltersChange = new EventEmitter<Filters>();
-  @Output() onAddExpenseSuccess = new EventEmitter<void>();
 
   private readonly _categoryService = inject(CategoryService);
   private readonly START_YEAR = 1900;
@@ -105,5 +104,10 @@ export class ExpenseToolbar {
       ...this.filters(),
       categoryId: event.value,
     });
+  };
+
+  handleAddExpenseSuccess = () => {
+    this.isModalOpen = false;
+    //notification de succès
   };
 }
