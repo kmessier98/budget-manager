@@ -4,10 +4,12 @@ import { Filters } from '../../models/expense/expense';
 import { FormsModule } from '@angular/forms';
 import { CategoryService } from '../../../categories/services/category-service';
 import { AddExpenseModal } from '../add-expense-modal/add-expense-modal';
+import { ToastModule } from 'primeng/toast';
+import { MessageService } from 'primeng/api';
 
 @Component({
   selector: 'app-expense-toolbar',
-  imports: [SelectModule, FormsModule, AddExpenseModal],
+  imports: [SelectModule, FormsModule, AddExpenseModal, ToastModule],
   templateUrl: './expense-toolbar.html',
   styleUrl: './expense-toolbar.scss',
 })
@@ -29,6 +31,7 @@ export class ExpenseToolbar {
   @Output() onFiltersChange = new EventEmitter<Filters>();
 
   private readonly _categoryService = inject(CategoryService);
+
   private readonly START_YEAR = 1900;
   private readonly CURRENT_YEAR = new Date().getFullYear();
   readonly months = [
@@ -104,10 +107,5 @@ export class ExpenseToolbar {
       ...this.filters(),
       categoryId: event.value,
     });
-  };
-
-  handleAddExpenseSuccess = () => {
-    this.isModalOpen = false;
-    //notification de succès
   };
 }

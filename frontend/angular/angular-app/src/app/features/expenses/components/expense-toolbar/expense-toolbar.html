@@ -55,16 +55,10 @@
       [categoryId]="categoryId()"
       [date]="date()"
       (onClose)="isModalOpen = false"
-      (onExpenseAdded)="handleAddExpenseSuccess()"
+      (onExpenseAdded)="isModalOpen = false;"
     ></app-add-expense-modal>
-    <!--
-    <app-add-expense-modal
-      [categories]="categories()"
-      [categoryId]="filters().categoryId"
-      [date]="createDateString()"
-      (close)="isModalOpen = false"
-      (saveSuccess)="handleSaveSuccess()"
-    ></app-add-expense-modal>
-    -->
   }
 </div>
+
+
+

@@ -16,6 +16,7 @@ import { SelectModule } from 'primeng/select';
 import { ExpenseService } from '../../services/expense-service';
 import { ExpenseFormValues } from '../../models/expense/expense';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { MessageService } from 'primeng/api';
 
 @Component({
   selector: 'app-add-expense-modal',
@@ -32,6 +33,7 @@ export class AddExpenseModal {
   private _fb = inject(FormBuilder);
   private _categoryService = inject(CategoryService);
   private _destroyRef = inject(DestroyRef);
+  private _messageService = inject(MessageService);
 
   readonly expenseForm = this._fb.group({
     amount: [0, [Validators.required, Validators.min(0.01)]],
@@ -102,8 +104,19 @@ export class AddExpenseModal {
       .subscribe({
         next: () => {
           this.onExpenseAdded.emit();
+          this._messageService.add({
+            severity: 'success',
+            summary: 'Succès',
+            detail: 'Dépense ajoutée avec succès',
+          });
         },
-        error: (err) => {},
+        error: (err) => {
+          this._messageService.add({
+            severity: 'error',
+            summary: 'Erreur',
+            detail: "Une erreur est survenue lors de l'ajout de la dépense",
+          });
+        },
       });
   }
 }

@@ -5,6 +5,7 @@ import { routes } from './app.routes';
 import { providePrimeNG } from 'primeng/config';
 import Aura from '@primeuix/themes/aura';
 import { ApiService } from './services/api-service';
+import { MessageService } from 'primeng/api';
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -12,5 +13,6 @@ export const appConfig: ApplicationConfig = {
     provideRouter(routes),
     providePrimeNG({ ripple: true, theme: { preset: Aura } }),
     ApiService,
+    MessageService,
   ],
 };
