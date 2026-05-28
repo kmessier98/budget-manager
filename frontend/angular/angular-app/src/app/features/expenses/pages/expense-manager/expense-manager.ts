@@ -52,6 +52,7 @@ export class ExpenseManager {
 
   constructor() {
     effect(() => {
+      // Cet effect se déclenche une fois initialement et agit comme un "watch" sur les changements de filtres.
       this.expenseService.fetchExpenses(this.filters());
     });
   }
