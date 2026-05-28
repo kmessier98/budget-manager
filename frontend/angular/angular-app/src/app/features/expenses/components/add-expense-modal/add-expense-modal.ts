@@ -14,7 +14,7 @@ import { FormBuilder, Validators, ReactiveFormsModule } from '@angular/forms';
 import { CategoryService } from '../../../categories/services/category-service';
 import { SelectModule } from 'primeng/select';
 import { ExpenseService } from '../../services/expense-service';
-import { ExpenseFormValues } from '../../models/expense/expense';
+import { Expense, ExpenseFormValues } from '../../models/expense/expense';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { MessageService } from 'primeng/api';
 

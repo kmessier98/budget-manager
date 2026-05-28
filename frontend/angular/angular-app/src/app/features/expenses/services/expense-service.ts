@@ -1,6 +1,6 @@
 import { inject, Injectable, signal } from '@angular/core';
 import { catchError, finalize, Observable, throwError } from 'rxjs';
-import { ExpenseFormValues } from '../models/expense/expense';
+import { ExpenseFormValues, Expense } from '../models/expense/expense';
 import { ApiService } from '../../../services/api-service';
 
 @Injectable({
@@ -15,11 +15,11 @@ export class ExpenseService {
   readonly loading = this._loading.asReadonly();
   readonly error = this._error.asReadonly();
 
-  addExpense(expense: ExpenseFormValues): Observable<any> {
+  addExpense(expense: ExpenseFormValues): Observable<Expense> {
     this._loading.set(true);
     this._error.set(null);
 
-    return this.apiService.create('transaction', expense).pipe(
+    return this.apiService.create<Expense, ExpenseFormValues>('transaction', expense).pipe(
       catchError((err) => {
         this._error.set('Failed to add expense');
         return throwError(() => err);

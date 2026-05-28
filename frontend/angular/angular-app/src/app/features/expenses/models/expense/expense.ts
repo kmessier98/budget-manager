@@ -21,7 +21,7 @@ export interface ExpenseResponse {
   summary: ExpenseSummary;
 }
 
-interface Expense {
+export interface Expense {
   id: string;
   amount: number;
   date: string;
