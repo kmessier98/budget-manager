@@ -14,7 +14,7 @@ import { FormBuilder, Validators, ReactiveFormsModule } from '@angular/forms';
 import { CategoryService } from '../../../categories/services/category-service';
 import { SelectModule } from 'primeng/select';
 import { ExpenseService } from '../../services/expense-service';
-import { Expense, ExpenseFormValues } from '../../models/expense/expense';
+import { Expense, ExpenseFormValues, Filters } from '../../models/expense/expense';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { MessageService } from 'primeng/api';
 
@@ -27,6 +27,12 @@ import { MessageService } from 'primeng/api';
 export class AddExpenseModal {
   categoryId = input<string>('');
   date = input<string>('');
+  filters = input<Filters>({
+    year: '',
+    month: '',
+    day: '',
+    categoryId: '',
+  });
   @Output() onClose = new EventEmitter<void>();
   @Output() onExpenseAdded = new EventEmitter<void>();
 
@@ -99,7 +105,7 @@ export class AddExpenseModal {
     }
     const newExpense = this.expenseForm.value as ExpenseFormValues;
     this.expenseService
-      .addExpense(newExpense)
+      .addExpense(newExpense, this.filters())
       .pipe(takeUntilDestroyed(this._destroyRef))
       .subscribe({
         next: () => {

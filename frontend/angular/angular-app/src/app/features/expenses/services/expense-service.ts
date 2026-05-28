@@ -1,5 +1,5 @@
 import { inject, Injectable, signal } from '@angular/core';
-import { catchError, finalize, Observable, throwError } from 'rxjs';
+import { catchError, delay, finalize, Observable, switchMap, tap, throwError } from 'rxjs';
 import { ExpenseFormValues, Expense, ExpenseResponse, Filters } from '../models/expense/expense';
 import { ApiService } from '../../../services/api-service';
 
@@ -36,16 +36,30 @@ export class ExpenseService {
       });
   }
 
-  addExpense(expense: ExpenseFormValues): Observable<Expense> {
+  addExpense(expense: ExpenseFormValues, filters: Filters): Observable<ExpenseResponse> {
     this._loading.set(true);
     this._error.set(null);
 
     return this.apiService.create<Expense, ExpenseFormValues>('transaction', expense).pipe(
+      tap((createdExpense) => {
+        console.log('1. Expense created:', createdExpense);
+      }),
+      switchMap(() =>
+        this.apiService.get<ExpenseResponse>('transaction', filters).pipe(
+          tap((response) => {
+            console.log('2. Expense added, fetching updated expenses:', response);
+            this._expenses.set(response);
+          }),
+          catchError((err) => {
+            return throwError(() => err);
+          }),
+        ),
+      ),
       catchError((err) => {
-        this._error.set('Failed to add expense');
         return throwError(() => err);
       }),
       finalize(() => {
+        console.log('3. Finalize: setting loading to false');
         this._loading.set(false);
       }),
     );

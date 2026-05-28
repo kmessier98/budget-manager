@@ -29,8 +29,8 @@ export class ExpenseManager {
   avatar = '/assets/user-avatar.png';
   filters: WritableSignal<Filters> = signal({
     year: new Date().getFullYear().toString(),
-    month: new Date().getMonth().toString(),
-    day: new Date().getDay().toString(),
+    month: (new Date().getMonth() + 1).toString(),
+    day: new Date().getDate().toString(),
     categoryId: '',
   });
 
