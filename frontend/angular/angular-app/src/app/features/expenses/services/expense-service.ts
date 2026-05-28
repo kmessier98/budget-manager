@@ -51,11 +51,15 @@ export class ExpenseService {
             this._expenses.set(response);
           }),
           catchError((err) => {
+            this._error.set('Dépense ajoutée, mais impossible de rafraîchir la liste.');
             return throwError(() => err);
           }),
         ),
       ),
       catchError((err) => {
+        if (!this._error()) {
+          this._error.set("Impossible d'ajouter la dépense.");
+        }
         return throwError(() => err);
       }),
       finalize(() => {
