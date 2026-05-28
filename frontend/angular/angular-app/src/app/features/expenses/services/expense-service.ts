@@ -1,6 +1,6 @@
 import { inject, Injectable, signal } from '@angular/core';
 import { catchError, finalize, Observable, throwError } from 'rxjs';
-import { ExpenseFormValues, Expense, ExpenseResponse } from '../models/expense/expense';
+import { ExpenseFormValues, Expense, ExpenseResponse, Filters } from '../models/expense/expense';
 import { ApiService } from '../../../services/api-service';
 
 @Injectable({
@@ -17,12 +17,12 @@ export class ExpenseService {
   readonly loading = this._loading.asReadonly();
   readonly error = this._error.asReadonly();
 
-  fetchExpenses(): void {
+  fetchExpenses(filters: Filters): void {
     this._loading.set(true);
     this._error.set(null);
 
     this.apiService
-      .get<ExpenseResponse>('transaction')
+      .get<ExpenseResponse>('transaction', filters)
       .pipe(finalize(() => this._loading.set(false)))
       .subscribe({
         next: (response) => {

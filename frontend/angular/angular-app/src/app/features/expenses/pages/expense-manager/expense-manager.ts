@@ -1,4 +1,4 @@
-import { Component, computed, inject, signal, WritableSignal } from '@angular/core';
+import { Component, computed, effect, inject, signal, WritableSignal } from '@angular/core';
 import { ExpenseToolbar } from '../../components/expense-toolbar/expense-toolbar';
 import { ExpenseTotalAmount } from '../../components/expense-total-amount/expense-total-amount';
 import { ExpenseTable } from '../../components/expense-table/expense-table';
@@ -50,9 +50,14 @@ export class ExpenseManager {
     return newDays;
   });
 
+  constructor() {
+    effect(() => {
+      this.expenseService.fetchExpenses(this.filters());
+    });
+  }
+
   ngOnInit() {
     this.categoryService.fetchCategories();
-    this.expenseService.fetchExpenses();
   }
 
   onFiltersChange = (filters: Filters) => {

@@ -48,12 +48,21 @@ export class ApiService {
 
   private buildParams(params?: Record<string, any>): HttpParams {
     let httpParams = new HttpParams();
-
     if (!params) return httpParams;
 
     Object.entries(params).forEach(([key, value]) => {
-      if (value !== null && value !== undefined && value !== '') {
-        httpParams = httpParams.set(key, value);
+      if (value === null || value === undefined || value === '') {
+        return;
+      }
+
+      if (Array.isArray(value)) {
+        value.forEach((val) => {
+          if (val !== null && val !== undefined && val !== '') {
+            httpParams = httpParams.append(key, val.toString());
+          }
+        });
+      } else {
+        httpParams = httpParams.set(key, value.toString());
       }
     });
 
