@@ -35,14 +35,14 @@ export class AddExpenseModal {
   private _destroyRef = inject(DestroyRef);
   private _messageService = inject(MessageService);
 
-  readonly expenseForm = this._fb.group({
+  protected readonly expenseForm = this._fb.group({
     amount: [0, [Validators.required, Validators.min(0.01)]],
     categoryId: ['', Validators.required],
     date: ['', Validators.required],
     description: ['', [Validators.required, Validators.maxLength(255)]],
   });
 
-  expenseService = inject(ExpenseService);
+  protected readonly expenseService = inject(ExpenseService);
 
   constructor() {
     // Explication : Reactive Forms ne surveille pas les variables d'entrée (qu'elles soient des signaux ou des variables normales).

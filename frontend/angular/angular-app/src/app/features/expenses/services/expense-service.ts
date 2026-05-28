@@ -7,7 +7,7 @@ import { ApiService } from '../../../services/api-service';
   providedIn: 'root',
 })
 export class ExpenseService {
-  private _apiService = inject(ApiService);
+  private readonly apiService = inject(ApiService);
 
   private _loading = signal<boolean>(false);
   private _error = signal<string | null>(null);
@@ -17,13 +17,16 @@ export class ExpenseService {
 
   addExpense(expense: ExpenseFormValues): Observable<any> {
     this._loading.set(true);
+    this._error.set(null);
 
-    return this._apiService.create('transaction', expense).pipe(
+    return this.apiService.create('transaction', expense).pipe(
       catchError((err) => {
         this._error.set('Failed to add expense');
         return throwError(() => err);
       }),
-      finalize(() => this._loading.set(false)),
+      finalize(() => {
+        this._loading.set(false);
+      }),
     );
   }
 }

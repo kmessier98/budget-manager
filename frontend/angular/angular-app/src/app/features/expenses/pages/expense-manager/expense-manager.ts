@@ -6,15 +6,23 @@ import { ExpenseChart } from '../../components/expense-chart/expense-chart';
 import { ButtonModule } from 'primeng/button';
 import { Filters } from '../../models/expense/expense';
 import { CategoryService } from '../../../categories/services/category-service';
+import { ProgressSpinnerModule } from 'primeng/progressspinner';
 
 @Component({
   selector: 'app-expense-manager',
-  imports: [ExpenseToolbar, ExpenseTotalAmount, ExpenseTable, ExpenseChart, ButtonModule],
+  imports: [
+    ExpenseToolbar,
+    ExpenseTotalAmount,
+    ExpenseTable,
+    ExpenseChart,
+    ButtonModule,
+    ProgressSpinnerModule,
+  ],
   templateUrl: './expense-manager.html',
   styleUrl: './expense-manager.scss',
 })
 export class ExpenseManager {
-  private readonly _categoryService = inject(CategoryService);
+  protected readonly categoryService = inject(CategoryService);
 
   avatar = '/assets/user-avatar.png';
   filters: WritableSignal<Filters> = signal({
@@ -41,7 +49,7 @@ export class ExpenseManager {
   });
 
   ngOnInit() {
-    this._categoryService.fetchCategories();
+    this.categoryService.fetchCategories();
   }
 
   onFiltersChange = (filters: Filters) => {

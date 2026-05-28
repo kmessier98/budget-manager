@@ -6,6 +6,8 @@
   [focusOnShow]="false"
   [style]="{ width: '500px', 'max-width': '90%' }"
 >
+
+
   <form [formGroup]="expenseForm" class="add-expense-form" (ngSubmit)="handleFormSubmit()">
     <div class="form-group">
       <label for="amount">Montant ($):</label>
@@ -76,7 +78,7 @@
     </div>
 
     <div class="actions">
-      <button type="submit">Enregistrer</button>
+      <p-button type="submit" [loading]="expenseService.loading()">Enregistrer</p-button>
       <button type="button" (click)="onClose.emit()">Annuler</button>
     </div>
     @if (expenseService.error()) {

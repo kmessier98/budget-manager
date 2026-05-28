@@ -30,11 +30,11 @@ export class ExpenseToolbar {
   daysInMonth = input<{ value: string; label: string }[]>([]);
   @Output() onFiltersChange = new EventEmitter<Filters>();
 
-  private readonly _categoryService = inject(CategoryService);
+  private readonly categoryService = inject(CategoryService);
 
   private readonly START_YEAR = 1900;
   private readonly CURRENT_YEAR = new Date().getFullYear();
-  readonly months = [
+  protected readonly months = [
     { value: '', label: 'Aucun' },
     { value: '1', label: 'Janvier' },
     { value: '2', label: 'Février' },
@@ -51,7 +51,7 @@ export class ExpenseToolbar {
   ];
   years = [{ value: this.CURRENT_YEAR.toString(), label: this.CURRENT_YEAR.toString() }];
   categories = computed(() => {
-    const categories = this._categoryService.categories();
+    const categories = this.categoryService.categories();
     return [
       { value: '', label: 'Toutes les catégories' },
       ...categories.map((category) => ({ value: category.id, label: category.name })),

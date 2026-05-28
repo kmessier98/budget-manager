@@ -62,3 +62,14 @@
     </div>
   </div>
 </div>
+
+@if (categoryService.loading()) {
+  <div class="progress-overlay">
+    <p-progressSpinner
+      ariaLabel="loading"
+      strokeWidth="5"
+      animationDuration=".5s"
+      class="progress-spinner"
+    ></p-progressSpinner>
+  </div>
+}
