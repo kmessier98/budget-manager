@@ -2,12 +2,13 @@ import { HttpClient } from '@angular/common/http';
 import { inject, Injectable, signal } from '@angular/core';
 import { Category } from '../models/category/category';
 import { finalize } from 'rxjs';
+import { ApiService } from '../../../services/api-service';
 
 @Injectable({
   providedIn: 'root',
 })
 export class CategoryService {
-  private http = inject(HttpClient);
+  private _apiService = inject(ApiService);
 
   private _categories = signal<Category[]>([]);
   private _loading = signal<boolean>(false);
@@ -20,8 +21,8 @@ export class CategoryService {
   fetchCategories() {
     this._loading.set(true);
 
-    this.http
-      .get<Category[]>('https://localhost:7208/api/category')
+    this._apiService
+      .getAll<Category>('category')
       .pipe(finalize(() => this._loading.set(false)))
       .subscribe({
         next: (categories) => {

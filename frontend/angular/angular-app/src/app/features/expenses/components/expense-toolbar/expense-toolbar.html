@@ -55,6 +55,7 @@
       [categoryId]="categoryId()"
       [date]="date()"
       (onClose)="isModalOpen = false"
+      (onExpenseAdded)="handleAddExpenseSuccess()"
     ></app-add-expense-modal>
     <!--
     <app-add-expense-modal
