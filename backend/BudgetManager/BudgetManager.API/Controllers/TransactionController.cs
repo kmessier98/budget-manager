@@ -40,8 +40,8 @@ namespace BudgetManager.API.Controllers
             return CreatedAtAction(nameof(GetById), new { id = result.Id }, result);
         }
 
-        [HttpPut]
-        public async Task<IActionResult> Update(UpdateTransactionDTO dto)
+        [HttpPut("{id}")]
+        public async Task<IActionResult> Update(Guid id, UpdateTransactionDTO dto)
         {
             var result = await _transactionService.Update(dto);
 

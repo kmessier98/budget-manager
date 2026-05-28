@@ -1,10 +1,10 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
-import type { ExpenseResponse,  Filters } from "../models/expense/expenses";
+import type { ExpenseResponse, Filters } from "../models/expense/expenses";
 
 type ExpenseFilters = Filters & {
   pageNumber: number;
   pageSize: number;
-}
+};
 
 export const expenseApiSlice = createApi({
   reducerPath: "expenseApi",
@@ -18,7 +18,7 @@ export const expenseApiSlice = createApi({
     getExpenses: builder.query<ExpenseResponse, ExpenseFilters>({
       query: (params) => ({
         url: "transaction",
-        params, 
+        params,
       }),
       providesTags: ["Expense"],
     }),
@@ -32,7 +32,7 @@ export const expenseApiSlice = createApi({
     }),
     updateExpense: builder.mutation({
       query: (formData) => ({
-        url: "transaction",
+        url: `transaction/${formData.id}`,
         method: "PUT",
         body: formData,
       }),
@@ -45,7 +45,12 @@ export const expenseApiSlice = createApi({
       }),
       invalidatesTags: ["Expense"],
     }),
-    }),
+  }),
 });
 
-export const { useGetExpensesQuery, useAddExpenseMutation, useUpdateExpenseMutation, useDeleteExpenseMutation } = expenseApiSlice;
+export const {
+  useGetExpensesQuery,
+  useAddExpenseMutation,
+  useUpdateExpenseMutation,
+  useDeleteExpenseMutation,
+} = expenseApiSlice;
