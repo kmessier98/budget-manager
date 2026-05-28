@@ -20,6 +20,12 @@ export class ApiService {
     });
   }
 
+  get<T>(endpoint: string, params?: Record<string, any>): Observable<T> {
+    return this.http.get<T>(`${this.apiUrl}/${endpoint}`, {
+      params: this.buildParams(params),
+    });
+  }
+
   getById<T>(endpoint: string, id: string | number): Observable<T> {
     return this.http.get<T>(`${this.apiUrl}/${endpoint}/${id}`);
   }

@@ -63,7 +63,7 @@
   </div>
 </div>
 
-@if (categoryService.loading()) {
+@if (categoryService.loading() || expenseService.loading()) {
   <div class="progress-overlay">
     <p-progressSpinner
       ariaLabel="loading"

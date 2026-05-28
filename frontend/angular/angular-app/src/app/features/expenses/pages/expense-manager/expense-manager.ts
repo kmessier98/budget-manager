@@ -7,6 +7,7 @@ import { ButtonModule } from 'primeng/button';
 import { Filters } from '../../models/expense/expense';
 import { CategoryService } from '../../../categories/services/category-service';
 import { ProgressSpinnerModule } from 'primeng/progressspinner';
+import { ExpenseService } from '../../services/expense-service';
 
 @Component({
   selector: 'app-expense-manager',
@@ -23,6 +24,7 @@ import { ProgressSpinnerModule } from 'primeng/progressspinner';
 })
 export class ExpenseManager {
   protected readonly categoryService = inject(CategoryService);
+  protected readonly expenseService = inject(ExpenseService);
 
   avatar = '/assets/user-avatar.png';
   filters: WritableSignal<Filters> = signal({
@@ -50,6 +52,7 @@ export class ExpenseManager {
 
   ngOnInit() {
     this.categoryService.fetchCategories();
+    this.expenseService.fetchExpenses();
   }
 
   onFiltersChange = (filters: Filters) => {
