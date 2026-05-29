@@ -52,8 +52,6 @@
   </div>
   @if (isModalOpen) {
     <app-expense-form-modal
-      [categoryId]="categoryId()"
-      [date]="date()"
       [filters]="filters()"
       (onClose)="isModalOpen = false"
       (onExpenseSaved)="handleSavedExpense()"

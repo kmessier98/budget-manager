@@ -59,13 +59,6 @@ export class ExpenseToolbar {
     ];
   });
   isModalOpen = false;
-  categoryId = computed(() => this.filters().categoryId);
-  date = computed(() => {
-    const year = this.filters().year;
-    const day = this.filters().day ? String(this.filters().day).padStart(2, '0') : '01';
-    const month = this.filters().month ? String(this.filters().month).padStart(2, '0') : '01';
-    return `${year}-${month}-${day}`;
-  });
 
   ngOnInit() {
     this.initYears();

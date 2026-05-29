@@ -25,8 +25,6 @@ import { MessageService } from 'primeng/api';
   styleUrl: './expense-form-modal.scss',
 })
 export class ExpenseFormModal {
-  categoryId = input<string>('');
-  date = input<string>('');
   expenseToEdit = input<Expense | null>(null);
   filters = input<Filters>({
     year: '',
@@ -58,6 +56,16 @@ export class ExpenseFormModal {
   isEditMode = computed(() => this.expenseToEdit() !== null);
   modalTitle = computed(() => (this.isEditMode() ? 'Modifier la dépense' : 'Ajouter une dépense'));
   submitButtonLabel = computed(() => (this.isEditMode() ? 'Modifier' : 'Enregistrer'));
+  date = computed(() => {
+    if (this.isEditMode()) {
+      return this.expenseToEdit()!.date.split('T')[0];
+    } else {
+      const year = this.filters().year;
+      const day = this.filters().day ? String(this.filters().day).padStart(2, '0') : '01';
+      const month = this.filters().month ? String(this.filters().month).padStart(2, '0') : '01';
+      return `${year}-${month}-${day}`;
+    }
+  });
 
   constructor() {
     // Explication : Reactive Forms ne surveille pas les variables d'entrée (qu'elles soient des signaux ou des variables normales).
@@ -73,11 +81,10 @@ export class ExpenseFormModal {
       if (expense) {
         // --- MODE MODIFICATION ---
 
-        const date = expense.date.split('T')[0];
         this.expenseForm.patchValue({
           amount: expense.amount,
           categoryId: expense.category.id,
-          date: date,
+          date: this.date(),
           description: expense.description,
         });
       } else {
@@ -87,7 +94,7 @@ export class ExpenseFormModal {
         // Si c'est le cas, on sélectionne par défaut le premier élément de la liste.
         // Sinon, on prend la catégorie sélectionnée dans le toolbar.
         let defaultCategoryId = this.categories().find(
-          (cat) => cat.value === this.categoryId(),
+          (cat) => cat.value === this.filters().categoryId,
         )?.value;
         if (!defaultCategoryId) {
           defaultCategoryId = this.categories()[0].value;
