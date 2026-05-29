@@ -49,8 +49,8 @@ export class ExpenseToolbar {
     { value: '11', label: 'Novembre' },
     { value: '12', label: 'Décembre' },
   ];
-  years = [{ value: this.CURRENT_YEAR.toString(), label: this.CURRENT_YEAR.toString() }];
-  categories = computed(() => {
+  protected years = [{ value: this.CURRENT_YEAR.toString(), label: this.CURRENT_YEAR.toString() }];
+  protected categories = computed(() => {
     const categories = this.categoryService.categories();
     return [
       { value: '', label: 'Toutes les catégories' },
