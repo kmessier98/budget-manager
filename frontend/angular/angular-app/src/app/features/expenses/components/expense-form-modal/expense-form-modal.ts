@@ -72,11 +72,12 @@ export class ExpenseFormModal {
 
       if (expense) {
         // --- MODE MODIFICATION ---
-        console.log('Expense to edit:', expense);
+
+        const date = expense.date.split('T')[0];
         this.expenseForm.patchValue({
           amount: expense.amount,
           categoryId: expense.category.id,
-          date: expense.date,
+          date: date,
           description: expense.description,
         });
       } else {
@@ -85,7 +86,6 @@ export class ExpenseFormModal {
         // Il est possible de sélectionné "toutes les catégories" dans le toolbar.
         // Si c'est le cas, on sélectionne par défaut le premier élément de la liste.
         // Sinon, on prend la catégorie sélectionnée dans le toolbar.
-
         let defaultCategoryId = this.categories().find(
           (cat) => cat.value === this.categoryId(),
         )?.value;
