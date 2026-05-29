@@ -31,7 +31,6 @@ export class ExpenseTable {
   handlePageChange(event: TablePageEvent) {
     const pageNumber = event.first / event.rows + 1;
     const pageSize = event.rows;
-    console.log('Page change event:', event);
 
     this.onPageChange.emit({ pageNumber, pageSize });
   }
