@@ -105,4 +105,37 @@ export class ExpenseService {
       }),
     );
   }
+
+  deleteExpense(id: string, filters: Filters): Observable<ExpenseResponse> {
+    this._loading.set(true);
+    this._error.set(null);
+
+    return this.apiService.delete('transaction', id).pipe(
+      tap(() => {
+        console.log('1. Expense deleted with id:', id);
+      }),
+      switchMap(() =>
+        this.apiService.get<ExpenseResponse>('transaction', filters).pipe(
+          tap((response) => {
+            console.log('2. Expense deleted, fetching updated expenses:', response);
+            this._expenses.set(response);
+          }),
+          catchError((err) => {
+            this._error.set('Dépense supprimée, mais impossible de rafraîchir la liste.');
+            return throwError(() => err);
+          }),
+        ),
+      ),
+      catchError((err) => {
+        if (!this._error()) {
+          this._error.set('Impossible de supprimer la dépense.');
+        }
+        return throwError(() => err);
+      }),
+      finalize(() => {
+        console.log('3. Finalize: setting loading to false');
+        this._loading.set(false);
+      }),
+    );
+  }
 }

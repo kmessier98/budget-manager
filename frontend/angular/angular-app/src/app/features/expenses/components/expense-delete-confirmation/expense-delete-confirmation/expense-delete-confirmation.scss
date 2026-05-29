@@ -1,0 +1,99 @@
+@use '../../../../../../styles/variables' as *;
+$red: rgb(189, 3, 3);
+
+:host ::ng-deep {
+  .p-dialog-header {
+    background-color: $red;
+    padding: 10px 10px 10px 20px;
+
+    .p-dialog-title {
+      font-size: 1.5rem;
+      color: $color-1;
+      color: #fff;
+    }
+    button {
+      background: none;
+      border: none;
+      font-size: 2rem;
+      color: #fff;
+    }
+  }
+
+  .p-dialog-content {
+    background-color: #fff;
+
+    .content {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      padding-top: 10px;
+      .header {
+        .header-title {
+          padding: 15px 30px;
+
+          h3 {
+            color: $color-1;
+            font-weight: 700;
+          }
+        }
+      }
+      .body {
+        padding: 0 30px;
+        color: $color-1;
+        font-size: 1rem;
+
+        .infos {
+          display: flex;
+          flex-direction: column;
+          gap: 8px;
+
+          label {
+            width: 90px;
+            font-size: 0.875rem;
+            font-weight: 500;
+            font-size: medium;
+          }
+
+          span {
+            font-size: 1rem;
+            font-weight: 600;
+          }
+        }
+      }
+    }
+  }
+  .actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+    margin-top: 20px;
+
+    .cancel-button {
+      button,
+      .p-button {
+        background-color: #ccc !important;
+        color: $color-1 !important;
+        font-weight: 400;
+        border: none !important;
+
+        &:hover {
+          background-color: #bbb !important;
+        }
+      }
+    }
+
+    .delete-button {
+      button,
+      .p-button {
+        background-color: $red !important;
+        color: #fff !important;
+        font-weight: 400;
+        border: none !important;
+
+        &:hover {
+          background-color: #9c0202 !important;
+        }
+      }
+    }
+  }
+}

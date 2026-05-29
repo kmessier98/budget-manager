@@ -7,10 +7,19 @@ import { DatePipe, CurrencyPipe } from '@angular/common';
 import { PaginatorModule } from 'primeng/paginator';
 import { ExpenseFormModal } from '../expense-form-modal/expense-form-modal';
 import { MessageService } from 'primeng/api';
+import { ExpenseDeleteConfirmation } from '../expense-delete-confirmation/expense-delete-confirmation/expense-delete-confirmation';
 
 @Component({
   selector: 'app-expense-table',
-  imports: [TableModule, ButtonModule, DatePipe, CurrencyPipe, PaginatorModule, ExpenseFormModal],
+  imports: [
+    TableModule,
+    ButtonModule,
+    DatePipe,
+    CurrencyPipe,
+    PaginatorModule,
+    ExpenseFormModal,
+    ExpenseDeleteConfirmation,
+  ],
   templateUrl: './expense-table.html',
   styleUrl: './expense-table.scss',
 })
@@ -68,13 +77,34 @@ export class ExpenseTable {
     });
   }
 
-  handleDeleteConfirmation() {
-    if (!this.selectedExpense) return;
-    //todo faire le delete ici car le modal na pas besoin d e rester ouvert si ya un erreur
-    this._messageService.add({
-      severity: 'error',
-      summary: 'Erreur',
-      detail: 'Une erreur est survenue lors de la suppression de la dépense',
+  handleDeletedExpense() {
+    if (!this.selectedExpense) {
+      this.isDeleteConfirmationOpen = false;
+      this._messageService.add({
+        severity: 'error',
+        summary: 'Erreur',
+        detail: 'Une erreur est survenue lors de la suppression de la dépense',
+      });
+      return;
+    }
+
+    this.expenseService.deleteExpense(this.selectedExpense.id, this.filters()).subscribe({
+      next: () => {
+        this.isDeleteConfirmationOpen = false;
+        this._messageService.add({
+          severity: 'success',
+          summary: 'Succès',
+          detail: 'Dépense supprimée avec succès',
+        });
+      },
+      error: (err) => {
+        this.isDeleteConfirmationOpen = false;
+        this._messageService.add({
+          severity: 'error',
+          summary: 'Erreur',
+          detail: 'Une erreur est survenue lors de la suppression de la dépense',
+        });
+      },
     });
   }
 

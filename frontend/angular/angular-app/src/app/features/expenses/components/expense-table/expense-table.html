@@ -42,3 +42,10 @@
     (onExpenseSaved)="handleSavedExpense()"
   ></app-expense-form-modal>
 }
+@if (isDeleteConfirmationOpen) {
+  <app-expense-delete-confirmation
+    [expense]="selectedExpense"
+    (onClose)="handleModalClose()"
+    (onConfirm)="handleDeletedExpense()"
+  ></app-expense-delete-confirmation>
+}
