@@ -1,12 +1,12 @@
 <p-dialog
-  header="Ajouter une dépense"
+  [header]="modalTitle()"
   [modal]="true"
   [visible]="true"
   (onHide)="onClose.emit()"
   [focusOnShow]="false"
   [style]="{ width: '500px', 'max-width': '90%' }"
 >
-  <form [formGroup]="expenseForm" class="add-expense-form" (ngSubmit)="handleFormSubmit()">
+  <form [formGroup]="expenseForm" class="expense-form-modal" (ngSubmit)="handleFormSubmit()">
     <div class="form-group">
       <label for="amount">Montant ($):</label>
       <div class="input-container">
@@ -76,12 +76,14 @@
     </div>
 
     <div class="actions">
-      <p-button type="submit" [loading]="expenseService.loading()">Enregistrer</p-button>
+      <p-button type="submit" [loading]="expenseService.loading()">{{
+        submitButtonLabel()
+      }}</p-button>
       <button type="button" (click)="onClose.emit()">Annuler</button>
     </div>
     @if (expenseService.error()) {
       <span class="error-message-global visible">
-        {{ expenseService.error()}}
+        {{ expenseService.error() }}
       </span>
     }
   </form>

@@ -19,14 +19,15 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { MessageService } from 'primeng/api';
 
 @Component({
-  selector: 'app-add-expense-modal',
+  selector: 'app-expense-form-modal',
   imports: [DialogModule, ButtonModule, ReactiveFormsModule, SelectModule],
-  templateUrl: './add-expense-modal.html',
-  styleUrl: './add-expense-modal.scss',
+  templateUrl: './expense-form-modal.html',
+  styleUrl: './expense-form-modal.scss',
 })
-export class AddExpenseModal {
+export class ExpenseFormModal {
   categoryId = input<string>('');
   date = input<string>('');
+  expenseToEdit = input<Expense | null>(null);
   filters = input<Filters>({
     year: '',
     month: '',
@@ -34,7 +35,7 @@ export class AddExpenseModal {
     categoryId: '',
   });
   @Output() onClose = new EventEmitter<void>();
-  @Output() onExpenseAdded = new EventEmitter<void>();
+  @Output() onExpenseSaved = new EventEmitter<void>();
 
   private _fb = inject(FormBuilder);
   private _categoryService = inject(CategoryService);
@@ -50,6 +51,14 @@ export class AddExpenseModal {
 
   protected readonly expenseService = inject(ExpenseService);
 
+  categories = computed(() => {
+    const categories = this._categoryService.categories();
+    return categories.map((category) => ({ value: category.id, label: category.name }));
+  });
+  isEditMode = computed(() => this.expenseToEdit() !== null);
+  modalTitle = computed(() => (this.isEditMode() ? 'Modifier la dépense' : 'Ajouter une dépense'));
+  submitButtonLabel = computed(() => (this.isEditMode() ? 'Modifier' : 'Enregistrer'));
+
   constructor() {
     // Explication : Reactive Forms ne surveille pas les variables d'entrée (qu'elles soient des signaux ou des variables normales).
     // Le formulaire s'initialise une seule fois au démarrage avec les valeurs par défaut du composant (généralement vides).
@@ -59,20 +68,38 @@ export class AddExpenseModal {
     // Note d'architecture : L'équipe d'Angular travaille sur une nouvelle API ("Signal Forms")
     // qui permettra aux formulaires de réagir automatiquement, mais elle est encore récente/expérimentale.
     effect(() => {
-      // Il est possible de sélectionné "toutes les catégories" dans le toolbar.
-      // Si c'est le cas, on sélectionne par défaut le premier élément de la liste.
-      // Sinon, on prend la catégorie sélectionnée dans le toolbar.
-      let defaultCategoryId = this.categories().find(
-        (cat) => cat.value === this.categoryId(),
-      )?.value;
-      if (!defaultCategoryId) {
-        defaultCategoryId = this.categories()[0].value;
-      }
+      const expense = this.expenseToEdit();
 
-      this.expenseForm.patchValue({
-        categoryId: defaultCategoryId,
-        date: this.date(),
-      });
+      if (expense) {
+        // --- MODE MODIFICATION ---
+        console.log('Expense to edit:', expense);
+        this.expenseForm.patchValue({
+          amount: expense.amount,
+          categoryId: expense.category.id,
+          date: expense.date,
+          description: expense.description,
+        });
+      } else {
+        // --- MODE AJOUT ---
+
+        // Il est possible de sélectionné "toutes les catégories" dans le toolbar.
+        // Si c'est le cas, on sélectionne par défaut le premier élément de la liste.
+        // Sinon, on prend la catégorie sélectionnée dans le toolbar.
+
+        let defaultCategoryId = this.categories().find(
+          (cat) => cat.value === this.categoryId(),
+        )?.value;
+        if (!defaultCategoryId) {
+          defaultCategoryId = this.categories()[0].value;
+        }
+
+        this.expenseForm.patchValue({
+          amount: 0,
+          categoryId: defaultCategoryId,
+          date: this.date(),
+          description: '',
+        });
+      }
     });
   }
 
@@ -92,35 +119,52 @@ export class AddExpenseModal {
     return this.expenseForm.get('description');
   }
 
-  categories = computed(() => {
-    const categories = this._categoryService.categories();
-    return categories.map((category) => ({ value: category.id, label: category.name }));
-  });
-
   handleFormSubmit() {
-    console.log('Form submitted with values:', this.expenseForm.value);
     if (this.expenseForm.invalid) {
       this.expenseForm.markAllAsTouched();
       return;
     }
-    const newExpense = this.expenseForm.value as ExpenseFormValues;
+
+    const formValues = this.expenseForm.value as ExpenseFormValues;
+
+    if (this.isEditMode()) {
+      this.handleUpdateExpense(formValues);
+    } else {
+      this.handleAddExpense(formValues);
+    }
+  }
+
+  handleAddExpense(formValues: ExpenseFormValues) {
     this.expenseService
-      .addExpense(newExpense, this.filters())
+      .addExpense(formValues, this.filters())
       .pipe(takeUntilDestroyed(this._destroyRef))
       .subscribe({
         next: () => {
-          this.onExpenseAdded.emit();
-          this._messageService.add({
-            severity: 'success',
-            summary: 'Succès',
-            detail: 'Dépense ajoutée avec succès',
-          });
+          this.onExpenseSaved.emit();
         },
         error: (err) => {
           this._messageService.add({
             severity: 'error',
             summary: 'Erreur',
             detail: "Une erreur est survenue lors de l'ajout de la dépense",
+          });
+        },
+      });
+  }
+
+  handleUpdateExpense(formValues: ExpenseFormValues) {
+    this.expenseService
+      .updateExpense(this.expenseToEdit()!.id, formValues, this.filters())
+      .pipe(takeUntilDestroyed(this._destroyRef))
+      .subscribe({
+        next: () => {
+          this.onExpenseSaved.emit();
+        },
+        error: (err) => {
+          this._messageService.add({
+            severity: 'error',
+            summary: 'Erreur',
+            detail: 'Une erreur est survenue lors de la modification de la dépense',
           });
         },
       });

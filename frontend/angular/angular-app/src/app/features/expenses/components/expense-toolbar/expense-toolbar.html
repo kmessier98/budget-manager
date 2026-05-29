@@ -51,12 +51,12 @@
     </div>
   </div>
   @if (isModalOpen) {
-    <app-add-expense-modal
+    <app-expense-form-modal
       [categoryId]="categoryId()"
       [date]="date()"
       [filters]="filters()"
       (onClose)="isModalOpen = false"
-      (onExpenseAdded)="isModalOpen = false"
-    ></app-add-expense-modal>
+      (onExpenseSaved)="handleSavedExpense()"
+    ></app-expense-form-modal>
   }
 </div>

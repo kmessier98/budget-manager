@@ -68,4 +68,41 @@ export class ExpenseService {
       }),
     );
   }
+
+  updateExpense(
+    id: string,
+    expense: ExpenseFormValues,
+    filters: Filters,
+  ): Observable<ExpenseResponse> {
+    this._loading.set(true);
+    this._error.set(null);
+
+    return this.apiService.update<Expense, ExpenseFormValues>('transaction', id, expense).pipe(
+      tap((updatedExpense) => {
+        console.log('1. Expense updated:', updatedExpense);
+      }),
+      switchMap(() =>
+        this.apiService.get<ExpenseResponse>('transaction', filters).pipe(
+          tap((response) => {
+            console.log('2. Expense updated, fetching updated expenses:', response);
+            this._expenses.set(response);
+          }),
+          catchError((err) => {
+            this._error.set('Dépense modifiée, mais impossible de rafraîchir la liste.');
+            return throwError(() => err);
+          }),
+        ),
+      ),
+      catchError((err) => {
+        if (!this._error()) {
+          this._error.set('Impossible de modifier la dépense.');
+        }
+        return throwError(() => err);
+      }),
+      finalize(() => {
+        console.log('3. Finalize: setting loading to false');
+        this._loading.set(false);
+      }),
+    );
+  }
 }

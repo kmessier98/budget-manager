@@ -15,31 +15,10 @@
       <div class="middle">
         <div class="left">
           <app-expense-total-amount></app-expense-total-amount>
-          <app-expense-table (onPageChange)="handlePageChange($event)"></app-expense-table>
-          <!--
-          <!--
-              {expense && <TotalAmount summaryExpense={expense.summary} />}
-              {expense && (
-                <ExpensesTable
-                  expenseResponse={expense}
-                  onDelete={handleDelete}
-                  categories={categories}
-                  onUpdateSuccess={() => {
-                    handleUpdateSuccess();
-                  }}
-                  onPaginationChange={(newPagination) => {
-                    setPagination({
-                      pageNumber: newPagination.pageIndex + 1,
-                      pageSize: newPagination.pageSize,
-                    });
-                  }}
-                  pagination={{
-                    pageIndex: pagination.pageNumber - 1,
-                    pageSize: pagination.pageSize,
-                  }}
-                />
-              )}
-                -->
+          <app-expense-table
+            [filters]="filters()"
+            (onPageChange)="handlePageChange($event)"
+          ></app-expense-table>
         </div>
         <div class="right">
           <app-expense-chart></app-expense-chart>
