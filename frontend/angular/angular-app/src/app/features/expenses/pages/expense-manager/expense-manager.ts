@@ -61,7 +61,15 @@ export class ExpenseManager {
     this.categoryService.fetchCategories();
   }
 
-  onFiltersChange = (filters: Filters) => {
+  handleFiltersChange = (filters: Filters) => {
     this.filters.set(filters);
+  };
+
+  handlePageChange = ({ pageNumber, pageSize }: { pageNumber: number; pageSize: number }) => {
+    this.filters.update((current) => ({
+      ...current,
+      pageNumber: pageNumber.toString(),
+      pageSize: pageSize.toString(),
+    }));
   };
 }

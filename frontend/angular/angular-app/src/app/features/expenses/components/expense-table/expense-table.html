@@ -1,4 +1,15 @@
-<p-table [value]="transactions()">
+<p-table
+  [value]="transactions()"
+  [paginator]="true"
+  [lazy]="true"
+  [first]="first()"
+  [rows]="metadata()?.pageSize ?? 10"
+  [rowsPerPageOptions]="[5, 10, 20, 30, 40, 50]"
+  [showCurrentPageReport]="true"
+  [totalRecords]="metadata()?.totalItems ?? 0"
+  (onPage)="handlePageChange($event)"
+  dropdownAppendTo="body"
+>
   <ng-template pTemplate="header">
     <tr>
       <th>Date</th>

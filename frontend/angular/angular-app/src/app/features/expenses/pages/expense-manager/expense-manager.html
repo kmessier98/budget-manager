@@ -8,23 +8,14 @@
     <div class="content">
       <app-expense-toolbar
         [filters]="filters()"
-        (onFiltersChange)="onFiltersChange($event)"
+        (onFiltersChange)="handleFiltersChange($event)"
         [daysInMonth]="daysInMonth()"
       ></app-expense-toolbar>
-      <!-- 
-          <ExpenseToolbar
-            filters={filters}
-            daysInMonth={daysInMonth}
-            categories={categoriesOptions}
-            onFiltersChange={(newFilters: Filters) => setFilters(newFilters)}
-            onAddExpenseSuccess={loadExpenses}
-          />
-        -->
       <hr />
       <div class="middle">
         <div class="left">
           <app-expense-total-amount></app-expense-total-amount>
-          <app-expense-table></app-expense-table>
+          <app-expense-table (onPageChange)="handlePageChange($event)"></app-expense-table>
           <!--
           <!--
               {expense && <TotalAmount summaryExpense={expense.summary} />}
