@@ -1,0 +1,60 @@
+<div class="expense-toolbar-container">
+  <div class="expense-toolbar">
+    <div class="form-group">
+      <label for="year">Année</label>
+      <p-select
+        [options]="years"
+        optionLabel="label"
+        optionValue="value"
+        class="select"
+        [ngModel]="filters().year"
+        (onChange)="handleYearChange($event)"
+      />
+    </div>
+    <div class="form-group">
+      <label for="month">Mois</label>
+      <p-select
+        [options]="months"
+        optionLabel="label"
+        optionValue="value"
+        class="select"
+        [ngModel]="filters().month"
+        (onChange)="handleMonthChange($event)"
+      />
+    </div>
+
+    <div class="form-group">
+      <label for="day">Jour</label>
+      <p-select
+        [options]="daysInMonth()"
+        optionLabel="label"
+        optionValue="value"
+        class="select"
+        [ngModel]="filters().day"
+        (onChange)="handleDayChange($event)"
+      />
+    </div>
+
+    <div class="form-group">
+      <label for="category">Catégorie</label>
+      <p-select
+        [options]="categories()"
+        optionValue="value"
+        optionLabel="label"
+        class="select"
+        [ngModel]="filters().categoryId"
+        (onChange)="handleCategoryChange($event)"
+      />
+    </div>
+    <div class="form-group">
+      <button (click)="isModalOpen = true">Ajouter une dépense</button>
+    </div>
+  </div>
+  @if (isModalOpen) {
+    <app-expense-form-modal
+      [filters]="filters()"
+      (onClose)="isModalOpen = false"
+      (onExpenseSaved)="handleSavedExpense()"
+    ></app-expense-form-modal>
+  }
+</div>

@@ -1,0 +1,16 @@
+<div class="expense-chart">
+  <h2>Dépenses par catégéories</h2>
+  <hr />
+  <div class="chart-container">
+    @if (!chartData()) {
+      <p>Aucune donnée disponible</p>
+    } @else {
+      <p-chart
+        type="doughnut"
+        [data]="chartData()"
+        [options]="chartOptions()"
+        class="w-full md:w-[30rem]"
+      ></p-chart>
+    }
+  </div>
+</div>

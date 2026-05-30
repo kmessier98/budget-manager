@@ -1,0 +1,90 @@
+<p-dialog
+  [header]="modalTitle()"
+  [modal]="true"
+  [visible]="true"
+  (onHide)="onClose.emit()"
+  [focusOnShow]="false"
+  [style]="{ width: '500px', 'max-width': '90%' }"
+>
+  <form [formGroup]="expenseForm" class="expense-form-modal" (ngSubmit)="handleFormSubmit()">
+    <div class="form-group">
+      <label for="amount">Montant ($):</label>
+      <div class="input-container">
+        <input type="number" id="amount" step="0.01" min="0" formControlName="amount" />
+        @if (amountControl?.invalid && (amountControl?.dirty || amountControl?.touched)) {
+          <span class="error-message visible">
+            @if (amountControl?.errors?.['required']) {
+              Le montant est requis.
+            } @else if (amountControl?.errors?.['min']) {
+              Le montant doit être supérieur à zéro.
+            }
+          </span>
+        }
+      </div>
+    </div>
+    <div class="form-group">
+      <label for="category">Catégorie:</label>
+      <div class="input-container">
+        <p-select
+          [options]="categories()"
+          optionValue="value"
+          optionLabel="label"
+          class="select"
+          formControlName="categoryId"
+          appendTo="body"
+        />
+        @if (
+          categoryIdControl?.invalid && (categoryIdControl?.dirty || categoryIdControl?.touched)
+        ) {
+          <span class="error-message visible">
+            @if (categoryIdControl?.errors?.['required']) {
+              La catégorie est requise.
+            }
+          </span>
+        }
+      </div>
+    </div>
+    <div class="form-group">
+      <label for="date">Date:</label>
+      <div class="input-container">
+        <input type="date" id="date" formControlName="date" />
+        @if (dateControl?.invalid && (dateControl?.dirty || dateControl?.touched)) {
+          <span class="error-message visible">
+            @if (dateControl?.errors?.['required']) {
+              La date est requise.
+            }
+          </span>
+        }
+      </div>
+    </div>
+    <div class="form-group">
+      <label for="description">Description:</label>
+      <div class="input-container">
+        <input type="text" id="description" formControlName="description" />
+        @if (
+          descriptionControl?.invalid && (descriptionControl?.dirty || descriptionControl?.touched)
+        ) {
+          <span class="error-message visible">
+            @if (descriptionControl?.errors?.['required']) {
+              La description est requise.
+            } @else if (descriptionControl?.errors?.['maxLength']) {
+              La description ne peut pas dépasser 255 caractères.
+            }
+          </span>
+        }
+      </div>
+    </div>
+
+    <div class="actions">
+      <p-button type="submit" [loading]="expenseService.loading()">{{
+        submitButtonLabel()
+      }}</p-button>
+      <button type="button" (click)="onClose.emit()">Annuler</button>
+    </div>
+    @if (expenseService.error()) {
+      <span class="error-message-global visible">
+        {{ expenseService.error() }}
+      </span>
+    }
+  </form>
+</p-dialog>

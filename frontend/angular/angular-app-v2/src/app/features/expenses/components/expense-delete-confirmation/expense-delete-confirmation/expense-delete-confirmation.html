@@ -1,0 +1,42 @@
+<p-dialog
+  header="Supprimer la dépense"
+  [modal]="true"
+  [visible]="true"
+  (onHide)="onClose.emit()"
+  [focusOnShow]="false"
+  [style]="{ width: '600px', 'max-width': '90%' }"
+>
+  <div class="content">
+    <div class="header">
+      <div class="header-title">
+        <h3>Êtes-vous sûr de vouloir supprimer cette dépense ?</h3>
+      </div>
+      <hr />
+    </div>
+    <div class="body">
+      <div class="infos">
+        <div>
+          <label>Catégorie:</label>
+          <span>{{ expense()?.category?.name }}</span>
+        </div>
+        <div>
+          <label>Montant:</label>
+          <span>{{ expense()?.amount | currency: 'CAD' : 'symbol' : '' : 'fr-CA' }}</span>
+        </div>
+        <div>
+          <label>Date:</label>
+          <span>{{ expense()?.date | date: 'dd MMMM yyyy' : '' : 'fr-CA' }}</span>
+        </div>
+        <div>
+          <label>Description:</label>
+          <span>{{ expense()?.description }}</span>
+        </div>
+      </div>
+    </div>
+    <hr />
+  </div>
+  <div class="actions">
+    <p-button class="delete-button" label="Supprimer" (onClick)="onConfirm.emit()"></p-button>
+    <p-button class="cancel-button" label="Annuler" (onClick)="onClose.emit()"></p-button>
+  </div>
+</p-dialog>
