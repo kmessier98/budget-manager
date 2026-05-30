@@ -37,7 +37,6 @@
 @if (isEditModalOpen) {
   <app-expense-form-modal
     [expenseToEdit]="selectedExpense"
-    [filters]="filters()"
     (onClose)="handleModalClose()"
     (onExpenseSaved)="handleSavedExpense()"
   ></app-expense-form-modal>
