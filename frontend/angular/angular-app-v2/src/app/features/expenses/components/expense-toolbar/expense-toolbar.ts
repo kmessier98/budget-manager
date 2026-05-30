@@ -6,6 +6,7 @@ import { CategoryService } from '../../../categories/services/category-service';
 import { ExpenseFormModal } from '../expense-form-modal/expense-form-modal';
 import { ToastModule } from 'primeng/toast';
 import { MessageService } from 'primeng/api';
+import { ExpenseService } from '../../services/expense-service';
 
 @Component({
   selector: 'app-expense-toolbar',
@@ -14,27 +15,13 @@ import { MessageService } from 'primeng/api';
   styleUrl: './expense-toolbar.scss',
 })
 export class ExpenseToolbar {
-  // ==========================================
-  // ARCHITECTURE & FLUX DE DONNÉES :
-  // Le HTML utilise [ngModel] et non pas [(ngModel)], du coup on ne peut pas utiliser la syntaxe de liaison bidirectionnelle pour mettre à jour les filtres.
-  // La raison pk on fait cela est que les filtres sont gérés dans le composant parent (ExpenseManager) et que ce composant (ExpenseToolbar) est un composant enfant qui reçoit les filtres en entrée et émet des événements de changement de filtres en sortie.
-  // Le filtre on le recoit en input et on ne peut pas le modifier directement dans le composant enfant, sinon cela violerait le principe de l'unidirectional data flow d'Angular.
-  // Les input() modernes d'Angular (basés sur les signaux) sont conçus pour être strictement en lecture seule à l'intérieur du composant enfant.
-  // ==========================================
-  filters = input({
-    year: '',
-    month: '',
-    day: '',
-    categoryId: '',
-  });
-  daysInMonth = input<{ value: string; label: string }[]>([]);
-  @Output() onFiltersChange = new EventEmitter<Filters>();
-
   private readonly categoryService = inject(CategoryService);
   private _messageService = inject(MessageService);
 
   private readonly START_YEAR = 1900;
   private readonly CURRENT_YEAR = new Date().getFullYear();
+
+  protected readonly expenseService = inject(ExpenseService);
   protected readonly months = [
     { value: '', label: 'Aucun' },
     { value: '1', label: 'Janvier' },
@@ -58,6 +45,22 @@ export class ExpenseToolbar {
       ...categories.map((category) => ({ value: category.id, label: category.name })),
     ];
   });
+  daysInMonth = computed(() => {
+    const month = parseInt(this.expenseService.filters().month);
+    const year = parseInt(this.expenseService.filters().year);
+
+    if (!month) return [{ value: '', label: 'Aucun' }];
+
+    const numberOfDays = new Date(year, month, 0).getDate();
+    const newDays = [{ value: '', label: 'Aucun' }];
+
+    for (let day = 1; day <= numberOfDays; day++) {
+      newDays.push({ value: day.toString(), label: day.toString() });
+    }
+
+    return newDays;
+  });
+
   isModalOpen = false;
 
   ngOnInit() {
@@ -74,33 +77,33 @@ export class ExpenseToolbar {
   }
 
   handleYearChange = (event: any) => {
-    this.onFiltersChange.emit({
-      ...this.filters(),
+    this.expenseService.filters.update((current) => ({
+      ...current,
       year: event.value,
       day: '',
-    });
+    }));
   };
 
   handleMonthChange = (event: any) => {
-    this.onFiltersChange.emit({
-      ...this.filters(),
+    this.expenseService.filters.update((current) => ({
+      ...current,
       month: event.value,
       day: '',
-    });
+    }));
   };
 
   handleDayChange = (event: any) => {
-    this.onFiltersChange.emit({
-      ...this.filters(),
+    this.expenseService.filters.update((current) => ({
+      ...current,
       day: event.value,
-    });
+    }));
   };
 
   handleCategoryChange = (event: any) => {
-    this.onFiltersChange.emit({
-      ...this.filters(),
+    this.expenseService.filters.update((current) => ({
+      ...current,
       categoryId: event.value,
-    });
+    }));
   };
 
   handleSavedExpense() {

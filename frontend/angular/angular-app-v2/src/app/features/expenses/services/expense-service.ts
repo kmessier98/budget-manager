@@ -22,6 +22,8 @@ export class ExpenseService {
     month: (new Date().getMonth() + 1).toString(),
     day: new Date().getDate().toString(),
     categoryId: '',
+    pageNumber: '1',
+    pageSize: '10',
   });
 
   constructor() {

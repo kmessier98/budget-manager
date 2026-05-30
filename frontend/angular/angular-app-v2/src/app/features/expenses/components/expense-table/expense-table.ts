@@ -33,14 +33,6 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
   styleUrl: './expense-table.scss',
 })
 export class ExpenseTable {
-  @Output() onPageChange = new EventEmitter<{ pageNumber: number; pageSize: number }>();
-  filters = input({
-    year: '',
-    month: '',
-    day: '',
-    categoryId: '',
-  });
-
   private readonly expenseService = inject(ExpenseService);
   private _messageService = inject(MessageService);
   private _destroyRef = inject(DestroyRef);
@@ -65,7 +57,11 @@ export class ExpenseTable {
     const pageNumber = event.first / event.rows + 1;
     const pageSize = event.rows;
 
-    this.onPageChange.emit({ pageNumber, pageSize });
+    this.expenseService.filters.update((current) => ({
+      ...current,
+      pageNumber: pageNumber.toString(),
+      pageSize: pageSize.toString(),
+    }));
   }
 
   handleEdit(transaction: Expense) {
@@ -99,7 +95,7 @@ export class ExpenseTable {
     }
 
     this.expenseService
-      .deleteExpense(this.selectedExpense.id, this.filters())
+      .deleteExpense(this.selectedExpense.id, this.expenseService.filters())
       .pipe(takeUntilDestroyed(this._destroyRef))
       .subscribe({
         next: () => {

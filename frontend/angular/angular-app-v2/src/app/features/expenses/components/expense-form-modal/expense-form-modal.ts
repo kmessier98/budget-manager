@@ -26,12 +26,6 @@ import { MessageService } from 'primeng/api';
 })
 export class ExpenseFormModal {
   expenseToEdit = input<Expense | null>(null);
-  filters = input<Filters>({
-    year: '',
-    month: '',
-    day: '',
-    categoryId: '',
-  });
   @Output() onClose = new EventEmitter<void>();
   @Output() onExpenseSaved = new EventEmitter<void>();
 
@@ -60,9 +54,13 @@ export class ExpenseFormModal {
     if (this.isEditMode()) {
       return this.expenseToEdit()!.date.split('T')[0];
     } else {
-      const year = this.filters().year;
-      const day = this.filters().day ? String(this.filters().day).padStart(2, '0') : '01';
-      const month = this.filters().month ? String(this.filters().month).padStart(2, '0') : '01';
+      const year = this.expenseService.filters().year;
+      const day = this.expenseService.filters().day
+        ? String(this.expenseService.filters().day).padStart(2, '0')
+        : '01';
+      const month = this.expenseService.filters().month
+        ? String(this.expenseService.filters().month).padStart(2, '0')
+        : '01';
       return `${year}-${month}-${day}`;
     }
   });
@@ -94,7 +92,7 @@ export class ExpenseFormModal {
         // Si c'est le cas, on sélectionne par défaut le premier élément de la liste.
         // Sinon, on prend la catégorie sélectionnée dans le toolbar.
         let defaultCategoryId = this.categories().find(
-          (cat) => cat.value === this.filters().categoryId,
+          (cat) => cat.value === this.expenseService.filters().categoryId,
         )?.value;
         if (!defaultCategoryId) {
           defaultCategoryId = this.categories()[0].value;
@@ -143,7 +141,7 @@ export class ExpenseFormModal {
 
   handleAddExpense(formValues: ExpenseFormValues) {
     this.expenseService
-      .addExpense(formValues, this.filters())
+      .addExpense(formValues, this.expenseService.filters())
       .pipe(takeUntilDestroyed(this._destroyRef))
       .subscribe({
         next: () => {
@@ -161,7 +159,7 @@ export class ExpenseFormModal {
 
   handleUpdateExpense(formValues: ExpenseFormValues) {
     this.expenseService
-      .updateExpense(this.expenseToEdit()!.id, formValues, this.filters())
+      .updateExpense(this.expenseToEdit()!.id, formValues, this.expenseService.filters())
       .pipe(takeUntilDestroyed(this._destroyRef))
       .subscribe({
         next: () => {

@@ -27,49 +27,8 @@ export class ExpenseManager {
   protected readonly expenseService = inject(ExpenseService);
 
   avatar = '/assets/user-avatar.png';
-  filters: WritableSignal<Filters> = signal({
-    year: new Date().getFullYear().toString(),
-    month: (new Date().getMonth() + 1).toString(),
-    day: new Date().getDate().toString(),
-    categoryId: '',
-  });
-
-  daysInMonth = computed(() => {
-    const month = parseInt(this.filters().month);
-    const year = parseInt(this.filters().year);
-
-    if (!month) return [{ value: '', label: 'Aucun' }];
-
-    const numberOfDays = new Date(year, month, 0).getDate();
-    const newDays = [{ value: '', label: 'Aucun' }];
-
-    for (let day = 1; day <= numberOfDays; day++) {
-      newDays.push({ value: day.toString(), label: day.toString() });
-    }
-
-    return newDays;
-  });
-
-  constructor() {
-    effect(() => {
-      // Cet effect se déclenche une fois initialement et agit comme un "watch" sur les changements de filtres.
-      this.expenseService.fetchExpenses(this.filters());
-    });
-  }
 
   ngOnInit() {
     this.categoryService.fetchCategories();
   }
-
-  handleFiltersChange = (filters: Filters) => {
-    this.filters.set(filters);
-  };
-
-  handlePageChange = ({ pageNumber, pageSize }: { pageNumber: number; pageSize: number }) => {
-    this.filters.update((current) => ({
-      ...current,
-      pageNumber: pageNumber.toString(),
-      pageSize: pageSize.toString(),
-    }));
-  };
 }

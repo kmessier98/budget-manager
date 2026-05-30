@@ -6,19 +6,12 @@
     </div>
     <hr />
     <div class="content">
-      <app-expense-toolbar
-        [filters]="filters()"
-        (onFiltersChange)="handleFiltersChange($event)"
-        [daysInMonth]="daysInMonth()"
-      ></app-expense-toolbar>
+      <app-expense-toolbar></app-expense-toolbar>
       <hr />
       <div class="middle">
         <div class="left">
           <app-expense-total-amount></app-expense-total-amount>
-          <app-expense-table
-            [filters]="filters()"
-            (onPageChange)="handlePageChange($event)"
-          ></app-expense-table>
+          <app-expense-table></app-expense-table>
         </div>
         <div class="right">
           <app-expense-chart></app-expense-chart>
