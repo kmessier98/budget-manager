@@ -7,6 +7,10 @@
   h2 {
     @include text-style(1.5rem, $color-1, 700);
     margin-bottom: 7px;
+
+    @media (max-width: 1350px) {
+      text-align: center;
+    }
   }
 
   .chart-container {
