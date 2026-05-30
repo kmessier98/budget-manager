@@ -17,6 +17,7 @@ import { ExpenseFormModal } from '../expense-form-modal/expense-form-modal';
 import { MessageService } from 'primeng/api';
 import { ExpenseDeleteConfirmation } from '../expense-delete-confirmation/expense-delete-confirmation/expense-delete-confirmation';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { TooltipModule } from 'primeng/tooltip';
 
 @Component({
   selector: 'app-expense-table',
@@ -28,6 +29,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
     PaginatorModule,
     ExpenseFormModal,
     ExpenseDeleteConfirmation,
+    TooltipModule,
   ],
   templateUrl: './expense-table.html',
   styleUrl: './expense-table.scss',

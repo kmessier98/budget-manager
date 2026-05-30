@@ -25,9 +25,25 @@
             font-size: 0.875rem;
             color: $color-1;
 
-            &.amount {
+            &.date-cell {
+              white-space: nowrap !important;
+            }
+
+            &.amount-cell {
               font-weight: 600;
               font-size: 1rem;
+            }
+
+            &.description-cell {
+              max-width: 100px;
+            }
+
+            .text-ellipsis {
+              max-width: 300;
+              display: block;
+              overflow: hidden;
+              text-overflow: ellipsis;
+              white-space: nowrap;
             }
 
             .actions {

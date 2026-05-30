@@ -21,10 +21,20 @@
   </ng-template>
   <ng-template pTemplate="body" let-transaction>
     <tr>
-      <td>{{ transaction.date | date: 'dd MMMM yyyy' : '' : 'fr-CA' }}</td>
+      <td class="date-cell">{{ transaction.date | date: 'dd MMMM yyyy' : '' : 'fr-CA' }}</td>
       <td>{{ transaction.category.name }}</td>
-      <td>{{ transaction.description }}</td>
-      <td class="amount">{{ transaction.amount | currency: 'CAD' : 'symbol' : '' : 'fr-CA' }}</td>
+      <td class="description-cell">
+        <span
+          class="cell-content text-ellipsis"
+          [pTooltip]="transaction.description"
+          tooltipPosition="top"
+        >
+          {{ transaction.description }}
+        </span>
+      </td>
+      <td class="amount-cell">
+        {{ transaction.amount | currency: 'CAD' : 'symbol' : '' : 'fr-CA' }}
+      </td>
       <td>
         <div class="actions">
           <p-button icon="pi pi-pencil" class="" (onClick)="handleEdit(transaction)"></p-button>
