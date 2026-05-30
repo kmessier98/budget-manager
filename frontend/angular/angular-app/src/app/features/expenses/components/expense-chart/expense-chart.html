@@ -2,6 +2,16 @@
   <h2>Dépenses par catégéories</h2>
   <hr />
   <div class="chart-container">
+    @if (!chartData()) {
+      <p>Aucune donnée disponible</p>
+    } @else {
+      <p-chart
+        type="doughnut"
+        [data]="chartData()"
+        [options]="chartOptions()"
+        class="w-full md:w-[30rem]"
+      ></p-chart>
+    }
     <!--
         <ResponsiveContainer width="100%" height={550}>
           <PieChart margin={{ top: 20, bottom: 20, left: 30, right: 30 }}>

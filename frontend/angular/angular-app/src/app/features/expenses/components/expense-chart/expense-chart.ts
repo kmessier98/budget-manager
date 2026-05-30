@@ -1,9 +1,10 @@
 import { Component, computed, effect, inject, signal } from '@angular/core';
 import { ExpenseService } from '../../services/expense-service';
+import { ChartModule } from 'primeng/chart';
 
 @Component({
   selector: 'app-expense-chart',
-  imports: [],
+  imports: [ChartModule],
   templateUrl: './expense-chart.html',
   styleUrl: './expense-chart.scss',
 })
@@ -13,25 +14,59 @@ export class ExpenseChart {
   protected chartData = signal<any>(null);
   protected chartOptions = signal<any>(null);
 
-  //sera  suremnet initule. on va initer le chart dans le effect
-  protected readonly data = computed(() => {
-    return this.expenseService.expenses()?.summary?.amountByCategory || [];
-  });
-
   constructor() {
     effect(() => {
-      // 1. On extrait TOUJOURS la valeur du computed en premier dans une variable
-      // Cela force Angular à enregistrer la dépendance de manière stricte à chaque cycle
-      const summary = this.data();
+      const amountByCategory = this.expenseService.expenses()?.summary.amountByCategory || [];
+      console.log('Updating chart data with amountByCategory:', amountByCategory);
 
-      // 2. On fait nos vérifications sur la variable
-      if (summary) {
-        console.log('Le computed fonctionne ! Voici le summary :', summary);
-
-        // C'est ici que vous injecterez les données dans votre graphique PrimeNG !
-      } else {
-        console.log("Le computed est actuellement undefined (en attente de l'API)...");
+      if (amountByCategory.length === 0) {
+        this.chartData.set(null);
+        this.chartOptions.set(null);
+        return;
       }
+
+      const labels = amountByCategory.map(
+        (item) => `${item.name} (${this.amountFormatter(item.amount)})`,
+      );
+      const data = amountByCategory.map((item) => item.amount);
+
+      this.initChart(labels, data);
     });
   }
+
+  initChart(labels: string[], data: number[]) {
+    this.chartData.set({
+      labels,
+      datasets: [
+        {
+          data,
+          backgroundColor: ['#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', '#9966FF', '#FF9F40'],
+        },
+      ],
+    });
+
+    this.chartOptions.set({
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: {
+          position: 'top',
+          align: 'center',
+        },
+        tooltip: {
+          callbacks: {
+            label: (context: any) => ` ${this.amountFormatter(context.raw)}`,
+          },
+        },
+      },
+    });
+  }
+
+  amountFormatter = (value: number) => {
+    const amount = parseFloat(value.toString());
+    return new Intl.NumberFormat('fr-CA', {
+      style: 'currency',
+      currency: 'CAD',
+    }).format(amount);
+  };
 }
