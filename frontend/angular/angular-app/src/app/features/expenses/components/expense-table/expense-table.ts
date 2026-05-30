@@ -1,4 +1,12 @@
-import { Component, computed, EventEmitter, inject, input, Output } from '@angular/core';
+import {
+  Component,
+  computed,
+  DestroyRef,
+  EventEmitter,
+  inject,
+  input,
+  Output,
+} from '@angular/core';
 import { TableModule, TablePageEvent } from 'primeng/table';
 import { ExpenseService } from '../../services/expense-service';
 import { ButtonModule } from 'primeng/button';
@@ -35,6 +43,7 @@ export class ExpenseTable {
 
   private readonly expenseService = inject(ExpenseService);
   private _messageService = inject(MessageService);
+  private _destroyRef = inject(DestroyRef);
 
   protected transactions = computed(() => this.expenseService.expenses()?.transactions || []);
   protected metadata = computed(() => this.expenseService.expenses()?.metadata);
@@ -91,7 +100,7 @@ export class ExpenseTable {
 
     this.expenseService
       .deleteExpense(this.selectedExpense.id, this.filters())
-      .pipe(takeUntilDestroyed())
+      .pipe(takeUntilDestroyed(this._destroyRef))
       .subscribe({
         next: () => {
           this.isDeleteConfirmationOpen = false;
