@@ -8,6 +8,7 @@ import { PaginatorModule } from 'primeng/paginator';
 import { ExpenseFormModal } from '../expense-form-modal/expense-form-modal';
 import { MessageService } from 'primeng/api';
 import { ExpenseDeleteConfirmation } from '../expense-delete-confirmation/expense-delete-confirmation/expense-delete-confirmation';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 @Component({
   selector: 'app-expense-table',
@@ -88,24 +89,27 @@ export class ExpenseTable {
       return;
     }
 
-    this.expenseService.deleteExpense(this.selectedExpense.id, this.filters()).subscribe({
-      next: () => {
-        this.isDeleteConfirmationOpen = false;
-        this._messageService.add({
-          severity: 'success',
-          summary: 'Succès',
-          detail: 'Dépense supprimée avec succès',
-        });
-      },
-      error: (err) => {
-        this.isDeleteConfirmationOpen = false;
-        this._messageService.add({
-          severity: 'error',
-          summary: 'Erreur',
-          detail: 'Une erreur est survenue lors de la suppression de la dépense',
-        });
-      },
-    });
+    this.expenseService
+      .deleteExpense(this.selectedExpense.id, this.filters())
+      .pipe(takeUntilDestroyed())
+      .subscribe({
+        next: () => {
+          this.isDeleteConfirmationOpen = false;
+          this._messageService.add({
+            severity: 'success',
+            summary: 'Succès',
+            detail: 'Dépense supprimée avec succès',
+          });
+        },
+        error: (err) => {
+          this.isDeleteConfirmationOpen = false;
+          this._messageService.add({
+            severity: 'error',
+            summary: 'Erreur',
+            detail: 'Une erreur est survenue lors de la suppression de la dépense',
+          });
+        },
+      });
   }
 
   handleModalClose() {
