@@ -3,24 +3,24 @@ import Dialog from 'primevue/dialog'; // Importation du composant PrimeVue
 import type { Expense, ExpenseFormValues } from '../models/expense/expense';
 import { useCategoryStore } from '../../../stores/category';
 import { useExpenseStore } from '../../../stores/expense';
-import { computed } from 'vue';
+import { computed, reactive } from 'vue';
 import Select from 'primevue/select';
+import { useToast } from 'primevue/usetoast';
+import { z } from 'zod';
+import { zodResolver } from '@primevue/forms/resolvers/zod';
+import Form, { type FormSubmitEvent } from '@primevue/forms/Form';
+import InputText from 'primevue/inputtext';
+import InputNumber from 'primevue/inputnumber';
+import Button from 'primevue/button';
+import Message from 'primevue/message';
 
 const props = defineProps<{ expenseToEdit: Expense | null; }>();
 const emit = defineEmits(['close', 'submit']);
 
+const toast = useToast();
 const categoryStore = useCategoryStore();
 const expenseStore = useExpenseStore();
 const { filters } = expenseStore;
-
-/*
-  protected readonly expenseForm = this._fb.group({
-    amount: [0, [Validators.required, Validators.min(0.01)]],
-    categoryId: ['', Validators.required],
-    date: ['', Validators.required],
-    description: ['', [Validators.required, Validators.maxLength(255)]],
-  });
-  */
 
 const categories = computed(() => {
     const categories = categoryStore.categories;
@@ -56,84 +56,31 @@ const categoryId = computed(() => {
         return defaultCategoryId;
     }
 });
+const form = reactive<ExpenseFormValues>({
+    amount: isEditMode.value ? props.expenseToEdit!.amount : 0,
+    categoryId: categoryId.value,
+    date: date.value!,
+    description: isEditMode.value ? props.expenseToEdit!.description : '',
+});
+const schema = z.object({
+    amount: z.number().positive({ message: 'Le montant doit être supérieur à zéro.' }),
+    categoryId: z.string().min(1, { message: 'La catégorie est requise.' }),
+    date: z.string().min(1, { message: 'La date est requise.' }),
+    description: z.string()
+        .min(1, { message: 'La description est requise.' })
+        .max(255, { message: 'La description ne peut pas dépasser 255 caractères.' }),
+});
+const resolver = zodResolver(schema);
 
-/*  
-constructor() {
-    // Explication : Reactive Forms ne surveille pas les variables d'entrée (qu'elles soient des signaux ou des variables normales).
-    // Le formulaire s'initialise une seule fois au démarrage avec les valeurs par défaut du composant (généralement vides).
-    // Cet effect() [ou un ngOnChanges / setter si c'était une variable normale] sert de passerelle obligatoire
-    // pour écouter l'arrivée des données et forcer la mise à jour des champs internes du formulaire via patchValue().
-    //
-    // Note d'architecture : L'équipe d'Angular travaille sur une nouvelle API ("Signal Forms")
-    // qui permettra aux formulaires de réagir automatiquement, mais elle est encore récente/expérimentale.
-    effect(() => {
-      const expense = this.expenseToEdit();
 
-      if (expense) {
-        // --- MODE MODIFICATION ---
-
-        this.expenseForm.patchValue({
-          amount: expense.amount,
-          categoryId: expense.category.id,
-          date: this.date(),
-          description: expense.description,
-        });
-      } else {
-        // --- MODE AJOUT ---
-
-        // Il est possible de sélectionné "toutes les catégories" dans le toolbar.
-        // Si c'est le cas, on sélectionne par défaut le premier élément de la liste.
-        // Sinon, on prend la catégorie sélectionnée dans le toolbar.
-        let defaultCategoryId = this.categories().find(
-          (cat) => cat.value === this.expenseService.filters().categoryId,
-        )?.value;
-        if (!defaultCategoryId) {
-          defaultCategoryId = this.categories()[0].value;
-        }
-
-        this.expenseForm.patchValue({
-          amount: 0,
-          categoryId: defaultCategoryId,
-          date: this.date(),
-          description: '',
-        });
-      }
-    });
-  }
-
-  get amountControl() {
-    return this.expenseForm.get('amount');
-  }
-*/
-
-/*
-  get amountControl() {
-    return this.expenseForm.get('amount');
-  }
-
-  get categoryIdControl() {
-    return this.expenseForm.get('categoryId');
-  }
-
-  get dateControl() {
-    return this.expenseForm.get('date');
-  }
-
-  get descriptionControl() {
-    return this.expenseForm.get('description');
-  }
-    */
-
-function handleFormSubmit(formValues: ExpenseFormValues) {
-    /*
- if (this.expenseForm.invalid) {
-      this.expenseForm.markAllAsTouched();
-      return;
+function handleFormSubmit(e: FormSubmitEvent) {
+    if (!e.valid) {
+        toast.add({ severity: 'error', summary: 'Erreur', detail: 'Veuillez corriger les erreurs du formulaire.', life: 3000 });
+        return;
     }
 
-    const formValues = this.expenseForm.value as ExpenseFormValues;
-
-    */
+    const formValues = e.values as ExpenseFormValues;
+    console.log('Form values:', formValues);
 
     if (isEditMode.value) {
         handleUpdateExpense(formValues);
@@ -143,11 +90,17 @@ function handleFormSubmit(formValues: ExpenseFormValues) {
 }
 
 function handleAddExpense(formValues: ExpenseFormValues) {
-
+    //Add 
+    //if success => emit('submit')
+    //if error => toast.add({ severity: 'error', summary: 'Erreur', detail
+    toast.add({ severity: 'error', summary: 'Erreur', detail: 'Une erreur est survenue lors de l\'ajout de la dépense.', life: 3000 });
 }
 
 function handleUpdateExpense(formValues: ExpenseFormValues) {
-
+    //update 
+    //if success => emit('submit')
+    //if error => toast.add({ severity: 'error', summary: 'Erreur', detail
+    toast.add({ severity: 'error', summary: 'Erreur', detail: 'Une erreur est survenue lors de la mise à jour de la dépense.', life: 3000 });
 }
 
 
@@ -156,89 +109,45 @@ function handleUpdateExpense(formValues: ExpenseFormValues) {
 <template>
     <Dialog :header="modalTitle" :visible="true" modal @update:visible="emit('close')" class="expense-dialog"
         :style="{ width: '500px', 'max-width': '90%' }">
-        <!--
-        Contenu du formulaire de dépense (champs, boutons, etc.)
-        Par exemple :
-     
-            <!-- Champs du formulaire -->
-        <!--
-        <form @submit.prevent="emit('submit', /* données du formulaire (formData) */)">
-            <button type="submit">Enregistrer</button>
-            <button type="button" @click="emit('close')">Annuler</button>
-        </form>
-        -->
 
-
-        <form class="expense-form-modal">
+        <Form v-slot="$form" :initialValues="form" :resolver="resolver" @submit="handleFormSubmit"
+            class="expense-form-modal">
             <div class="form-group">
                 <label for="amount">Montant ($):</label>
                 <div class="input-container">
-                    <input type="number" id="amount" step="0.01" min="0" formControlName="amount" />
-                    <!--
-                    @if (amountControl?.invalid && (amountControl?.dirty || amountControl?.touched)) {
-                    <span class="error-message visible">
-                        @if (amountControl?.errors?.['required']) {
-                        Le montant est requis.
-                        } @else if (amountControl?.errors?.['min']) {
-                        Le montant doit être supérieur à zéro.
-                        }
-                    </span>
-                    }
-                    -->
+                    <InputNumber type="number" id="amount" name="amount" :min="0" />
+                    <Message v-if="$form.amount?.invalid" name="amount" severity="error" variant="simple">
+                        {{ $form.amount?.error.message }}
+                    </Message>
                 </div>
             </div>
             <div class="form-group">
                 <label for="category">Catégorie:</label>
                 <div class="input-container">
-                    <Select v-model="categoryId" :options="categories" optionLabel="label" optionValue="value"
-                        class="select"></Select>
-                    <!--
-                    <p-select [options]="categories()" optionValue="value" optionLabel="label" class="select"
-                        formControlName="categoryId" appendTo="body" />
-                    @if (
-                    categoryIdControl?.invalid && (categoryIdControl?.dirty || categoryIdControl?.touched)
-                    ) {
-                    <span class="error-message visible">
-                        @if (categoryIdControl?.errors?.['required']) {
-                        La catégorie est requise.
-                        }
-                    </span>
-                    }
-                    -->
+                    <Select :options="categories" name="categoryId" id="categoryId" optionLabel="label"
+                        optionValue="value" class="select"></Select>
+                    <Message v-if="$form.categoryId?.invalid" name="categoryId" severity="error" variant="simple">
+                        {{ $form.categoryId?.error.message }}
+                    </Message>
                 </div>
             </div>
             <div class="form-group">
                 <label for="date">Date:</label>
                 <div class="input-container">
-                    <input v-model="date" type="date" id="date" formControlName="date" />
-                    <!--
-                    @if (dateControl?.invalid && (dateControl?.dirty || dateControl?.touched)) {
-                    <span class="error-message visible">
-                        @if (dateControl?.errors?.['required']) {
-                        La date est requise.
-                        }
-                    </span>
-                    }
-                    -->
+                    <InputText type="date" name="date" id="date" />
+                    <Message v-if="$form.date?.invalid" name="date" severity="error" variant="simple">
+                        {{ $form.date?.error.message }}
+                    </Message>
+
                 </div>
             </div>
             <div class="form-group">
                 <label for="description">Description:</label>
                 <div class="input-container">
-                    <input type="text" id="description" formControlName="description" />
-                    <!--
-                    @if (
-                    descriptionControl?.invalid && (descriptionControl?.dirty || descriptionControl?.touched)
-                    ) {
-                    <span class="error-message visible">
-                        @if (descriptionControl?.errors?.['required']) {
-                        La description est requise.
-                        } @else if (descriptionControl?.errors?.['maxLength']) {
-                        La description ne peut pas dépasser 255 caractères.
-                        }
-                    </span>
-                    }
-                    -->
+                    <InputText name="description" id="description" />
+                    <Message v-if="$form.description?.invalid" name="description" severity="error" variant="simple">
+                        {{ $form.description?.error.message }}
+                    </Message>
                 </div>
             </div>
 
@@ -248,16 +157,11 @@ function handleUpdateExpense(formValues: ExpenseFormValues) {
                     submitButtonLabel
                 }}</p-button>
                 -->
-                <button type="button" @click="emit('close')">Annuler</button>
+                <!--TODO :loading=useExpense.Loading-->
+                <Button type="submit">{{ submitButtonLabel }}</Button>
+                <Button type="button" @click="emit('close')">Annuler</Button>
             </div>
-            <!--
-            @if (expenseService.error()) {
-            <span class="error-message-global visible">
-                {{ expenseService.error() }}
-            </span>
-            }
-            -->
-        </form>
+        </Form>
 
     </Dialog>
 </template>
