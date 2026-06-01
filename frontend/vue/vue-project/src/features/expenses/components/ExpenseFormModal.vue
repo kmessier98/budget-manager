@@ -154,7 +154,7 @@ function handleUpdateExpense(formValues: ExpenseFormValues) {
 </script>
 
 <template>
-    <Dialog :header="modalTitle" :visible="true" modal @update:visible="emit('close')"
+    <Dialog :header="modalTitle" :visible="true" modal @update:visible="emit('close')" class="expense-dialog"
         :style="{ width: '500px', 'max-width': '90%' }">
         <!--
         Contenu du formulaire de dépense (champs, boutons, etc.)
@@ -262,149 +262,164 @@ function handleUpdateExpense(formValues: ExpenseFormValues) {
     </Dialog>
 </template>
 
+<!-- 1. BLOC GLOBAL (SANS SCOPED) : Dédié à la structure externe de PrimeVue -->
+<style lang="scss">
+@use '../../../assets/scss/variables' as *;
+
+.p-dialog-mask {
+    .p-dialog.expense-dialog {
+        .p-dialog-header {
+            background-color: $color-1 !important;
+            padding: 10px 10px 10px 20px !important;
+
+            .p-dialog-title {
+                font-size: 1.5rem !important;
+                color: #fff !important;
+            }
+
+            .p-dialog-close-button {
+                background: none !important;
+                border: none !important;
+                color: #fff !important;
+                box-shadow: none !important; // Enlève l'effet d'ombre au clic de PrimeVue
+
+                &:hover {
+                    background: rgba(255, 255, 255, 0.2) !important;
+                }
+
+                svg {
+                    color: #fff !important;
+                }
+            }
+        }
+
+        .p-dialog-content {
+            background-color: #fff !important;
+            padding: 15px 20px !important;
+        }
+    }
+}
+</style>
+
+<!-- 2. BLOC SCOPED : Dédié au style interne du formulaire -->
 <style lang="scss" scoped>
 @use '../../../assets/scss/variables' as *;
 
-:host ::ng-deep {
-    .p-dialog-header {
-        background-color: $color-1;
-        padding: 10px 10px 10px 20px;
+.expense-form-modal {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    padding-top: 10px;
 
-        .p-dialog-title {
-            font-size: 1.5rem;
+    .form-group {
+        display: flex;
+        flex-direction: row;
+        align-items: flex-start;
+        gap: 16px;
+
+        label {
             color: $color-1;
-            color: #fff;
+            font-size: 1rem;
+            font-weight: 400;
+            width: 90px;
+            padding-top: 5px;
         }
 
-        button {
-            background: none;
-            border: none;
-            font-size: 2rem;
-            color: #fff;
+        .input-container {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            flex: 1;
+        }
+
+        input {
+            border-radius: 4px;
+            width: 100%;
+            padding: 4px 0;
+            padding-left: 8px;
+        }
+
+        .p-select {
+            border: 2px solid $color-1;
+            border-radius: 4px;
+            width: 100%;
+
+            .p-select-label {
+                padding: 4px 8px;
+            }
         }
     }
 
-    .p-dialog-content {
-        background-color: #fff;
-        padding: 15px 20px;
+    .actions {
+        display: flex;
+        justify-content: flex-end;
+        gap: 8px;
 
-        .expense-form-modal {
-            display: flex;
-            flex-direction: column;
-            gap: 16px;
-            padding-top: 10px;
+        button {
+            background-color: $color-1;
+            color: #fff;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 500;
+            margin-top: auto;
 
-            .form-group {
-                display: flex;
-                flex-direction: row;
-                align-items: flex-start;
-                gap: 16px;
-
-                label {
-                    color: $color-1;
-                    font-size: 1rem;
-                    font-weight: 400;
-                    width: 90px;
-                    padding-top: 5px;
-                }
-
-                .input-container {
-                    width: 100%;
-                    display: flex;
-                    flex-direction: column;
-                    flex: 1;
-                }
-
-                input {
-                    border-radius: 4px;
-                    width: 100%;
-                    padding: 4px 0;
-                    padding-left: 8px;
-                }
-
-                .p-select {
-                    border: 2px solid $color-1;
-                    border-radius: 4px;
-                    width: 100%;
-
-                    .p-select-label {
-                        padding: 4px 8px;
-                    }
-                }
+            &:hover {
+                background-color: $background-color-3;
             }
 
-            .actions {
-                display: flex;
-                justify-content: flex-end;
-                gap: 8px;
+            &.disabled {
+                background-color: #ccc;
+                cursor: not-allowed;
 
-                button {
-                    background-color: $color-1;
-                    color: #fff;
-                    border: none;
-                    padding: 8px 16px;
-                    border-radius: 4px;
-                    cursor: pointer;
-                    font-size: 1rem;
-                    font-weight: 500;
-                    margin-top: auto;
-
-                    &:hover {
-                        background-color: $background-color-3;
-                    }
-
-                    &.disabled {
-                        background-color: #ccc;
-                        cursor: not-allowed;
-
-                        &:hover {
-                            background-color: #ccc;
-                        }
-                    }
-                }
-
-                button[type='button'] {
+                &:hover {
                     background-color: #ccc;
-                    color: $color-1;
-                    font-weight: 400;
-
-                    &:hover {
-                        background-color: #bbb;
-                    }
-
-                    &.disabled {
-                        background-color: #ccc;
-                        cursor: not-allowed;
-
-                        &:hover {
-                            background-color: #ccc;
-                        }
-                    }
                 }
             }
+        }
 
-            .error-message {
-                color: #dc3545;
-                font-size: 12px;
-                margin-top: 4px;
-                visibility: hidden;
+        button[type='button'] {
+            background-color: #ccc;
+            color: $color-1;
+            font-weight: 400;
 
-                &.visible {
-                    visibility: visible;
-                }
+            &:hover {
+                background-color: #bbb;
             }
 
-            .error-message-global {
-                color: #dc3545;
-                font-size: 14px;
-                margin-top: 8px;
-                text-align: left;
-                visibility: hidden;
+            &.disabled {
+                background-color: #ccc;
+                cursor: not-allowed;
 
-                &.visible {
-                    visibility: visible;
+                &:hover {
+                    background-color: #ccc;
                 }
             }
+        }
+    }
+
+    .error-message {
+        color: #dc3545;
+        font-size: 12px;
+        margin-top: 4px;
+        visibility: hidden;
+
+        &.visible {
+            visibility: visible;
+        }
+    }
+
+    .error-message-global {
+        color: #dc3545;
+        font-size: 14px;
+        margin-top: 8px;
+        text-align: left;
+        visibility: hidden;
+
+        &.visible {
+            visibility: visible;
         }
     }
 }
