@@ -132,7 +132,8 @@ function handleSavedExpense() {
                 <button @click="isModalOpen = true">Ajouter une dépense</button>
             </div>
         </div>
-        <ExpenseFormModal v-if="isModalOpen" @close="isModalOpen = false" @submit="handleSavedExpense" />
+        <ExpenseFormModal v-if="isModalOpen" :expenseToEdit="null" @close="isModalOpen = false"
+            @submit="handleSavedExpense" />
     </div>
 </template>
 
