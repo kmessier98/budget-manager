@@ -4,6 +4,7 @@ import type { Expense, ExpenseFormValues } from '../models/expense/expense';
 import { useCategoryStore } from '../../../stores/category';
 import { useExpenseStore } from '../../../stores/expense';
 import { computed } from 'vue';
+import Select from 'primevue/select';
 
 const props = defineProps<{ expenseToEdit: Expense | null; }>();
 const emit = defineEmits(['close', 'submit']);
@@ -40,6 +41,19 @@ const date = computed(() => {
             ? String(filters.month).padStart(2, '0')
             : '01';
         return `${year}-${month}-${day}`;
+    }
+});
+const categoryId = computed(() => {
+    if (isEditMode.value) {
+        return props.expenseToEdit!.category.id;
+    } else {
+        let defaultCategoryId = categories.value.find(
+            (cat) => cat.value === filters.categoryId,
+        )?.value;
+        if (!defaultCategoryId) {
+            defaultCategoryId = categories.value[0]!.value;
+        }
+        return defaultCategoryId;
     }
 });
 
@@ -176,6 +190,8 @@ function handleUpdateExpense(formValues: ExpenseFormValues) {
             <div class="form-group">
                 <label for="category">Catégorie:</label>
                 <div class="input-container">
+                    <Select v-model="categoryId" :options="categories" optionLabel="label" optionValue="value"
+                        class="select"></Select>
                     <!--
                     <p-select [options]="categories()" optionValue="value" optionLabel="label" class="select"
                         formControlName="categoryId" appendTo="body" />
@@ -194,7 +210,7 @@ function handleUpdateExpense(formValues: ExpenseFormValues) {
             <div class="form-group">
                 <label for="date">Date:</label>
                 <div class="input-container">
-                    <input type="date" id="date" formControlName="date" />
+                    <input v-model="date" type="date" id="date" formControlName="date" />
                     <!--
                     @if (dateControl?.invalid && (dateControl?.dirty || dateControl?.touched)) {
                     <span class="error-message visible">

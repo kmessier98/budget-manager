@@ -58,7 +58,7 @@ const years = computed(() => {
     return result;
 });
 const monthModel = computed({
-    get: () => { filters.value.month; console.log(filters.value.month); console.log(filters.value.day); return filters.value.month },
+    get: () => filters.value.month,
     set: (value) => setMonth(value)
 })
 const yearModel = computed({
