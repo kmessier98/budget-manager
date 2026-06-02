@@ -184,7 +184,7 @@ async function handleUpdateExpense(formValues: ExpenseFormValues) {
             </div>
 
             <span v-if="submitError || fetchError" class="error-message-global visible">{{ submitError || fetchError
-                }}</span>
+            }}</span>
         </Form>
     </Dialog>
 </template>

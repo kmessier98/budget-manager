@@ -9,6 +9,7 @@ import DataTable, { type DataTablePageEvent } from 'primevue/datatable';
 import Column from 'primevue/column';
 import Button from 'primevue/button';
 import ExpenseFormModal from "./ExpenseFormModal.vue";
+import ExpenseDeleteConfirmation from "./ExpenseDeleteConfirmation.vue";
 
 const expenseStore = useExpenseStore();
 const { filters, expenses } = storeToRefs(expenseStore);
@@ -125,6 +126,8 @@ function formatAmount(amount: number): string {
     </DataTable>
     <ExpenseFormModal v-if="isEditModalOpen" :expenseToEdit="selectedExpense" @close="handleModalClose"
         @submit="handleSavedExpense" />
+    <ExpenseDeleteConfirmation v-if="isDeleteConfirmationOpen" :expenseToDelete="selectedExpense!"
+        @close="handleModalClose" @deleted="handleDeletedExpense" />
 
 </template>
 
