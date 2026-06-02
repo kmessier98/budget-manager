@@ -2,13 +2,13 @@
 import avatar from "@/assets/images/user-avatar.png";
 import ExpenseToolbar from "../../components/ExpenseToolbar.vue";
 import { onMounted } from "vue";
-import { useCategoryStore } from "../../../../stores/category";
+import { useCategoryStore } from "../../../categories/stores/category.ts";
 import ProgressSpinner from 'primevue/progressspinner';
 
 const categoryStore = useCategoryStore();
 
-onMounted(() => {
-  categoryStore.fetchCategories();
+onMounted(async () => {
+  await categoryStore.fetchCategories();
 });
 </script>
 

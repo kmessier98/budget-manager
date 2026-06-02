@@ -1,15 +1,17 @@
 <script setup lang="ts">
 import { ref, computed } from "vue";
-import { useExpenseStore } from "../../../stores/expense";
-import { useCategoryStore } from "../../../stores/category";
+import { useExpenseStore } from "../stores/expense";
+import { useCategoryStore } from "../../categories/stores/category";
 import { storeToRefs } from 'pinia';
 import Select from 'primevue/select';
 import ExpenseFormModal from "./ExpenseFormModal.vue";
+import { useToast } from 'primevue/usetoast';
 
 const expenseStore = useExpenseStore();
 const { filters } = storeToRefs(expenseStore);
 const { setYear, setMonth } = expenseStore;
 const categoryStore = useCategoryStore();
+const toast = useToast();
 const START_YEAR = 1900;
 const CURRENT_YEAR = new Date().getFullYear();
 const months = [
@@ -100,7 +102,7 @@ const isModalOpen = ref(false);
 
 function handleSavedExpense() {
     isModalOpen.value = false;
-    //todo alert message success
+    toast.add({ severity: 'success', summary: 'Succès', detail: 'Dépense enregistrée avec succès.', life: 3000 });
 }
 
 </script>

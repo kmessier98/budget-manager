@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import Dialog from 'primevue/dialog'; // Importation du composant PrimeVue
 import type { Expense, ExpenseFormValues } from '../models/expense/expense';
-import { useCategoryStore } from '../../../stores/category';
-import { useExpenseStore } from '../../../stores/expense';
+import { useCategoryStore } from '../../categories/stores/category';
+import { useExpenseStore } from '../stores/expense';
 import { computed, reactive } from 'vue';
 import Select from 'primevue/select';
 import { useToast } from 'primevue/usetoast';
@@ -13,6 +13,7 @@ import InputText from 'primevue/inputtext';
 import InputNumber from 'primevue/inputnumber';
 import Button from 'primevue/button';
 import Message from 'primevue/message';
+import { useExpenseApi } from '../composables/useExpenseApi';
 
 const props = defineProps<{ expenseToEdit: Expense | null; }>();
 const emit = defineEmits(['close', 'submit']);
@@ -21,6 +22,7 @@ const toast = useToast();
 const categoryStore = useCategoryStore();
 const expenseStore = useExpenseStore();
 const { filters } = expenseStore;
+const { addExpense, error, loading } = useExpenseApi();
 
 const categories = computed(() => {
     const categories = categoryStore.categories;
@@ -73,7 +75,7 @@ const schema = z.object({
 const resolver = zodResolver(schema);
 
 
-function handleFormSubmit(e: FormSubmitEvent) {
+async function handleFormSubmit(e: FormSubmitEvent) {
     if (!e.valid) {
         toast.add({ severity: 'error', summary: 'Erreur', detail: 'Veuillez corriger les erreurs du formulaire.', life: 3000 });
         return;
@@ -83,20 +85,23 @@ function handleFormSubmit(e: FormSubmitEvent) {
     console.log('Form values:', formValues);
 
     if (isEditMode.value) {
-        handleUpdateExpense(formValues);
+        await handleUpdateExpense(formValues);
     } else {
-        handleAddExpense(formValues);
+        await handleAddExpense(formValues);
     }
 }
 
-function handleAddExpense(formValues: ExpenseFormValues) {
-    //Add 
-    //if success => emit('submit')
-    //if error => toast.add({ severity: 'error', summary: 'Erreur', detail
-    toast.add({ severity: 'error', summary: 'Erreur', detail: 'Une erreur est survenue lors de l\'ajout de la dépense.', life: 3000 });
+async function handleAddExpense(formValues: ExpenseFormValues) {
+    try {
+        const response = await addExpense(formValues);
+        emit('submit');
+    } catch (err) {
+        console.error('Error adding expense:', err);
+        toast.add({ severity: 'error', summary: 'Erreur', detail: 'Une erreur est survenue lors de l\'ajout de la dépense.', life: 3000 });
+    }
 }
 
-function handleUpdateExpense(formValues: ExpenseFormValues) {
+async function handleUpdateExpense(formValues: ExpenseFormValues) {
     //update 
     //if success => emit('submit')
     //if error => toast.add({ severity: 'error', summary: 'Erreur', detail
@@ -152,17 +157,12 @@ function handleUpdateExpense(formValues: ExpenseFormValues) {
             </div>
 
             <div class="actions">
-                <!---
-                <p-button type="submit" [loading]="expenseService.loading()">{{
-                    submitButtonLabel
-                }}</p-button>
-                -->
-                <!--TODO :loading=useExpense.Loading-->
-                <Button type="submit">{{ submitButtonLabel }}</Button>
+                <Button type="submit" :loading="loading">{{ submitButtonLabel }}</Button>
                 <Button type="button" @click="emit('close')">Annuler</Button>
             </div>
-        </Form>
 
+            <span v-if="error" class="error-message-global visible">{{ error }}</span>
+        </Form>
     </Dialog>
 </template>
 

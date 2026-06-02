@@ -1,6 +1,6 @@
 import { defineStore } from "pinia";
 import { ref } from "vue";
-import { type Category } from "../features/categories/models/category/category";
+import { type Category } from "../models/category/category";
 
 export const useCategoryStore = defineStore("category", () => {
   const categories = ref<Category[]>([]);
