@@ -65,7 +65,26 @@ export function useExpenseApi() {
     }
   };
 
-  return { error, loading, addExpense, updateExpense };
+  const deleteExpense = async (expenseId: string): Promise<void> => {
+    loading.value = true;
+    error.value = null;
+
+    try {
+      const response = await fetch(`/api/transaction/${expenseId}`, {
+        method: "DELETE",
+      });
+      if (!response.ok) {
+        throw new Error("Failed to delete expense");
+      }
+    } catch (err) {
+      error.value = (err as Error).message;
+      throw err;
+    } finally {
+      loading.value = false;
+    }
+  };
+
+  return { error, loading, addExpense, updateExpense, deleteExpense };
 }
 
 const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));

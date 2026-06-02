@@ -25,13 +25,13 @@ export const useExpenseStore = defineStore("expense", () => {
     filters.value.day = "";
   }
 
-  const fetchExpenses = async (filters: Filters): Promise<void> => {
+  const fetchExpenses = async (): Promise<void> => {
     loading.value = true;
     error.value = null;
 
     try {
       const queryParams = new URLSearchParams(
-        filters as Record<string, string>,
+        filters.value as Record<string, string>,
       ).toString();
 
       const response = await fetch(`/api/transaction?${queryParams}`);
@@ -50,7 +50,7 @@ export const useExpenseStore = defineStore("expense", () => {
   watch(
     filters,
     async (newFilters) => {
-      await fetchExpenses(newFilters);
+      await fetchExpenses();
       console.log("Filters changed:", newFilters);
       console.log("Current expenses:", expenses.value);
     },

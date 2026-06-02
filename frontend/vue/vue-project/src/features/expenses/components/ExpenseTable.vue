@@ -1,25 +1,28 @@
 <script setup lang="ts">
 import { computed, ref } from "vue";
 import { useExpenseStore } from "../stores/expense";
-import { storeToRefs } from 'pinia';
+import { storeToRefs } from "pinia";
 import type { PaginationMetadata } from "@/models/pagination";
 import type { Expense } from "../models/expense/expense";
-import { useToast } from 'primevue/usetoast';
-import DataTable, { type DataTablePageEvent } from 'primevue/datatable';
-import Column from 'primevue/column';
-import Button from 'primevue/button';
+import { useToast } from "primevue/usetoast";
+import DataTable, { type DataTablePageEvent } from "primevue/datatable";
+import Column from "primevue/column";
+import Button from "primevue/button";
 import ExpenseFormModal from "./ExpenseFormModal.vue";
 import ExpenseDeleteConfirmation from "./ExpenseDeleteConfirmation.vue";
+import { useExpenseApi } from "../../expenses/composables/useExpenseApi.ts";
 
 const expenseStore = useExpenseStore();
-const { filters, expenses } = storeToRefs(expenseStore);
+const { filters, expenses, loading: fetchLoading } = storeToRefs(expenseStore);
+const { deleteExpense, loading: deleteLoading } = useExpenseApi();
+
 const toast = useToast();
 
 const transactions = computed(() => {
     return expenses.value?.transactions || [];
 });
 const metadata = computed<PaginationMetadata>(() => {
-    return expenses.value?.metadata || {} as PaginationMetadata;
+    return expenses.value?.metadata || ({} as PaginationMetadata);
 });
 
 const first = computed(() => {
@@ -35,7 +38,6 @@ const isEditModalOpen = ref(false);
 const isDeleteConfirmationOpen = ref(false);
 const selectedExpense = ref<Expense | null>(null);
 
-
 function handlePageChange(event: DataTablePageEvent) {
     console.log("Page changed:", event);
     const pageNumber = event.first / event.rows + 1; //ou event.page + 1 si event.page est disponible
@@ -43,7 +45,6 @@ function handlePageChange(event: DataTablePageEvent) {
 
     filters.value.pageNumber = pageNumber.toString();
     filters.value.pageSize = pageSize.toString();
-
 }
 function handleEdit(transaction: Expense) {
     selectedExpense.value = transaction;
@@ -58,21 +59,45 @@ function handleDelete(transaction: Expense) {
 function handleSavedExpense() {
     isEditModalOpen.value = false;
     selectedExpense.value = null;
-    toast.add({ severity: 'success', summary: 'Succès', detail: 'Dépense enregistrée avec succès', life: 3000 });
+    toast.add({
+        severity: "success",
+        summary: "Succès",
+        detail: "Dépense enregistrée avec succès",
+        life: 3000,
+    });
 }
 
-function handleDeletedExpense() {
+async function handleDeletedExpense() {
     if (!selectedExpense.value) {
         isDeleteConfirmationOpen.value = false;
-        toast.add({ severity: 'error', summary: 'Erreur', detail: 'Aucune dépense sélectionnée pour la suppression.', life: 3000 });
+        toast.add({
+            severity: "error",
+            summary: "Erreur",
+            detail: "Aucune dépense sélectionnée pour la suppression.",
+            life: 3000,
+        });
         return;
     }
 
-    // call api pour delete
-    isDeleteConfirmationOpen.value = false;
-    selectedExpense.value = null;
-    // await expenseStore.fetchExpenses(); + filters
-    toast.add({ severity: 'success', summary: 'Succès', detail: 'Dépense supprimée avec succès', life: 3000 });
+    try {
+        await deleteExpense(selectedExpense.value.id);
+        await expenseStore.fetchExpenses();
+        isDeleteConfirmationOpen.value = false;
+        selectedExpense.value = null;
+        toast.add({
+            severity: "success",
+            summary: "Succès",
+            detail: "Dépense supprimée avec succès",
+            life: 3000,
+        });
+    } catch (error) {
+        toast.add({
+            severity: "error",
+            summary: "Erreur",
+            detail: "Une erreur est survenue lors de la suppression de la dépense.",
+            life: 3000,
+        });
+    }
 }
 
 function handleModalClose() {
@@ -83,19 +108,25 @@ function handleModalClose() {
 
 function formatDate(dateStr: string): string {
     const date = new Date(dateStr);
-    return new Intl.DateTimeFormat('fr-CA', { day: '2-digit', month: 'long', year: 'numeric' }).format(date);
+    return new Intl.DateTimeFormat("fr-CA", {
+        day: "2-digit",
+        month: "long",
+        year: "numeric",
+    }).format(date);
 }
 
 function formatAmount(amount: number): string {
-    return new Intl.NumberFormat('fr-CA', { style: 'currency', currency: 'CAD' }).format(amount);
+    return new Intl.NumberFormat("fr-CA", {
+        style: "currency",
+        currency: "CAD",
+    }).format(amount);
 }
-
 </script>
 
 <template>
     <DataTable :value="transactions" :paginator="true" :lazy="true" :rows="metadata.pageSize"
         :totalRecords="metadata.totalItems" :first="first" :rowsPerPageOptions="[5, 10, 20, 50]" class="expense-table"
-        @page="handlePageChange($event)">
+        @page="handlePageChange($event)" :loading="deleteLoading || fetchLoading">
         <Column field="date" header="Date" class="date-cell">
             <template #body="slotProps">
                 {{ formatDate(slotProps.data.date) }}
@@ -126,19 +157,16 @@ function formatAmount(amount: number): string {
     </DataTable>
     <ExpenseFormModal v-if="isEditModalOpen" :expenseToEdit="selectedExpense" @close="handleModalClose"
         @submit="handleSavedExpense" />
-    <ExpenseDeleteConfirmation v-if="isDeleteConfirmationOpen" :expenseToDelete="selectedExpense!"
+    <ExpenseDeleteConfirmation v-if="isDeleteConfirmationOpen" :expenseToDelete="selectedExpense"
         @close="handleModalClose" @deleted="handleDeletedExpense" />
-
 </template>
 
-
 <style lang="scss" scoped>
-@use '../../../assets/scss/variables' as *;
-
+@use "../../../assets/scss/variables" as *;
 
 .expense-table :deep(.p-datatable-thead > tr > th) {
-    color: $color-1 ;
-    background-color: #e1e6f7
+    color: $color-1;
+    background-color: #e1e6f7;
 }
 
 .expense-table :deep(.p-datatable-tbody > tr) {
@@ -194,7 +222,6 @@ function formatAmount(amount: number): string {
         }
     }
 }
-
 
 .expense-table :deep(.p-paginator) {
     background-color: #e1e6f7;

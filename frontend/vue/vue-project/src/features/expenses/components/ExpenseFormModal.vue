@@ -100,7 +100,7 @@ async function handleFormSubmit(e: FormSubmitEvent) {
 
 async function handleFetchExpenses() {
     try {
-        await fetchExpenses(filters.value);
+        await fetchExpenses();
     } catch (err) {
         console.error('Error fetching expenses:', err);
         toast.add({ severity: 'error', summary: 'Erreur', detail: 'Une erreur est survenue lors du chargement des dépenses.', life: 3000 });
