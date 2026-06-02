@@ -4,6 +4,8 @@ import ExpenseToolbar from "../../components/ExpenseToolbar.vue";
 import { onMounted } from "vue";
 import { useCategoryStore } from "../../../categories/stores/category.ts";
 import ProgressSpinner from 'primevue/progressspinner';
+import ExpenseTotalAmount from "../../components/ExpenseTotalAmount.vue";
+
 
 const categoryStore = useCategoryStore();
 
@@ -26,11 +28,11 @@ onMounted(async () => {
           <hr />
           <div class="middle">
             <div class="left">
-              <app-expense-total-amount></app-expense-total-amount>
-              <app-expense-table></app-expense-table>
+              <ExpenseTotalAmount></ExpenseTotalAmount>
+              <ExpenseTable></ExpenseTable>
             </div>
             <div class="right">
-              <app-expense-chart></app-expense-chart>
+              <ExpenseChart></ExpenseChart>
             </div>
           </div>
         </div>
