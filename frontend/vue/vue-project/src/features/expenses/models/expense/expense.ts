@@ -5,6 +5,8 @@ export type Filters = {
   month: string;
   day: string;
   categoryId: string;
+  pageNumber: string;
+  pageSize: string;
 };
 
 export type ExpenseFormValues = {
