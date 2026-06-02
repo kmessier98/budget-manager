@@ -7,6 +7,7 @@ import type { Expense } from "../models/expense/expense";
 import { useToast } from 'primevue/usetoast';
 import DataTable, { type DataTablePageEvent } from 'primevue/datatable';
 import Column from 'primevue/column';
+import Button from 'primevue/button';
 
 const expenseStore = useExpenseStore();
 const { filters, expenses } = storeToRefs(expenseStore);
@@ -116,8 +117,8 @@ function formatAmount(amount: number): string {
         <Column header="Actions" class="actions-cell">
             <template #body="slotProps">
                 <div class="actions">
-                    <button @click="handleEdit(slotProps.data)">Éditer</button>
-                    <button @click="handleDelete(slotProps.data)">Supprimer</button>
+                    <Button @click="handleEdit(slotProps.data)" icon="pi pi-pencil" />
+                    <Button @click="handleDelete(slotProps.data)" icon="pi pi-trash" />
                 </div>
             </template>
         </Column>
@@ -127,120 +128,74 @@ function formatAmount(amount: number): string {
 <style lang="scss" scoped>
 @use '../../../assets/scss/variables' as *;
 
-:deep(.p-datatable) {
-    .p-datatable-table-container {
-        .p-datatable-table {
-            .p-datatable-thead {
-                tr {
-                    th {
-                        color: $color-1;
-                        background-color: #e1e6f7;
-                    }
-                }
-            }
 
-            .p-datatable-tbody {
-                tr {
-                    background-color: #fff;
+.expense-table :deep(.p-datatable-thead > tr > th) {
+    color: $color-1 ;
+    background-color: #e1e6f7
+}
 
-                    &:hover {
-                        background-color: #f9f9f9;
-                    }
-                }
+.expense-table :deep(.p-datatable-tbody > tr) {
+    background-color: #fff;
 
-                td {
-                    font-size: 0.875rem;
-                    color: $color-1;
+    &:hover {
+        background-color: #f9f9f9;
+    }
+}
 
-                    &.date-cell {
-                        white-space: nowrap !important;
-                    }
+.expense-table :deep(.p-datatable-tbody > tr > td) {
+    font-size: 0.875rem;
+    color: $color-1;
 
-                    &.amount-cell {
-                        font-weight: 600;
-                        font-size: 1rem;
-                    }
+    &.date-cell {
+        white-space: nowrap !important;
+    }
 
-                    &.description-cell {
-                        max-width: 100px;
-                    }
+    &.amount-cell {
+        font-weight: 600;
+        font-size: 1rem;
+    }
 
-                    .text-ellipsis {
-                        max-width: 300;
-                        display: block;
-                        overflow: hidden;
-                        text-overflow: ellipsis;
-                        white-space: nowrap;
-                    }
+    &.description-cell {
+        max-width: 100px;
+    }
 
-                    .actions {
-                        display: flex;
-                        gap: 8px;
+    .text-ellipsis {
+        max-width: 300px;
+        display: block;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
 
-                        button {
-                            background-color: $color-1;
-                            color: #fff;
-                            border: none;
-                            padding: 4px 8px;
-                            border-radius: 4px;
-                            font-size: 0.875rem;
-                            font-weight: 500;
-                            width: 40px;
+    .actions {
+        display: flex;
+        gap: 8px;
 
-                            &:hover {
-                                background-color: $background-color-3;
-                            }
-                        }
-                    }
-                }
+        button {
+            background-color: $color-1;
+            color: #fff;
+            border: none;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 0.875rem;
+            font-weight: 500;
+            width: 40px;
+
+            &:hover {
+                background-color: $background-color-3;
             }
         }
     }
 }
 
 
-.pagination-table {
+.expense-table :deep(.p-paginator) {
     background-color: #e1e6f7;
-    padding: 12px 8px;
-    font-size: 1rem;
-    font-weight: 600;
-    color: $color-1;
-    text-align: center;
-    gap: 8px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    margin-top: -12px;
 
     button {
-        background-color: $color-1;
-        color: #fff;
-        border: none;
-        padding: 4px 8px;
-        border-radius: 4px;
-        cursor: pointer;
-        font-size: 0.875rem;
-        font-weight: 500;
+        &:hover {}
 
-        &:hover {
-            background-color: $background-color-3;
-        }
-
-        &:disabled {
-            background-color: #ccc;
-            cursor: not-allowed;
-
-            &:hover {
-                background-color: #ccc;
-            }
-        }
-    }
-
-    select {
-        border-radius: 4px;
-        padding: 4px 0;
-        padding-left: 8px;
-        border: 2px solid $color-1;
+        &:disabled {}
     }
 }
 </style>
