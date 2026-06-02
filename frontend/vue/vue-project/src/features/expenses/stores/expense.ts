@@ -39,6 +39,7 @@ export const useExpenseStore = defineStore("expense", () => {
         throw new Error("Failed to fetch expenses");
       }
       expenses.value = await response.json();
+      console.log("Fetched expenses:", expenses.value);
     } catch (err) {
       error.value = (err as Error).message;
     } finally {

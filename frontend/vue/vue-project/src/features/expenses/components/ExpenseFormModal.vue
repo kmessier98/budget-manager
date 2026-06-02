@@ -14,6 +14,7 @@ import InputNumber from 'primevue/inputnumber';
 import Button from 'primevue/button';
 import Message from 'primevue/message';
 import { useExpenseApi } from '../composables/useExpenseApi';
+import { storeToRefs } from 'pinia';
 
 const props = defineProps<{ expenseToEdit: Expense | null; }>();
 const emit = defineEmits(['close', 'submit']);
@@ -21,8 +22,10 @@ const emit = defineEmits(['close', 'submit']);
 const toast = useToast();
 const categoryStore = useCategoryStore();
 const expenseStore = useExpenseStore();
-const { filters } = expenseStore;
-const { addExpense, error, loading } = useExpenseApi();
+const { fetchExpenses } = expenseStore;
+const { filters, loading: isFetching, error: fetchError } = storeToRefs(expenseStore);
+const { addExpense, error: submitError, loading: isSubmitting } = useExpenseApi();
+
 
 const categories = computed(() => {
     const categories = categoryStore.categories;
@@ -35,12 +38,12 @@ const date = computed(() => {
     if (isEditMode.value) {
         return props.expenseToEdit!.date.split('T')[0];
     } else {
-        const year = filters.year;
-        const day = filters.day
-            ? String(filters.day).padStart(2, '0')
+        const year = filters.value.year;
+        const day = filters.value.day
+            ? String(filters.value.day).padStart(2, '0')
             : '01';
-        const month = filters.month
-            ? String(filters.month).padStart(2, '0')
+        const month = filters.value.month
+            ? String(filters.value.month).padStart(2, '0')
             : '01';
         return `${year}-${month}-${day}`;
     }
@@ -50,7 +53,7 @@ const categoryId = computed(() => {
         return props.expenseToEdit!.category.id;
     } else {
         let defaultCategoryId = categories.value.find(
-            (cat) => cat.value === filters.categoryId,
+            (cat) => cat.value === filters.value.categoryId,
         )?.value;
         if (!defaultCategoryId) {
             defaultCategoryId = categories.value[0]!.value;
@@ -91,9 +94,19 @@ async function handleFormSubmit(e: FormSubmitEvent) {
     }
 }
 
+async function handleFetchExpenses() {
+    try {
+        await fetchExpenses(filters.value);
+    } catch (err) {
+        console.error('Error fetching expenses:', err);
+        toast.add({ severity: 'error', summary: 'Erreur', detail: 'Une erreur est survenue lors du chargement des dépenses.', life: 3000 });
+    }
+}
+
 async function handleAddExpense(formValues: ExpenseFormValues) {
     try {
         const response = await addExpense(formValues);
+        await handleFetchExpenses();
         emit('submit');
     } catch (err) {
         console.error('Error adding expense:', err);
@@ -107,6 +120,7 @@ async function handleUpdateExpense(formValues: ExpenseFormValues) {
     //if error => toast.add({ severity: 'error', summary: 'Erreur', detail
     toast.add({ severity: 'error', summary: 'Erreur', detail: 'Une erreur est survenue lors de la mise à jour de la dépense.', life: 3000 });
 }
+
 
 
 </script>
@@ -157,11 +171,12 @@ async function handleUpdateExpense(formValues: ExpenseFormValues) {
             </div>
 
             <div class="actions">
-                <Button type="submit" :loading="loading">{{ submitButtonLabel }}</Button>
+                <Button type="submit" :loading="isSubmitting || isFetching">{{ submitButtonLabel }}</Button>
                 <Button type="button" @click="emit('close')">Annuler</Button>
             </div>
 
-            <span v-if="error" class="error-message-global visible">{{ error }}</span>
+            <span v-if="submitError || fetchError" class="error-message-global visible">{{ submitError || fetchError
+            }}</span>
         </Form>
     </Dialog>
 </template>
