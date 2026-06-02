@@ -5,6 +5,7 @@ import { onMounted } from "vue";
 import { useCategoryStore } from "../../../categories/stores/category.ts";
 import ProgressSpinner from 'primevue/progressspinner';
 import ExpenseTotalAmount from "../../components/ExpenseTotalAmount.vue";
+import ExpenseTable from "../../components/ExpenseTable.vue";
 
 
 const categoryStore = useCategoryStore();
