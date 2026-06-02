@@ -24,7 +24,7 @@ const categoryStore = useCategoryStore();
 const expenseStore = useExpenseStore();
 const { fetchExpenses } = expenseStore;
 const { filters, loading: isFetching, error: fetchError } = storeToRefs(expenseStore);
-const { addExpense, error: submitError, loading: isSubmitting } = useExpenseApi();
+const { addExpense, updateExpense, error: submitError, loading: isSubmitting } = useExpenseApi();
 
 
 const categories = computed(() => {
@@ -62,6 +62,7 @@ const categoryId = computed(() => {
     }
 });
 const form = reactive<ExpenseFormValues>({
+    id: isEditMode.value ? props.expenseToEdit!.id : undefined,
     amount: isEditMode.value ? props.expenseToEdit!.amount : 0,
     categoryId: categoryId.value,
     date: date.value!,
@@ -78,6 +79,7 @@ const schema = z.object({
 const resolver = zodResolver(schema);
 
 
+
 async function handleFormSubmit(e: FormSubmitEvent) {
     if (!e.valid) {
         toast.add({ severity: 'error', summary: 'Erreur', detail: 'Veuillez corriger les erreurs du formulaire.', life: 3000 });
@@ -85,10 +87,12 @@ async function handleFormSubmit(e: FormSubmitEvent) {
     }
 
     const formValues = e.values as ExpenseFormValues;
-    console.log('Form values:', formValues);
 
     if (isEditMode.value) {
-        await handleUpdateExpense(formValues);
+        await handleUpdateExpense({
+            ...formValues,
+            id: props.expenseToEdit!.id,
+        });
     } else {
         await handleAddExpense(formValues);
     }
@@ -115,10 +119,14 @@ async function handleAddExpense(formValues: ExpenseFormValues) {
 }
 
 async function handleUpdateExpense(formValues: ExpenseFormValues) {
-    //update 
-    //if success => emit('submit')
-    //if error => toast.add({ severity: 'error', summary: 'Erreur', detail
-    toast.add({ severity: 'error', summary: 'Erreur', detail: 'Une erreur est survenue lors de la mise à jour de la dépense.', life: 3000 });
+    try {
+        const response = await updateExpense(formValues.id!, formValues);
+        await handleFetchExpenses();
+        emit('submit');
+    } catch (err) {
+        console.error('Error updating expense:', err);
+        toast.add({ severity: 'error', summary: 'Erreur', detail: 'Une erreur est survenue lors de la mise à jour de la dépense.', life: 3000 });
+    }
 }
 
 
@@ -176,7 +184,7 @@ async function handleUpdateExpense(formValues: ExpenseFormValues) {
             </div>
 
             <span v-if="submitError || fetchError" class="error-message-global visible">{{ submitError || fetchError
-            }}</span>
+                }}</span>
         </Form>
     </Dialog>
 </template>

@@ -8,6 +8,7 @@ import { useToast } from 'primevue/usetoast';
 import DataTable, { type DataTablePageEvent } from 'primevue/datatable';
 import Column from 'primevue/column';
 import Button from 'primevue/button';
+import ExpenseFormModal from "./ExpenseFormModal.vue";
 
 const expenseStore = useExpenseStore();
 const { filters, expenses } = storeToRefs(expenseStore);
@@ -56,7 +57,6 @@ function handleDelete(transaction: Expense) {
 function handleSavedExpense() {
     isEditModalOpen.value = false;
     selectedExpense.value = null;
-    // await expenseStore.fetchExpenses(); + filters
     toast.add({ severity: 'success', summary: 'Succès', detail: 'Dépense enregistrée avec succès', life: 3000 });
 }
 
@@ -123,7 +123,11 @@ function formatAmount(amount: number): string {
             </template>
         </Column>
     </DataTable>
+    <ExpenseFormModal v-if="isEditModalOpen" :expenseToEdit="selectedExpense" @close="handleModalClose"
+        @submit="handleSavedExpense" />
+
 </template>
+
 
 <style lang="scss" scoped>
 @use '../../../assets/scss/variables' as *;
