@@ -28,16 +28,9 @@ const ExpenseManager = () => {
     isLoading: expensesLoading,
     isError: expensesError,
     error: expensesErrorMessage,
-  } = useExpense({
-    ...filters,
-  });
+  } = useExpense(filters);
 
-  const {
-    data: categoriesData,
-    isLoading: categoriesLoading,
-    isError: categoriesError,
-    error: categoriesErrorMessage,
-  } = useCategories();
+  const { isLoading: categoriesLoading, isError: categoriesError, error: categoriesErrorMessage } = useCategories();
 
   const daysInMonth = useMemo(() => {
     const month = parseInt(filters.month);
@@ -55,17 +48,8 @@ const ExpenseManager = () => {
     return newDays;
   }, [filters.month, filters.year]);
 
-  const categoriesOptions = useMemo(() => {
-    const options = [{ value: "", label: "Toutes les catégories" }];
-    categoriesData?.forEach((cat) => {
-      options.push({ value: cat.id, label: cat.name });
-    });
-
-    return options;
-  }, [categoriesData]);
-
   const isLoading = expensesLoading || categoriesLoading;
-  if (isLoading && !expensesData && !categoriesData) {
+  if (isLoading) {
     return (
       <div className="spinner">
         <ClipLoader color="#36d7b7" loading={isLoading} size={150} aria-label="Chargement en cours" />
@@ -101,17 +85,15 @@ const ExpenseManager = () => {
           <ExpenseToolbar
             filters={filters}
             daysInMonth={daysInMonth}
-            categories={categoriesOptions}
             onFiltersChange={(newFilters: Filters) => setFilters(newFilters)}
           />
           <hr />
           <div className="middle">
             <div className="left">
               {expensesData && <TotalAmount summaryExpense={expensesData.summary} />}
-              {expensesData && categoriesData && (
+              {expensesData && (
                 <ExpensesTable
                   expenseResponse={expensesData}
-                  categories={categoriesData}
                   onPaginationChange={(newPagination) => {
                     setFilters((prevFilters) => ({
                       ...prevFilters,

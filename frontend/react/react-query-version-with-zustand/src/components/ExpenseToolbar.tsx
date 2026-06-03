@@ -1,14 +1,13 @@
 import "./ExpenseToolbar.scss";
 import type { Filters } from "../models/expense/expenses";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import AddExpenseModal from "../Modals/AddExpenseModal";
 import { toast } from "react-hot-toast";
+import { useCategories } from "../hooks/useCategory";
 
 const startYear = 1900;
 const currentYear = new Date().getFullYear();
-const years = [
-  { value: currentYear.toString(), label: currentYear.toString() },
-];
+const years = [{ value: currentYear.toString(), label: currentYear.toString() }];
 const months = [
   { value: "", label: "Aucun" },
   { value: 1, label: "Janvier" },
@@ -35,17 +34,20 @@ for (let year = currentYear - 1; year >= startYear; year--) {
 type ExpenseToolbarProps = {
   filters: Filters;
   daysInMonth: { value: string; label: string }[];
-  categories: { value: string; label: string }[];
   onFiltersChange: (newFilters: Filters) => void;
 };
 
-const ExpenseToolbar = ({
-  filters,
-  daysInMonth,
-  categories,
-  onFiltersChange,
-}: ExpenseToolbarProps) => {
+const ExpenseToolbar = ({ filters, daysInMonth, onFiltersChange }: ExpenseToolbarProps) => {
   const [open, setOpen] = useState(false);
+  const { data: categoriesData } = useCategories();
+  const categories = useMemo(() => {
+    const options = [{ value: "", label: "Toutes les catégories" }];
+    categoriesData?.forEach((cat) => {
+      options.push({ value: cat.id, label: cat.name });
+    });
+
+    return options;
+  }, [categoriesData]);
 
   const handleYearChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     onFiltersChange({
@@ -103,12 +105,7 @@ const ExpenseToolbar = ({
         </div>
         <div className="form-group">
           <label htmlFor="month">Mois</label>
-          <select
-            id="month"
-            value={filters.month}
-            onChange={handleMonthChange}
-            className="border rounded px-2 py-1"
-          >
+          <select id="month" value={filters.month} onChange={handleMonthChange} className="border rounded px-2 py-1">
             {months.map((month) => (
               <option key={month.value} value={month.value}>
                 {month.label}
@@ -129,11 +126,7 @@ const ExpenseToolbar = ({
         </div>
         <div className="form-group">
           <label htmlFor="category">Catégorie</label>
-          <select
-            id="category"
-            value={filters.categoryId}
-            onChange={handleCategoryChange}
-          >
+          <select id="category" value={filters.categoryId} onChange={handleCategoryChange}>
             {categories.map((category) => (
               <option key={category.value} value={category.value}>
                 {category.label}

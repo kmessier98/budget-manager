@@ -2,12 +2,11 @@ import "./ModifyExpenseModal.scss";
 import { useForm } from "react-hook-form";
 import type { ExpenseFormValues } from "../models/expense/expenses";
 import Modal from "./Modal";
-import type { Category } from "../models/category/category";
 import { useUpdateExpenseMutation } from "../hooks/useExpense";
+import { useCategories } from "../hooks/useCategory";
 
 type ModifyExpenseModal = {
   id: string;
-  categories: Category[];
   categoryId: string;
   date: string;
   description: string;
@@ -18,7 +17,6 @@ type ModifyExpenseModal = {
 
 const ModifyExpenseModal = ({
   id,
-  categories,
   categoryId,
   date,
   description,
@@ -26,7 +24,8 @@ const ModifyExpenseModal = ({
   onClose,
   onUpdateSuccess,
 }: ModifyExpenseModal) => {
-  const defaultCategoryId = categories.find((cat) => cat.id === categoryId)?.id;
+  const { data: categories } = useCategories();
+  const defaultCategoryId = categories?.find((cat) => cat.id === categoryId)?.id;
 
   const {
     register,
@@ -73,16 +72,8 @@ const ModifyExpenseModal = ({
 
   return (
     <>
-      <Modal
-        isOpen={true}
-        onClose={() => onClose()}
-        title="Modifier une dépense"
-        isSubmitting={isSubmitting}
-      >
-        <form
-          className="add-expense-form"
-          onSubmit={handleSubmit(handleFormSubmit)}
-        >
+      <Modal isOpen={true} onClose={() => onClose()} title="Modifier une dépense" isSubmitting={isSubmitting}>
+        <form className="add-expense-form" onSubmit={handleSubmit(handleFormSubmit)}>
           <div className="form-group">
             <label htmlFor="amount">Montant ($):</label>
             <div className="input-container">
@@ -101,18 +92,14 @@ const ModifyExpenseModal = ({
                   onBlur: handleAmountBlur,
                 })}
               />
-              <span
-                className={`error-message ${errors.amount ? "visible" : ""}`}
-              >
-                {errors.amount?.message}
-              </span>
+              <span className={`error-message ${errors.amount ? "visible" : ""}`}>{errors.amount?.message}</span>
             </div>
           </div>
           <div className="form-group">
             <label htmlFor="category">Catégorie:</label>
             <div className="input-container">
               <select id="category" {...register("categoryId")}>
-                {categories.map((category) => {
+                {categories?.map((category) => {
                   return (
                     <option key={category.id} value={category.id}>
                       {category.name}
@@ -120,9 +107,7 @@ const ModifyExpenseModal = ({
                   );
                 })}
               </select>
-              <span
-                className={`error-message ${errors.categoryId ? "visible" : ""}`}
-              >
+              <span className={`error-message ${errors.categoryId ? "visible" : ""}`}>
                 {errors.categoryId?.message}
               </span>
             </div>
@@ -137,9 +122,7 @@ const ModifyExpenseModal = ({
                   required: "La date est requise",
                 })}
               />
-              <span className={`error-message ${errors.date ? "visible" : ""}`}>
-                {errors.date?.message}
-              </span>
+              <span className={`error-message ${errors.date ? "visible" : ""}`}>{errors.date?.message}</span>
             </div>
           </div>
           <div className="form-group">
@@ -152,24 +135,17 @@ const ModifyExpenseModal = ({
                   required: "La description est requise",
                   maxLength: {
                     value: 255,
-                    message:
-                      "La description ne peut pas dépasser 255 caractères",
+                    message: "La description ne peut pas dépasser 255 caractères",
                   },
                 })}
               />
-              <span
-                className={`error-message ${errors.description ? "visible" : ""}`}
-              >
+              <span className={`error-message ${errors.description ? "visible" : ""}`}>
                 {errors.description?.message}
               </span>
             </div>
           </div>
           <div className="actions">
-            <button
-              className={isSubmitting ? "disabled" : ""}
-              type="submit"
-              disabled={isSubmitting}
-            >
+            <button className={isSubmitting ? "disabled" : ""} type="submit" disabled={isSubmitting}>
               {isSubmitting ? "Modification..." : "Modification"}
             </button>
             <button
@@ -181,9 +157,7 @@ const ModifyExpenseModal = ({
               Annuler
             </button>
           </div>
-          <span
-            className={`error-message-global ${errors.root?.serverError ? "visible" : ""}`}
-          >
+          <span className={`error-message-global ${errors.root?.serverError ? "visible" : ""}`}>
             {errors.root?.serverError?.message}
           </span>
         </form>
