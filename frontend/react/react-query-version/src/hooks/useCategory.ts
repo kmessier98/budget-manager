@@ -6,5 +6,6 @@ export const useCategories = () => {
     queryKey: ["categories"],
     queryFn: () => categoryService.fetchCategories(),
     refetchOnWindowFocus: false,
+    staleTime: 5 * 60 * 1000, // 5 minutes. **Une mutation de catégorie invalidera cette cache, forçant une refetch à la prochaine utilisation du hook**.
   });
 };
