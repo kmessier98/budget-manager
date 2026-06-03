@@ -49,7 +49,7 @@ const ExpenseManager = () => {
   }, [filters.month, filters.year]);
 
   const isLoading = expensesLoading || categoriesLoading;
-  if (isLoading && !expensesData) {
+  if (isLoading) {
     return (
       <div className="spinner">
         <ClipLoader color="#36d7b7" loading={isLoading} size={150} aria-label="Chargement en cours" />
