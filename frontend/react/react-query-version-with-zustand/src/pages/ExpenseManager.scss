@@ -1,0 +1,59 @@
+@import "../index.scss";
+
+.expense-manager {
+  background-color: $background-color-1;
+  flex: 1; // Le parent (main-content) doit être un flex container pour que cela fonctionne
+  display: flex;
+
+  .expense-manager-content {
+    background-color: $background-color-2;
+    margin: 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    flex: 1;
+
+    .top {
+      display: flex;
+      align-items: center;
+      padding: 5px 20px;
+
+      img {
+        height: 60px;
+        width: 60px;
+        mix-blend-mode: multiply;
+      }
+
+      h1 {
+        @include text-style(1.5rem, $color-1, 600);
+        margin: 0;
+      }
+    }
+
+    .content {
+      padding: 0 30px;
+
+      .middle {
+        display: flex;
+        padding: 10px 0;
+
+        .left {
+          display: flex;
+          flex-direction: column;
+          width: 70%;
+          gap: 10px;
+        }
+
+        .right {
+          width: 30%;
+        }
+      }
+    }
+  }
+}
+
+.spinner {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 0 auto;
+}
