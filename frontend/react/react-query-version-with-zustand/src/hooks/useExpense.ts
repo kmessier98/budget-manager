@@ -8,6 +8,7 @@ export const useExpense = (filters: Record<string, string | number>) => {
 
     queryKey: ["expenses", filters],
     queryFn: () => expenseService.fetchExpenses(filters),
+    staleTime: 5 * 60 * 1000, // 5 minutes
   });
 };
 

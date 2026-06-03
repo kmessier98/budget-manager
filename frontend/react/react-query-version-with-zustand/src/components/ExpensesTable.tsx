@@ -1,12 +1,13 @@
 import "./ExpenseTable.scss";
 import { createColumnHelper, flexRender, getCoreRowModel, useReactTable } from "@tanstack/react-table";
-import type { ExpenseResponse } from "../models/expense/expenses";
 import { useMemo, useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPencil, faTrash } from "@fortawesome/free-solid-svg-icons";
 import ModifyExpenseModal from "../Modals/ModifyExpenseModal";
 import { toast } from "react-hot-toast";
 import { useDeleteExpenseMutation } from "../hooks/useExpense";
+import useFiltersStore from "../stores/useFiltersStore";
+import { useExpense } from "../hooks/useExpense";
 
 type Expense = {
   id: string;
@@ -21,20 +22,11 @@ type Expense = {
 
 const columnHelper = createColumnHelper<Expense>();
 
-const ExpensesTable = ({
-  expenseResponse,
-  pagination,
-  onPaginationChange,
-}: {
-  expenseResponse: ExpenseResponse;
-  pagination: {
-    pageIndex: number;
-    pageSize: number;
-  };
-  onPaginationChange: (newPagination: { pageIndex: number; pageSize: number }) => void;
-}) => {
+const ExpensesTable = () => {
   const [editingExpense, setEditingExpense] = useState<Expense | null>(null);
   const deleteExpenseMutation = useDeleteExpenseMutation();
+  const { filters, setFilters } = useFiltersStore();
+  const { data: expenseResponse } = useExpense(filters);
 
   const handleDelete = async (id: string) => {
     await toast.promise(
@@ -103,15 +95,17 @@ const ExpensesTable = ({
 
   const data = useMemo(() => {
     console.log("ExpenseResponse in ExpensesTable:", expenseResponse);
-    return expenseResponse.transactions.map((expense) => {
-      return {
-        id: expense.id,
-        date: expense.date,
-        categorie: expense.category,
-        description: expense.description,
-        amount: expense.amount.toFixed(2),
-      };
-    });
+    return (
+      expenseResponse?.transactions.map((expense) => {
+        return {
+          id: expense.id,
+          date: expense.date,
+          categorie: expense.category,
+          description: expense.description,
+          amount: expense.amount.toFixed(2),
+        };
+      }) ?? []
+    );
   }, [expenseResponse]);
 
   const table = useReactTable({
@@ -119,13 +113,19 @@ const ExpensesTable = ({
     columns,
     getCoreRowModel: getCoreRowModel(),
     manualPagination: true,
-    rowCount: expenseResponse.metadata.totalItems,
+    rowCount: expenseResponse?.metadata.totalItems ?? 0,
     onPaginationChange: (updater) => {
       const newPagination = typeof updater === "function" ? updater(table.getState().pagination) : updater;
-      onPaginationChange(newPagination);
+      setFilters({
+        pageNumber: newPagination.pageIndex + 1,
+        pageSize: newPagination.pageSize,
+      });
     },
     state: {
-      pagination,
+      pagination: {
+        pageIndex: filters.pageNumber - 1,
+        pageSize: filters.pageSize,
+      },
     },
   });
 

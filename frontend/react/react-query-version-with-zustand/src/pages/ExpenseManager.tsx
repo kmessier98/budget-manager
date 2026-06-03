@@ -1,8 +1,6 @@
 import "./ExpenseManager.scss";
 import avatar from "../assets/user-avatar.png";
 import ExpenseToolbar from "../components/ExpenseToolbar";
-import { useMemo } from "react";
-import type { Filters } from "../models/expense/expenses";
 import TotalAmount from "../components/TotalAmount";
 import ExpensesTable from "../components/ExpensesTable";
 import { ClipLoader } from "react-spinners";
@@ -12,32 +10,10 @@ import { useCategories } from "../hooks/useCategory";
 import useFiltersStore from "../stores/useFiltersStore";
 
 const ExpenseManager = () => {
-  const { filters, setFilters } = useFiltersStore();
-
-  const {
-    data: expensesData,
-    isLoading: expensesLoading,
-    isError: expensesError,
-    error: expensesErrorMessage,
-  } = useExpense(filters);
+  const { filters } = useFiltersStore();
+  const { isLoading: expensesLoading, isError: expensesError, error: expensesErrorMessage } = useExpense(filters);
 
   const { isLoading: categoriesLoading, isError: categoriesError, error: categoriesErrorMessage } = useCategories();
-
-  const daysInMonth = useMemo(() => {
-    const month = parseInt(filters.month);
-    const year = parseInt(filters.year);
-
-    if (!month) return [{ value: "", label: "Aucun" }];
-
-    const numberOfDays = new Date(year, month, 0).getDate();
-    const newDays = [{ value: "", label: "Aucun" }];
-
-    for (let day = 1; day <= numberOfDays; day++) {
-      newDays.push({ value: day.toString(), label: day.toString() });
-    }
-
-    return newDays;
-  }, [filters.month, filters.year]);
 
   const isLoading = expensesLoading || categoriesLoading;
   if (isLoading) {
@@ -73,32 +49,16 @@ const ExpenseManager = () => {
         </div>
         <hr />
         <div className="content">
-          <ExpenseToolbar
-            filters={filters}
-            daysInMonth={daysInMonth}
-            onFiltersChange={(newFilters: Filters) => setFilters(newFilters)}
-          />
+          <ExpenseToolbar />
           <hr />
           <div className="middle">
             <div className="left">
-              {expensesData && <TotalAmount summaryExpense={expensesData.summary} />}
-              {expensesData && (
-                <ExpensesTable
-                  expenseResponse={expensesData}
-                  onPaginationChange={(newPagination) => {
-                    setFilters({
-                      pageNumber: newPagination.pageIndex + 1,
-                      pageSize: newPagination.pageSize,
-                    });
-                  }}
-                  pagination={{
-                    pageIndex: filters.pageNumber - 1,
-                    pageSize: filters.pageSize,
-                  }}
-                />
-              )}
+              <TotalAmount />
+              <ExpensesTable />
             </div>
-            <div className="right">{expensesData && <ExpenseChart data={expensesData.summary.amountByCategory} />}</div>
+            <div className="right">
+              <ExpenseChart />
+            </div>
           </div>
         </div>
       </div>

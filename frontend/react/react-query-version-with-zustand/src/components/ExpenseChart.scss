@@ -17,5 +17,10 @@
     .legend-item {
       color: #555;
     }
+
+    p {
+      @include text-style(1rem, $color-1, 400);
+      margin-top: 20px;
+    }
   }
 }
