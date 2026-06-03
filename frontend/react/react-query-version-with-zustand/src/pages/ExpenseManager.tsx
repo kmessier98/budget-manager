@@ -1,7 +1,7 @@
 import "./ExpenseManager.scss";
 import avatar from "../assets/user-avatar.png";
 import ExpenseToolbar from "../components/ExpenseToolbar";
-import { useMemo, useState } from "react";
+import { useMemo } from "react";
 import type { Filters } from "../models/expense/expenses";
 import TotalAmount from "../components/TotalAmount";
 import ExpensesTable from "../components/ExpensesTable";
@@ -9,19 +9,10 @@ import { ClipLoader } from "react-spinners";
 import ExpenseChart from "../components/ExpenseChart";
 import { useExpense } from "../hooks/useExpense";
 import { useCategories } from "../hooks/useCategory";
+import useFiltersStore from "../stores/useFiltersStore";
 
 const ExpenseManager = () => {
-  const [filters, setFilters] = useState<Filters>(() => {
-    const now = new Date();
-    return {
-      year: now.getFullYear().toString(),
-      month: (now.getMonth() + 1).toString(),
-      day: now.getDate().toString(),
-      categoryId: "",
-      pageNumber: 1,
-      pageSize: 10,
-    };
-  });
+  const { filters, setFilters } = useFiltersStore();
 
   const {
     data: expensesData,
@@ -95,11 +86,10 @@ const ExpenseManager = () => {
                 <ExpensesTable
                   expenseResponse={expensesData}
                   onPaginationChange={(newPagination) => {
-                    setFilters((prevFilters) => ({
-                      ...prevFilters,
+                    setFilters({
                       pageNumber: newPagination.pageIndex + 1,
                       pageSize: newPagination.pageSize,
-                    }));
+                    });
                   }}
                   pagination={{
                     pageIndex: filters.pageNumber - 1,
