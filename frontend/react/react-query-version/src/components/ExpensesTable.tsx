@@ -1,16 +1,10 @@
 import "./ExpenseTable.scss";
-import {
-  createColumnHelper,
-  flexRender,
-  getCoreRowModel,
-  useReactTable,
-} from "@tanstack/react-table";
+import { createColumnHelper, flexRender, getCoreRowModel, useReactTable } from "@tanstack/react-table";
 import type { ExpenseResponse } from "../models/expense/expenses";
 import { useMemo, useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPencil, faTrash } from "@fortawesome/free-solid-svg-icons";
 import ModifyExpenseModal from "../Modals/ModifyExpenseModal";
-import type { Category } from "../models/category/category";
 import { toast } from "react-hot-toast";
 import { useDeleteExpenseMutation } from "../hooks/useExpense";
 
@@ -29,20 +23,15 @@ const columnHelper = createColumnHelper<Expense>();
 
 const ExpensesTable = ({
   expenseResponse,
-  categories,
   pagination,
   onPaginationChange,
 }: {
   expenseResponse: ExpenseResponse;
-  categories: Category[];
   pagination: {
     pageIndex: number;
     pageSize: number;
   };
-  onPaginationChange: (newPagination: {
-    pageIndex: number;
-    pageSize: number;
-  }) => void;
+  onPaginationChange: (newPagination: { pageIndex: number; pageSize: number }) => void;
 }) => {
   const [editingExpense, setEditingExpense] = useState<Expense | null>(null);
   const deleteExpenseMutation = useDeleteExpenseMutation();
@@ -55,8 +44,7 @@ const ExpensesTable = ({
       {
         loading: "Suppression de la dépense en cours...",
         success: "Dépense supprimée avec succès",
-        error: (err) =>
-          `Échec de la suppression : ${err instanceof Error ? err.message : ""}`,
+        error: (err) => `Échec de la suppression : ${err instanceof Error ? err.message : ""}`,
       },
     );
   };
@@ -102,10 +90,7 @@ const ExpensesTable = ({
               <button className="edit-button" onClick={() => handleEdit(row)}>
                 <FontAwesomeIcon icon={faPencil} />
               </button>
-              <button
-                className="delete-button"
-                onClick={() => handleDelete(row.id)}
-              >
+              <button className="delete-button" onClick={() => handleDelete(row.id)}>
                 <FontAwesomeIcon icon={faTrash} />
               </button>
             </div>
@@ -136,10 +121,7 @@ const ExpensesTable = ({
     manualPagination: true,
     rowCount: expenseResponse.metadata.totalItems,
     onPaginationChange: (updater) => {
-      const newPagination =
-        typeof updater === "function"
-          ? updater(table.getState().pagination)
-          : updater;
+      const newPagination = typeof updater === "function" ? updater(table.getState().pagination) : updater;
       onPaginationChange(newPagination);
     },
     state: {
@@ -163,12 +145,7 @@ const ExpensesTable = ({
           {table.getHeaderGroups().map((hg) => (
             <tr key={hg.id}>
               {hg.headers.map((header) => (
-                <th key={header.id}>
-                  {flexRender(
-                    header.column.columnDef.header,
-                    header.getContext(),
-                  )}
-                </th>
+                <th key={header.id}>{flexRender(header.column.columnDef.header, header.getContext())}</th>
               ))}
             </tr>
           ))}
@@ -177,39 +154,24 @@ const ExpensesTable = ({
           {table.getRowModel().rows.map((row) => (
             <tr key={row.id}>
               {row.getVisibleCells().map((cell) => (
-                <td key={cell.id}>
-                  {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                </td>
+                <td key={cell.id}>{flexRender(cell.column.columnDef.cell, cell.getContext())}</td>
               ))}
             </tr>
           ))}
         </tbody>
       </table>
       <div className="pagination-table">
-        <button
-          onClick={() => table.firstPage()}
-          disabled={!table.getCanPreviousPage()}
-        >
+        <button onClick={() => table.firstPage()} disabled={!table.getCanPreviousPage()}>
           {"<<"}
         </button>
-        <button
-          onClick={() => table.previousPage()}
-          disabled={!table.getCanPreviousPage()}
-        >
+        <button onClick={() => table.previousPage()} disabled={!table.getCanPreviousPage()}>
           {"<"}
         </button>
-        Page {table.getState().pagination.pageIndex + 1} sur{" "}
-        {table.getPageCount()}
-        <button
-          onClick={() => table.nextPage()}
-          disabled={!table.getCanNextPage()}
-        >
+        Page {table.getState().pagination.pageIndex + 1} sur {table.getPageCount()}
+        <button onClick={() => table.nextPage()} disabled={!table.getCanNextPage()}>
           {">"}
         </button>
-        <button
-          onClick={() => table.lastPage()}
-          disabled={!table.getCanNextPage()}
-        >
+        <button onClick={() => table.lastPage()} disabled={!table.getCanNextPage()}>
           {">>"}
         </button>
         <select
@@ -228,7 +190,6 @@ const ExpensesTable = ({
       {editingExpense && (
         <ModifyExpenseModal
           id={editingExpense.id}
-          categories={categories}
           categoryId={editingExpense.categorie.id}
           date={editingExpense.date}
           description={editingExpense.description}
