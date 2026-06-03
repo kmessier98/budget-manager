@@ -7,19 +7,30 @@ import { ClipLoader } from "react-spinners";
 import ExpenseChart from "../components/ExpenseChart";
 import { useExpense } from "../hooks/useExpense";
 import { useCategories } from "../hooks/useCategory";
-import useFiltersStore from "../stores/useFiltersStore";
 
 const ExpenseManager = () => {
-  const { filters } = useFiltersStore();
-  const { isLoading: expensesLoading, isError: expensesError, error: expensesErrorMessage } = useExpense(filters);
+  const {
+    isLoading: expensesLoading,
+    isError: expensesError,
+    error: expensesErrorMessage,
+  } = useExpense();
 
-  const { isLoading: categoriesLoading, isError: categoriesError, error: categoriesErrorMessage } = useCategories();
+  const {
+    isLoading: categoriesLoading,
+    isError: categoriesError,
+    error: categoriesErrorMessage,
+  } = useCategories();
 
   const isLoading = expensesLoading || categoriesLoading;
   if (isLoading) {
     return (
       <div className="spinner">
-        <ClipLoader color="#36d7b7" loading={isLoading} size={150} aria-label="Chargement en cours" />
+        <ClipLoader
+          color="#36d7b7"
+          loading={isLoading}
+          size={150}
+          aria-label="Chargement en cours"
+        />
       </div>
     );
   }
@@ -27,7 +38,10 @@ const ExpenseManager = () => {
   if (expensesError) {
     return (
       <div className="expense-manager">
-        Error: {expensesErrorMessage instanceof Error ? expensesErrorMessage.message : ""}
+        Error:{" "}
+        {expensesErrorMessage instanceof Error
+          ? expensesErrorMessage.message
+          : ""}
       </div>
     );
   }
@@ -35,7 +49,10 @@ const ExpenseManager = () => {
   if (categoriesError) {
     return (
       <div className="expense-manager">
-        Error: {categoriesErrorMessage instanceof Error ? categoriesErrorMessage.message : ""}
+        Error:{" "}
+        {categoriesErrorMessage instanceof Error
+          ? categoriesErrorMessage.message
+          : ""}
       </div>
     );
   }

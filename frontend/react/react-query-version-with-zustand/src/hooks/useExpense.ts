@@ -1,8 +1,10 @@
 import { expenseService } from "../services/expenseService";
 import { useQuery, useQueryClient, useMutation } from "@tanstack/react-query";
 import { type ExpenseFormValues } from "../models/expense/expenses";
+import useFiltersStore from "../stores/useFiltersStore";
 
-export const useExpense = (filters: Record<string, string | number>) => {
+export const useExpense = () => {
+  const { filters } = useFiltersStore();
   return useQuery({
     // inclure les filtres dans la clé pour recharger l'API quand ils changent
 
@@ -16,7 +18,8 @@ export const useAddExpenseMutation = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (formData: ExpenseFormValues) => expenseService.addExpense(formData),
+    mutationFn: (formData: ExpenseFormValues) =>
+      expenseService.addExpense(formData),
     onSuccess: () => {
       // Invalidate and refetch
       queryClient.invalidateQueries({ queryKey: ["expenses"] });
@@ -40,7 +43,8 @@ export const useUpdateExpenseMutation = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (formData: ExpenseFormValues) => expenseService.updateExpense(formData),
+    mutationFn: (formData: ExpenseFormValues) =>
+      expenseService.updateExpense(formData),
     onSuccess: () => {
       // Invalidate and refetch
       queryClient.invalidateQueries({ queryKey: ["expenses"] });

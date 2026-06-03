@@ -1,7 +1,6 @@
 import "./ExpenseChart.scss";
 import { PieChart, Pie, Tooltip, Legend, ResponsiveContainer } from "recharts";
 import { useMemo } from "react";
-import useFiltersStore from "../stores/useFiltersStore";
 import { useExpense } from "../hooks/useExpense";
 
 const COLORS = [
@@ -18,8 +17,7 @@ const COLORS = [
 ];
 
 const ExpenseChart = () => {
-  const { filters } = useFiltersStore();
-  const { data: expenseData } = useExpense(filters);
+  const { data: expenseData } = useExpense();
   const data = useMemo(() => {
     if (!expenseData) {
       return;
@@ -40,7 +38,10 @@ const ExpenseChart = () => {
     }).format(amount);
   };
 
-  const renderLegendText = (value: string, entry: { payload?: { amount?: number } }) => {
+  const renderLegendText = (
+    value: string,
+    entry: { payload?: { amount?: number } },
+  ) => {
     // entry.payload contient l'objet d'origine (votre CategoryAmount + la clé fill)
     const amount = entry.payload?.amount ?? 0;
     return (
@@ -68,10 +69,14 @@ const ExpenseChart = () => {
                 fill="#8884d8"
                 label={({ name, percent }) => {
                   if (percent === undefined) return "";
-                  return percent > 0.05 ? `${name} ${(percent * 100).toFixed(0)}%` : "";
+                  return percent > 0.05
+                    ? `${name} ${(percent * 100).toFixed(0)}%`
+                    : "";
                 }}
               ></Pie>
-              <Tooltip formatter={(value) => amountFormatter(value as number)} />
+              <Tooltip
+                formatter={(value) => amountFormatter(value as number)}
+              />
               <Legend
                 iconType="circle"
                 layout="vertical"
