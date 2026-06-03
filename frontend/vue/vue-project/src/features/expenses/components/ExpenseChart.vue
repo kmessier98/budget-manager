@@ -13,7 +13,6 @@ const chartData = computed(() => {
     if (amountByCategory.length === 0) {
         return null;
     }
-
     const labels = amountByCategory.map(
         (item) => `${item.name} (${amountFormatter(item.amount)})`,
     );
@@ -48,8 +47,7 @@ const options = {
             callbacks: {
                 label: function (context: any) {
                     const label = context.label || '';
-                    const value = context.parsed || 0;
-                    return `${label}: ${amountFormatter(value)}`;
+                    return label;
                 }
             }
         }
