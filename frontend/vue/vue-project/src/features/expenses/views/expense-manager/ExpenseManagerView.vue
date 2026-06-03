@@ -6,7 +6,7 @@ import { useCategoryStore } from "../../../categories/stores/category.ts";
 import ProgressSpinner from 'primevue/progressspinner';
 import ExpenseTotalAmount from "../../components/ExpenseTotalAmount.vue";
 import ExpenseTable from "../../components/ExpenseTable.vue";
-
+import ExpenseChart from "../../components/ExpenseChart.vue";
 
 const categoryStore = useCategoryStore();
 
