@@ -5,6 +5,8 @@ export type Filters = {
   month: string;
   day: string;
   categoryId: string;
+  pageNumber: number;
+  pageSize: number;
 };
 
 export type ExpenseFormValues = {
@@ -31,7 +33,6 @@ interface Expense {
     name: string;
   };
 }
-
 
 export interface ExpenseSummary {
   totalAmount: number;

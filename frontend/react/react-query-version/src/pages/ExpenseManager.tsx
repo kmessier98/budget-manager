@@ -18,20 +18,26 @@ const ExpenseManager = () => {
       month: (now.getMonth() + 1).toString(),
       day: now.getDate().toString(),
       categoryId: "",
+      pageNumber: 1,
+      pageSize: 10,
     };
   });
 
-  const [pagination, setPagination] = useState({
-    pageNumber: 1,
-    pageSize: 10,
+  const {
+    data: expensesData,
+    isLoading: expensesLoading,
+    isError: expensesError,
+    error: expensesErrorMessage,
+  } = useExpense({
+    ...filters,
   });
 
-  const expenseQuery = useExpense({
-    ...filters,
-    pageNumber: pagination.pageNumber,
-    pageSize: pagination.pageSize,
-  });
-  const categoriesQuery = useCategories();
+  const {
+    data: categoriesData,
+    isLoading: categoriesLoading,
+    isError: categoriesError,
+    error: categoriesErrorMessage,
+  } = useCategories();
 
   const daysInMonth = useMemo(() => {
     const month = parseInt(filters.month);
@@ -51,43 +57,34 @@ const ExpenseManager = () => {
 
   const categoriesOptions = useMemo(() => {
     const options = [{ value: "", label: "Toutes les catégories" }];
-    categoriesQuery.data?.forEach((cat) => {
+    categoriesData?.forEach((cat) => {
       options.push({ value: cat.id, label: cat.name });
     });
 
     return options;
-  }, [categoriesQuery.data]);
+  }, [categoriesData]);
 
-  const isLoading = expenseQuery.isLoading || categoriesQuery.isLoading;
-  if (isLoading && !expenseQuery.data && !categoriesQuery.data) {
+  const isLoading = expensesLoading || categoriesLoading;
+  if (isLoading && !expensesData && !categoriesData) {
     return (
       <div className="spinner">
-        <ClipLoader
-          color="#36d7b7"
-          loading={isLoading}
-          size={150}
-          aria-label="Chargement en cours"
-        />
+        <ClipLoader color="#36d7b7" loading={isLoading} size={150} aria-label="Chargement en cours" />
       </div>
     );
   }
 
-  if (expenseQuery.isError) {
+  if (expensesError) {
     return (
       <div className="expense-manager">
-        Error:{" "}
-        {expenseQuery.error instanceof Error ? expenseQuery.error.message : ""}
+        Error: {expensesErrorMessage instanceof Error ? expensesErrorMessage.message : ""}
       </div>
     );
   }
 
-  if (categoriesQuery.isError) {
+  if (categoriesError) {
     return (
       <div className="expense-manager">
-        Error:{" "}
-        {categoriesQuery.error instanceof Error
-          ? categoriesQuery.error.message
-          : ""}
+        Error: {categoriesErrorMessage instanceof Error ? categoriesErrorMessage.message : ""}
       </div>
     );
   }
@@ -110,33 +107,26 @@ const ExpenseManager = () => {
           <hr />
           <div className="middle">
             <div className="left">
-              {expenseQuery.data && (
-                <TotalAmount summaryExpense={expenseQuery.data.summary} />
-              )}
-              {expenseQuery.data && categoriesQuery.data && (
+              {expensesData && <TotalAmount summaryExpense={expensesData.summary} />}
+              {expensesData && categoriesData && (
                 <ExpensesTable
-                  expenseResponse={expenseQuery.data}
-                  categories={categoriesQuery.data}
+                  expenseResponse={expensesData}
+                  categories={categoriesData}
                   onPaginationChange={(newPagination) => {
-                    setPagination({
+                    setFilters((prevFilters) => ({
+                      ...prevFilters,
                       pageNumber: newPagination.pageIndex + 1,
                       pageSize: newPagination.pageSize,
-                    });
+                    }));
                   }}
                   pagination={{
-                    pageIndex: pagination.pageNumber - 1,
-                    pageSize: pagination.pageSize,
+                    pageIndex: filters.pageNumber - 1,
+                    pageSize: filters.pageSize,
                   }}
                 />
               )}
             </div>
-            <div className="right">
-              {expenseQuery.data && (
-                <ExpenseChart
-                  data={expenseQuery.data.summary.amountByCategory}
-                />
-              )}
-            </div>
+            <div className="right">{expensesData && <ExpenseChart data={expensesData.summary.amountByCategory} />}</div>
           </div>
         </div>
       </div>
