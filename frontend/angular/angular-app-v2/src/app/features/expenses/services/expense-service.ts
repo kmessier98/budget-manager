@@ -45,8 +45,16 @@ export class ExpenseService {
           this._expenses.set(response);
         },
         error: (err) => {
-          console.log('Failed to fetch expenses', err);
-          this._error.set('Failed to fetch expenses');
+          console.error('Failed to fetch expenses', err);
+
+          if (err.error && typeof err.error === 'object') {
+            const serverMessage = err.error.detail || err.error.title || `Erreur ${err.status}`;
+            console.error('Server error message:', serverMessage);
+            this._error.set(serverMessage);
+          } else {
+            console.error('Unexpected error format:', err);
+            this._error.set(`Impossible de joindre le serveur (Code: ${err.status})`);
+          }
         },
       });
   }

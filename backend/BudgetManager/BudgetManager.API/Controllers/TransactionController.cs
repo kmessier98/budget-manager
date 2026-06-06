@@ -20,7 +20,6 @@ namespace BudgetManager.API.Controllers
         public async Task<IActionResult> GetAll([FromQuery] GetTransactionsQuery query)
         {
             var result = await _transactionService.GetAll(query);
-
             return Ok(result);
         }
 
