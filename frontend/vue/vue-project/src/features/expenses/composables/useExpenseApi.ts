@@ -6,9 +6,7 @@ export function useExpenseApi() {
   const error = ref<string | null>(null);
   const loading = ref<boolean>(false);
 
-  const addExpense = async (
-    expenseData: ExpenseFormValues,
-  ): Promise<Expense> => {
+  const addExpense = async (expenseData: ExpenseFormValues): Promise<Expense> => {
     loading.value = true;
     error.value = null;
 
@@ -22,7 +20,9 @@ export function useExpenseApi() {
       });
 
       if (!response.ok) {
-        throw new Error("Failed to add expense");
+        const errorData = await response.json();
+        console.error("Error adding expense:", errorData);
+        throw new Error(errorData.message || errorData.error || "Une erreur est survenue");
       }
       return await response.json();
     } catch (err) {
@@ -33,18 +33,10 @@ export function useExpenseApi() {
     }
   };
 
-  const updateExpense = async (
-    expenseId: string,
-    expenseData: ExpenseFormValues,
-  ): Promise<Expense> => {
+  const updateExpense = async (expenseId: string, expenseData: ExpenseFormValues): Promise<Expense> => {
     loading.value = true;
     error.value = null;
-    console.log(
-      "Updating expense with ID:",
-      expenseId,
-      "and data:",
-      expenseData,
-    );
+    console.log("Updating expense with ID:", expenseId, "and data:", expenseData);
     try {
       const response = await fetch(`/api/transaction/${expenseId}`, {
         method: "PUT",
@@ -54,7 +46,9 @@ export function useExpenseApi() {
         body: JSON.stringify(expenseData),
       });
       if (!response.ok) {
-        throw new Error("Failed to update expense");
+        const errorData = await response.json();
+        console.error("Error updating expense:", errorData);
+        throw new Error(errorData.message || errorData.error || "Une erreur est survenue");
       }
       return await response.json();
     } catch (err) {
@@ -74,7 +68,9 @@ export function useExpenseApi() {
         method: "DELETE",
       });
       if (!response.ok) {
-        throw new Error("Failed to delete expense");
+        const errorData = await response.json();
+        console.error("Error deleting expense:", errorData);
+        throw new Error(errorData.message || errorData.error || "Une erreur est survenue");
       }
     } catch (err) {
       error.value = (err as Error).message;

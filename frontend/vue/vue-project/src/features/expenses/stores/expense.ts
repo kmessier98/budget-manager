@@ -30,13 +30,13 @@ export const useExpenseStore = defineStore("expense", () => {
     error.value = null;
 
     try {
-      const queryParams = new URLSearchParams(
-        filters.value as Record<string, string>,
-      ).toString();
+      const queryParams = new URLSearchParams(filters.value as Record<string, string>).toString();
 
       const response = await fetch(`/api/transaction?${queryParams}`);
       if (!response.ok) {
-        throw new Error("Failed to fetch expenses");
+        const errorData = await response.json();
+        console.error("Error fetching expenses:", errorData);
+        throw new Error(errorData.message || errorData.error || "Une erreur est survenue");
       }
       expenses.value = await response.json();
       console.log("Fetched expenses:", expenses.value);

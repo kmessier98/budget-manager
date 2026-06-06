@@ -20,7 +20,6 @@ namespace BudgetManager.API.Controllers
         public async Task<IActionResult> GetAll([FromQuery] GetTransactionsQuery query)
         {
             var result = await _transactionService.GetAll(query);
-
             return Ok(result);
         }
 
@@ -36,7 +35,7 @@ namespace BudgetManager.API.Controllers
         public async Task<IActionResult> Create(CreateTransactionDTO dto)
         {
             var result = await _transactionService.Create(dto);
-
+            return NotFound();
             return CreatedAtAction(nameof(GetById), new { id = result.Id }, result);
         }
 
