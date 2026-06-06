@@ -286,20 +286,19 @@ async function handleUpdateExpense(formValues: ExpenseFormValues) {
       width: 100%;
       padding-left: 8px;
       padding: 4px 0;
-
-      :deep(.p-inputtext) {
-        border: 2px solid black !important;
-        border-radius: 4px;
-      }
     }
-
+    :deep(.p-inputtext) {
+      border: 2px solid black !important;
+      border-radius: 4px;
+      padding: 4px 10px;
+    }
     .p-select {
       border: 2px solid $color-1;
       border-radius: 4px;
       width: 100%;
 
-      .p-select-label {
-        padding: 4px 8px;
+      :deep(.p-select-label) {
+        padding: 4px 10px;
       }
     }
   }
