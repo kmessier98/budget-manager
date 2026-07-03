@@ -1,11 +1,13 @@
 using BudgetManager.API.Filters;
 using BudgetManager.API.Filters.BudgetManager.API.Filters;
 using BudgetManager.API.Middlewares;
+using BudgetManager.Application;
 using BudgetManager.Application.Interfaces.Category;
 using BudgetManager.Application.Interfaces.Transaction;
 using BudgetManager.Application.Mappings;
 using BudgetManager.Application.Services;
 using BudgetManager.Application.Validators;
+using BudgetManager.Infrastructure;
 using BudgetManager.Infrastructure.Data;
 using BudgetManager.Infrastructure.Repositories;
 using FluentValidation;
@@ -42,11 +44,8 @@ builder.Services.AddOpenApi();
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
-//TODO mettre dans une extension method pour la DI
-builder.Services.AddScoped<ITransaction, TransactionRepository>();
-builder.Services.AddScoped<ICategory, CategoryRepository>();
-builder.Services.AddScoped<ITransactionService, TransactionService>();
-builder.Services.AddScoped<ICategoryService, CategoryService>();
+builder.Services.AddApplicationServices();
+builder.Services.AddInfrastructureService();
 
 
 // On cible l'assembly du validateur pour être sûr de scanner le projet Application
