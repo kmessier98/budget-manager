@@ -1,9 +1,10 @@
 ﻿using BudgetManager.Domain.Entities;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
 namespace BudgetManager.Infrastructure.Data
 {
-    public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(options)
+    public class AppDbContext(DbContextOptions<AppDbContext> options) : IdentityDbContext<ApplicationUser>(options)
     {
         public DbSet<Transaction> Transactions { get; set; }
         public DbSet<Category> Categories { get; set; }
