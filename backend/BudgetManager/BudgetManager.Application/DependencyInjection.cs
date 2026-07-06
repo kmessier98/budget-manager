@@ -1,4 +1,5 @@
-﻿using BudgetManager.Application.Interfaces.Category;
+﻿using BudgetManager.Application.Interfaces.AuthService;
+using BudgetManager.Application.Interfaces.Category;
 using BudgetManager.Application.Interfaces.Transaction;
 using BudgetManager.Application.Services;
 using Microsoft.Extensions.DependencyInjection;
@@ -11,7 +12,7 @@ namespace BudgetManager.Application
         {
             services.AddScoped<ITransactionService, TransactionService>();
             services.AddScoped<ICategoryService, CategoryService>();
-
+     
             return services;
         }
     }
