@@ -114,4 +114,20 @@ app.UseAuthorization();
 
 app.MapControllers();
 
+
+// Créer les rôles par défaut si ils n'existent pas déjà dans la base de données
+using (var scope = app.Services.CreateScope())
+{
+    var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
+    string[] roles = ["Admin", "User", "Premium"];
+
+    foreach (var role in roles)
+    {
+        if (!await roleManager.RoleExistsAsync(role))
+        {
+            await roleManager.CreateAsync(new IdentityRole(role));
+        }
+    }
+}
+
 app.Run();

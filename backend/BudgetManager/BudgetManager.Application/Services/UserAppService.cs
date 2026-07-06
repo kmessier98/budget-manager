@@ -37,7 +37,9 @@ namespace BudgetManager.Application.Services
 
                 return new AuthResponseDto(false, "Échec de la création de l'utilisateur.", Errors: errorCodes);
             }
-            
+
+            // Note : Le rôle doit déjà exister dans la table AspNetRole =­> Voir fichier program.cs 
+            await _userManager.AddToRoleAsync(user, "User");
 
             return new AuthResponseDto(true, "Utilisateur créé avec succès !");
         }
