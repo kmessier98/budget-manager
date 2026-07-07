@@ -50,7 +50,10 @@ export function useAuthApi() {
           errorData.message || errorData.error || "Une erreur est survenue",
         );
       }
-      return await response.json();
+      //store the token in localStorage or cookies if needed
+      const data = await response.json();
+
+      return data;
     } catch (err) {
       error.value = (err as Error).message;
       throw err;
