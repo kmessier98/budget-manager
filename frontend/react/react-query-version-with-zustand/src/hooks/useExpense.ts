@@ -5,6 +5,7 @@ import useFiltersStore from "../stores/useFiltersStore";
 
 export const useExpense = () => {
   const { filters } = useFiltersStore();
+  
   return useQuery({
     // inclure les filtres dans la clé pour recharger l'API quand ils changent
 

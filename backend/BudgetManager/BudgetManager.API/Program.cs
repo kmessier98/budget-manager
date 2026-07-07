@@ -1,3 +1,4 @@
+using BudgetManager.API.Configurations;
 using BudgetManager.API.Filters.BudgetManager.API.Filters;
 using BudgetManager.API.Middlewares;
 using BudgetManager.Application;
@@ -16,6 +17,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Scalar.AspNetCore;
 using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
 using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -44,7 +46,10 @@ builder.Services.AddCors(options =>
 //  Enregistrement de TOUS les validateurs du projet Application (via le package moderne)
 builder.Services.AddValidatorsFromAssemblyContaining<CreateTransactionDTOValidator>();
 
-builder.Services.AddOpenApi();
+builder.Services.AddOpenApi(options =>
+{
+    options.AddDocumentTransformer<BearerSecuritySchemeTransformer>();
+});
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
@@ -78,7 +83,7 @@ builder.Services.AddAuthentication(options =>
         IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]!)),
         ClockSkew = TimeSpan.Zero,
         NameClaimType = JwtRegisteredClaimNames.Name,
-        RoleClaimType = "role"
+        RoleClaimType = ClaimTypes.Role
     };
 });
 

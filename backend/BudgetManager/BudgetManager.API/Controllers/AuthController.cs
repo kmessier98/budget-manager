@@ -16,6 +16,7 @@ namespace BudgetManager.API.Controllers
         [HttpPost("register")]
         public async Task<IActionResult> Register([FromBody] RegisterDto dto)
         {
+            //TOOD fluentValidation pour email valide
             var result = await _userService.RegisterAsync(dto);
             return result.IsSuccess ? Ok(result) : BadRequest(result);
         }
