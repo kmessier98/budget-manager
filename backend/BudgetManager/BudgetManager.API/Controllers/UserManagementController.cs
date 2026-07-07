@@ -38,7 +38,7 @@ namespace BudgetManager.API.Controllers
             var result = await _userManager.AddToRoleAsync(user, dto.RoleName);
             if (!result.Succeeded)
                 return BadRequest(new { errors = result.Errors.Select(e => e.Code) });
-
+            
             return Ok(new { message = $"Rôle {dto.RoleName} attribué avec succès." });
         }
     }

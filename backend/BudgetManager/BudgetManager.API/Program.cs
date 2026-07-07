@@ -48,6 +48,8 @@ builder.Services.AddValidatorsFromAssemblyContaining<CreateTransactionDTOValidat
 
 builder.Services.AddOpenApi(options =>
 {
+    // Pour l'interface scaler, il faut ajouter le transformateur de schéma de sécurité Bearer
+    // Cela permet de pouvoir entrer un token JWT dans l'interface pour tester les endpoints sécurisés
     options.AddDocumentTransformer<BearerSecuritySchemeTransformer>();
 });
 builder.Services.AddDbContext<AppDbContext>(options =>
