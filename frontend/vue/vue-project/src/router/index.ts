@@ -10,6 +10,18 @@ const router = createRouter({
         import("../features/expenses/views/expense-manager/ExpenseManagerView.vue"),
     },
     {
+    path: "/register",
+      name: "register",
+      component: () =>
+        import("../features/auth/views/RegisterView.vue"),
+    },
+    {
+      path: "/login",
+      name: "login",
+      component: () =>
+        import("../features/auth/views/LoginView.vue"),
+    },
+    {
       path: "/:pathMatch(.*)*",
       redirect: "/",
     },
