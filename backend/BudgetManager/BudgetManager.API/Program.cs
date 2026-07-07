@@ -55,9 +55,16 @@ builder.Services.AddOpenApi(options =>
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
+
 builder.Services.AddIdentityCore<ApplicationUser>(options =>
 {
-    // Vos options si nécessaire (ex: options.Password.RequiredLength = 6;)
+    // Configuration des règles de mot de passe pour Identity
+    // Mode development : on assouplit les règles pour faciliter les tests
+    options.Password.RequiredLength = 5;
+    options.Password.RequireNonAlphanumeric = false;
+    options.Password.RequireUppercase = false;
+    options.Password.RequireLowercase = false;
+    options.Password.RequireDigit = false;
 })
 .AddRoles<IdentityRole>()
 .AddEntityFrameworkStores<AppDbContext>()

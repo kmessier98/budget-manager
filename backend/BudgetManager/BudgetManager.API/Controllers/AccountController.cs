@@ -17,8 +17,6 @@ namespace BudgetManager.API.Controllers
         [HttpPost("change-password")]
         public async Task<IActionResult> ChangePassword([FromBody] ChangePasswordDTO dto)
         {
-            //TODO vérifier newPassword == ConfirmPassword fluentValidation..
-
             // Récupération automatique et sécurisée de l'ID depuis le JWT (le claim 'nameidentifier')
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
             if (userId == null) return Unauthorized();
