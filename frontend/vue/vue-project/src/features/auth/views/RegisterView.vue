@@ -1,6 +1,9 @@
 <script setup lang="ts">
 import { reactive } from "vue";
 import type { RegisterFormValues } from "@/features/expenses/models/auth/auth";
+import { useAuthApi } from "@/features/expenses/composables/useAuthApi";
+import { useToast } from "primevue";
+import { useRouter } from "vue-router";
 
 const form = reactive<RegisterFormValues>({
   email: "",
@@ -9,9 +12,29 @@ const form = reactive<RegisterFormValues>({
   lastName: "",
 });
 
-function handleSubmit() {
-  console.log("submit");
-  console.log(form);
+const toast = useToast();
+const router = useRouter();
+
+const { registerUser, error, loading } = useAuthApi();
+
+async function handleSubmit() {
+  await registerUser(form);
+
+  if (error.value) {
+    console.error("Erreur lors de l'inscription:", error.value);
+  } else {
+    toast.add({
+      severity: "success",
+      summary: "Inscription réussie",
+      detail: "Vous pouvez maintenant vous connecter.",
+      life: 3000,
+    });
+    form.email = "";
+    form.password = "";
+    form.firstName = "";
+    form.lastName = "";
+    router.push("/login");
+  }
 }
 </script>
 
@@ -20,6 +43,27 @@ function handleSubmit() {
     <div class="form-container">
       <form @submit.prevent="handleSubmit">
         <div>
+          <div>
+            <label for="firstName">Prénom:</label>
+            <input
+              type="text"
+              id="firstName"
+              v-model="form.firstName"
+              autocomplete="off"
+              required
+            />
+          </div>
+
+          <div>
+            <label for="lastName">Nom de famille:</label>
+            <input
+              type="text"
+              id="lastName"
+              v-model="form.lastName"
+              autocomplete="off"
+              required
+            />
+          </div>
           <label for="email">Adresse courriel:</label>
           <input
             type="email"
@@ -41,34 +85,11 @@ function handleSubmit() {
           />
         </div>
 
-        <div>
-          <label for="firstName">Prénom:</label>
-          <input
-            type="text"
-            id="firstName"
-            v-model="form.firstName"
-            required
-            autocomplete="off"
-          />
-        </div>
-
-        <div>
-          <label for="lastName">Nom de famille:</label>
-          <input
-            type="text"
-            id="lastName"
-            v-model="form.lastName"
-            required
-            autocomplete="off"
-          />
-        </div>
-
-           <div class="login-btn"><button type="submit">S'inscrire</button></div>
-              <span class="login-link"
-        >Déjà un compte ? <a href="/login">Connectez-vous</a></span
-      >
+        <div class="login-btn"><button type="submit">S'inscrire</button></div>
+        <span class="login-link"
+          >Déjà un compte ? <a href="/login">Connectez-vous</a></span
+        >
       </form>
-
     </div>
   </div>
 </template>

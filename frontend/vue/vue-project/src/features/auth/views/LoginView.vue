@@ -1,15 +1,36 @@
 <script setup lang="ts">
 import { reactive } from "vue";
 import type { LoginFormValues } from "@/features/expenses/models/auth/auth";
+import { useToast } from "primevue";
+import { useRouter } from "vue-router";
+import { useAuthApi } from "@/features/expenses/composables/useAuthApi";
 
 const form = reactive<LoginFormValues>({
   email: "",
   password: "",
 });
 
-function handleSubmit() {
-  console.log("submit");
-  console.log(form);
+const toast = useToast();
+const router = useRouter();
+
+const { loginUser, error, loading } = useAuthApi();
+
+async function handleSubmit() {
+  await loginUser(form);
+
+  if (error.value) {
+    console.error("Erreur lors de la connexion:", error.value);
+  } else {
+    toast.add({
+      severity: "success",
+      summary: "Connexion réussie",
+      detail: "Vous êtes maintenant connecté.",
+      life: 3000,
+    });
+    form.email = "";
+    form.password = "";
+    router.push("/");
+  }
 }
 </script>
 
