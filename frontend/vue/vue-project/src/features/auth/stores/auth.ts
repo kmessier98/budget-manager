@@ -70,11 +70,21 @@ export const useAuthStore = defineStore("auth", {
       }
     },
 
-    logout() {
+    async logout() {
       this.user = null;
       this.isAuthenticated = false;
       this.loading = false;
-      // Optionnel : appeler un endpoint backend pour supprimer le cookie côté serveur
+      try {
+        await fetch("/api/auth/logout", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          credentials: "include", // Include cookies in the request
+        });
+      } catch (err) {
+        this.error = (err as Error).message;
+      }
     },
   },
 });
