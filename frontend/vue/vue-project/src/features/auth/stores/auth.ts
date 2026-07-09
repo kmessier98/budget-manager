@@ -52,19 +52,19 @@ export const useAuthStore = defineStore("auth", {
           credentials: "include", // Include cookies in the request
         });
         if (!response.ok) {
-          const errorData = await response.json();
+          // L'API a répondu par un 401 ou un autre code d'erreur
           this.logout();
-          throw new Error(
-            errorData.message || errorData.error || "Une erreur est survenue",
-          );
+          return; // On s'arrête ici proprement, pas besoin de lever une exception
         }
+
         const data = await response.json();
         this.user = data;
         this.isAuthenticated = true;
       } catch (err) {
+        // Problème réseau ou serveur éteint
         this.error = (err as Error).message;
         this.logout();
-        throw err;
+        // SURTOUT PAS de "throw err;" ici, pour éviter de faire planter le routeur
       } finally {
         this.loading = false;
       }
