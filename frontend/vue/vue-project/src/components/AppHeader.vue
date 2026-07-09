@@ -18,7 +18,7 @@
       <div class="collapse navbar-collapse" id="navbarSupportedContent">
         <ul class="navbar-nav me-auto mb-2 mb-lg-0">
           <li class="nav-item">
-            <RouterLink to="/" class="nav-link"
+            <RouterLink to="/dashboard" class="nav-link"
               >Gestionnaire de dépenses
             </RouterLink>
           </li>

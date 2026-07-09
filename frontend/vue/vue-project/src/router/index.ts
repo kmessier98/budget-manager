@@ -5,8 +5,8 @@ const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
     {
-      path: "/",
-      name: "home", //REMPLACER par dashboard..
+      path: "/dashboard",
+      name: "dashboard",
       component: () =>
         import("../features/expenses/views/expense-manager/ExpenseManagerView.vue"),
       meta: { requiresAuth: true },
@@ -23,7 +23,7 @@ const router = createRouter({
     },
     {
       path: "/:pathMatch(.*)*",
-      redirect: "/",
+      redirect: "/dashboard",
     },
   ],
 });
@@ -45,7 +45,7 @@ router.beforeEach(async (to, from, next) => {
   }
   // CAS B : L'utilisateur EST connecté, mais tente d'aller sur la page /login
   else if (to.path === "/login" && authStore.isAuthenticated) {
-    next("/"); // Bloqué -> Redirection vers l'espace sécurisé
+    next("/dashboard"); // Bloqué -> Redirection vers l'espace sécurisé
   }
   // CAS C : Tout est correct (page publique, ou page privée avec session valide)
   else {
