@@ -1,3 +1,10 @@
+<script setup lang="ts">
+import logo from "@/assets/images/app-logo.png";
+import { useAuthStore } from "@/features/auth/stores/auth";
+
+const authStore = useAuthStore();
+</script>
+
 <template>
   <nav class="navbar navbar-expand-lg">
     <div class="container-fluid">
@@ -23,14 +30,36 @@
             </RouterLink>
           </li>
         </ul>
+
+        <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
+          <li v-if="authStore.isAuthenticated" class="nav-item dropdown">
+            <a
+              class="nav-link dropdown-toggle"
+              href="#"
+              id="navbarDropdown"
+              role="button"
+              data-bs-toggle="dropdown"
+              aria-expanded="false"
+            >
+              {{ authStore.user?.firstName }} {{ authStore.user?.lastName }}
+            </a>
+            <div
+              class="dropdown-menu dropdown-menu-end"
+              aria-labelledby="navbarDropdown"
+            >
+              <a class="dropdown-item" href="#" @click="authStore.logout"
+                >Déconnexion</a
+              >
+            </div>
+          </li>
+          <li v-else class="nav-item">
+            <RouterLink to="/login" class="nav-link">Connexion</RouterLink>
+          </li>
+        </ul>
       </div>
     </div>
   </nav>
 </template>
-
-<script setup lang="ts">
-import logo from "@/assets/images/app-logo.png";
-</script>
 
 <style lang="scss" scoped>
 @use "../assets/scss/variables" as *;
@@ -59,7 +88,7 @@ nav {
     filter: invert(1) brightness(100%);
   }
 
-  a:not(.navbar-brand) {
+  a:not(.navbar-brand):not(.dropdown-item) {
     color: #f1f1f1 !important;
     text-decoration: none;
 
