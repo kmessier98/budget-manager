@@ -10,8 +10,13 @@ namespace BudgetManager.API.Controllers
     public class AuthController : ControllerBase
     {
         private readonly UserAppService _userService;
+        private readonly IWebHostEnvironment _env;
 
-        public AuthController(UserAppService userService) => _userService = userService;
+        public AuthController(UserAppService userAppService, IWebHostEnvironment env)
+        {
+            _userService = userAppService;
+            _env = env;
+        }
 
         [HttpPost("register")]
         public async Task<IActionResult> Register([FromBody] RegisterDto dto)
@@ -25,7 +30,18 @@ namespace BudgetManager.API.Controllers
         public async Task<IActionResult> Login([FromBody] LoginDto dto)
         {
             var result = await _userService.LoginAsync(dto);
-            return result.IsSuccess ? Ok(result) : Unauthorized(result);
+
+            var cookieOptions = new CookieOptions
+            {
+                HttpOnly = true,      // Protects against XSS
+                Secure = !_env.IsDevelopment(), // Requires HTTPS
+                SameSite = SameSiteMode.Strict, // Protects against CSRF
+                Expires = DateTime.UtcNow.AddMinutes(60)
+            };
+            // Le token va s'enregister dans le cookie du navigateur (faire f12 => application => cookies)
+            Response.Cookies.Append("jwt", result.Token ?? string.Empty, cookieOptions);
+
+            return result.IsSuccess ? Ok(new { result.Message }) : Unauthorized(result);
         }
     }
 }

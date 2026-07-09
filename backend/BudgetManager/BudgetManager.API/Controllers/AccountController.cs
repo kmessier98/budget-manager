@@ -14,6 +14,26 @@ namespace BudgetManager.API.Controllers
     [ApiController]
     public class AccountController(UserManager<ApplicationUser> userManager) : ControllerBase
     {
+        [HttpGet("me")]
+        public async Task<IActionResult> GetCurrentUser()
+        {
+            // Récupération automatique et sécurisée de l'ID depuis le JWT (le claim 'nameidentifier')
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (userId == null) return Unauthorized();
+
+            var user = await userManager.FindByIdAsync(userId);
+            if (user == null) return NotFound(new { message = "Utilisateur introuvable." });
+            var userDto = new UserDTO
+            {
+                Id = user.Id,
+                Email = user.Email!,
+                FirstName = user.FirstName,
+                LastName = user.LastName
+            };
+
+            return Ok(userDto);
+        }
+
         [HttpPost("change-password")]
         public async Task<IActionResult> ChangePassword([FromBody] ChangePasswordDTO dto)
         {

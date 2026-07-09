@@ -1,6 +1,7 @@
 ﻿using BudgetManager.Application.DTOs.Auth;
 using BudgetManager.Application.Interfaces.AuthService;
 using BudgetManager.Domain.Entities;
+using BudgetManager.SharedLibrary.Responses;
 using Microsoft.AspNetCore.Identity;
 
 namespace BudgetManager.Application.Services
