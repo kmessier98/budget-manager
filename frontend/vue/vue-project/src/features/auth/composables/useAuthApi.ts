@@ -1,5 +1,5 @@
 import { ref } from "vue";
-import type { RegisterFormValues, LoginFormValues } from "../models/auth/auth";
+import type { RegisterFormValues, LoginFormValues } from "../models/auth";
 
 export function useAuthApi() {
   const error = ref<string | null>(null);
@@ -32,40 +32,10 @@ export function useAuthApi() {
       loading.value = false;
     }
   };
-  const loginUser = async (userData: LoginFormValues) => {
-    loading.value = true;
-    error.value = null;
-    try {
-      const response = await fetch("/api/auth/login", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(userData),
-      });
-      if (!response.ok) {
-        const errorData = await response.json();
-        console.error("Error login:", errorData);
-        throw new Error(
-          errorData.message || errorData.error || "Une erreur est survenue",
-        );
-      }
-      //store the token in localStorage or cookies if needed
-      const data = await response.json();
-
-      return data;
-    } catch (err) {
-      error.value = (err as Error).message;
-      throw err;
-    } finally {
-      loading.value = false;
-    }
-  };
 
   return {
     error,
     loading,
     registerUser,
-    loginUser,
   };
 }

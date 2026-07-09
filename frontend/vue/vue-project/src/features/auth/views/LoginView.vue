@@ -1,9 +1,10 @@
 <script setup lang="ts">
 import { reactive } from "vue";
-import type { LoginFormValues } from "@/features/expenses/models/auth/auth";
+import type { LoginFormValues } from "@/features/auth/models/auth";
 import { useToast } from "primevue";
 import { useRouter } from "vue-router";
-import { useAuthApi } from "@/features/expenses/composables/useAuthApi";
+
+import { useAuthStore } from "@/features/auth/stores/auth";
 
 const form = reactive<LoginFormValues>({
   email: "",
@@ -13,13 +14,13 @@ const form = reactive<LoginFormValues>({
 const toast = useToast();
 const router = useRouter();
 
-const { loginUser, error, loading } = useAuthApi();
+const { loginUser, error, loading } = useAuthStore();
 
 async function handleSubmit() {
   await loginUser(form);
 
-  if (error.value) {
-    console.error("Erreur lors de la connexion:", error.value);
+  if (error) {
+    console.error("Erreur lors de la connexion:", error);
   } else {
     toast.add({
       severity: "success",

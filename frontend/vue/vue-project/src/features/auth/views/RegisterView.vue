@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { reactive } from "vue";
-import type { RegisterFormValues } from "@/features/expenses/models/auth/auth";
-import { useAuthApi } from "@/features/expenses/composables/useAuthApi";
+import type { RegisterFormValues } from "@/features/auth/models/auth";
+import { useAuthApi } from "@/features/auth/composables/useAuthApi";
 import { useToast } from "primevue";
 import { useRouter } from "vue-router";
 

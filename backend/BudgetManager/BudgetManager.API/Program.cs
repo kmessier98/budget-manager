@@ -94,6 +94,18 @@ builder.Services.AddAuthentication(options =>
         NameClaimType = JwtRegisteredClaimNames.Name,
         RoleClaimType = ClaimTypes.Role
     };
+    // Important pour que le backend lis le cookie nommé "jwt" et l'utilise comme token pour l'authentification
+    options.Events = new JwtBearerEvents
+    {
+        OnMessageReceived = context =>
+        {
+            if (context.Request.Cookies.TryGetValue("jwt", out var token))
+            {
+                context.Token = token; 
+            }
+            return Task.CompletedTask;
+        }
+    };
 });
 
 // Identity services
