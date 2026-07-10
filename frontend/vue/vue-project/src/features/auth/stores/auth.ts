@@ -71,11 +71,12 @@ export const useAuthStore = defineStore("auth", {
     },
 
     async logout() {
+      const userId = this.user?.id ?? "";
       this.user = null;
       this.isAuthenticated = false;
       this.loading = false;
       try {
-        await fetch("/api/auth/logout", {
+        await fetch(`/api/auth/logout/${userId}`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",

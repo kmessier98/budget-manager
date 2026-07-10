@@ -99,7 +99,7 @@ builder.Services.AddAuthentication(options =>
     {
         OnMessageReceived = context =>
         {
-            if (context.Request.Cookies.TryGetValue("jwt", out var token))
+            if (context.Request.Cookies.TryGetValue("X-Access-Token", out var token))
             {
                 context.Token = token; 
             }
@@ -123,6 +123,7 @@ var app = builder.Build();
 
 // Ajout du middleware au pipeline
 app.UseExceptionHandler();
+app.UseRefreshToken();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
