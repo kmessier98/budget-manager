@@ -102,7 +102,7 @@ namespace BudgetManager.Application.Services
             var newRefreshToken = Guid.NewGuid().ToString();
             await _userManager.SetAuthenticationTokenAsync(user, "Default", "RefreshToken", newRefreshToken);
 
-            return new AuthResponseDto(true, "Jetons rafraîchis avec succès.", newAccessToken, newRefreshToken);
+            return new AuthResponseDto(true, userId, "Jetons rafraîchis avec succès.", newAccessToken, newRefreshToken);
         }
 
     }
