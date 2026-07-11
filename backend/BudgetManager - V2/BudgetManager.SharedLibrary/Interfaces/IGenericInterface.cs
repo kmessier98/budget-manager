@@ -1,0 +1,15 @@
+﻿using BudgetManager.SharedLibrary.Responses;
+using System.Linq.Expressions;
+
+namespace BudgetManager.SharedLibrary.Interfaces
+{
+    public interface IGenericInterface<T> where T : class
+    {
+        Task<T> CreateAsync(T entity);
+        Task<T> UpdateAsync(T entity);
+        Task<bool> DeleteAsync(Guid id);
+        Task<IReadOnlyList<T>> GetAllAsync();
+        Task<T?> FindByIdAsync(Guid id);
+        Task<T?> GetByAsync(Expression<Func<T, bool>> predicate);
+    }
+}
