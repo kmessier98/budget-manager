@@ -56,7 +56,7 @@ namespace BudgetManager.API.Controllers
             };
 
             Response.Cookies.Delete("X-Access-Token", cookieOptions);
-            //TODO delete refresh token (cookie)
+            Response.Cookies.Delete("X-Refresh-Token", cookieOptions);
             bool success = await _userService.LogoutAsync(userId);
 
             return success ? Ok(new { message = "Déconnexion réussie" }) : BadRequest(new { message = "Échec de la déconnexion" });
