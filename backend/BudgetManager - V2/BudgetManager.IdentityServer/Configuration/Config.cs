@@ -11,23 +11,16 @@
                 new Client
                 {
                     ClientId = "my_frontend_app",
-                      AllowedGrantTypes = GrantTypes.ResourceOwnerPassword,
+                     AllowedGrantTypes = GrantTypes.Code,
                     RequirePkce = true,
                     RequireClientSecret = false,
-                    RedirectUris =
-                    {
-                        "http://localhost:5173/authentication/login-callback",
-                               "https://pstmn.io"
-                    },
-                    PostLogoutRedirectUris =
-                    {
-                        "http://localhost:5173/"
-                    },
+                     RedirectUris = { "http://localhost:5173/signin-oidc" },
+                    PostLogoutRedirectUris = { "http://localhost:5173/signout-callback-oidc" },
                     AllowedScopes =
                     {
                         "openid",
                         "profile",
-                        "monprojet.api"  // 👈 CORRIGÉ : Doit correspondre exactement à votre ApiScope plus bas !
+                        "monprojet.api"  // Doit correspondre exactement à votre ApiScope plus bas !
                     },
                     AllowOfflineAccess = true // REQUIS pour activer les Refresh Tokens
                 }

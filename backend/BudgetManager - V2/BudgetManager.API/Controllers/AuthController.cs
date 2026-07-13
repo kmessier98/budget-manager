@@ -1,5 +1,6 @@
 ﻿using BudgetManager.Application.DTOs.Auth;
 using BudgetManager.Application.Services;
+using BudgetManager.Domain.Entities;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Http;
@@ -14,11 +15,13 @@ namespace BudgetManager.API.Controllers
     {
         private readonly UserAppService _userService;
         private readonly IWebHostEnvironment _env;
+        private readonly SignInManager<ApplicationUser> _signInManager;
 
-        public AuthController(UserAppService userAppService, IWebHostEnvironment env)
+        public AuthController(UserAppService userAppService, IWebHostEnvironment env, SignInManager<ApplicationUser> signInManager)
         {
             _userService = userAppService;
             _env = env;
+            _signInManager = signInManager;
         }
 
         [HttpPost("register")]
@@ -32,41 +35,20 @@ namespace BudgetManager.API.Controllers
         [HttpPost("login")]
         public async Task<IActionResult> Login([FromBody] LoginDto dto)
         {
-            var result = await _userService.LoginAsync(dto);
-            if (!result.IsSuccess) return Unauthorized(result);
+            var result = await _signInManager.PasswordSignInAsync(dto.Email, dto.Password, isPersistent: true, lockoutOnFailure: false);
+            if (result.Succeeded)
+            {
+                return Ok(new { message = "Connexion réussie !" });
+            }
 
-            // Le token va s'enregister dans le cookie du navigateur (faire f12 => application => cookies)
-            Response.Cookies.Append("X-Access-Token", result.Token ?? string.Empty, CreateCookieOptions(DateTime.UtcNow.AddMinutes(1)));
-
-            return result.IsSuccess ? Ok(new { result.Message }) : Unauthorized(result);
+            return Unauthorized(new { error = "Identifiants invalides." });
         }
 
-        [HttpPost("logout/{userId}")]
-        public async Task<IActionResult> Logout(string userId)
+        [HttpPost("logout")]
+        public async Task<IActionResult> Logout()
         {
-            var cookieOptions = new CookieOptions
-            {
-                HttpOnly = true,
-                Secure = !_env.IsDevelopment(),
-                SameSite = SameSiteMode.Strict,
-            };
-
-            Response.Cookies.Delete("X-Access-Token", cookieOptions);
-            //TODO delete refresh token (cookie)
-            bool success = await _userService.LogoutAsync(userId);
-
-            return success ? Ok(new { message = "Déconnexion réussie" }) : BadRequest(new { message = "Échec de la déconnexion" });
-        }
-
-        private CookieOptions CreateCookieOptions(DateTime expires)
-        {
-            return new CookieOptions
-            {
-                HttpOnly = true, // Protects against XSS
-                Secure = !_env.IsDevelopment(),  // Requires HTTPS
-                SameSite = SameSiteMode.Strict, // Protects against CSRF
-                Expires = expires
-            };
+            await _signInManager.SignOutAsync();
+            return Ok(new { message = "Déconnexion réussie !" });
         }
     }
 }

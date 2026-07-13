@@ -45,30 +45,5 @@ namespace BudgetManager.Application.Services
 
             return new AuthResponseDto(true, user.Id, "Utilisateur créé avec succès !");
         }
-
-        public async Task<AuthResponseDto> LoginAsync(LoginDto dto)
-        {
-            var user = await _userManager.FindByEmailAsync(dto.Email);
-            if (user == null || !await _userManager.CheckPasswordAsync(user, dto.Password))
-                return new AuthResponseDto(false, null!, "Identifiants invalides.");
-
-            var roles = await _userManager.GetRolesAsync(user);
-
-            // 1. Générer le jeton d'accès JWT classique
-            var token = _authService.GenerateJwtToken(user, roles);
-
-            return new AuthResponseDto(true, user.Id, "Connexion réussie.", token);
-        }
-
-        public async Task<bool> LogoutAsync(string userId)
-        {
-            var user = await _userManager.FindByIdAsync(userId);
-            if (user == null) return false;
-
-            // Supprime proprement le Refresh Token de la table AspNetUserTokens
-            var result = await _userManager.RemoveAuthenticationTokenAsync(user, "Default", "RefreshToken");
-
-            return result.Succeeded;
-        }
     }
 }

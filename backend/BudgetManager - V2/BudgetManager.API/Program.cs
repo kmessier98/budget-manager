@@ -35,7 +35,8 @@ builder.Services.AddCors(options =>
         policy
             .WithOrigins("http://localhost:5173", "http://localhost:5174", "http://localhost:4200")
             .AllowAnyHeader()
-            .AllowAnyMethod();
+            .AllowAnyMethod()
+            .AllowCredentials(); // INDISPENSABLE pour autoriser le partage des cookies avec le frontend
     });
 });
 
@@ -52,37 +53,43 @@ builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 
-builder.Services.AddIdentityCore<ApplicationUser>(options =>
+// 1. IMPORTANT : Remplacer AddIdentityCore par AddIdentity pour avoir accès au SignInManager complet
+builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options =>
 {
-    // Configuration des règles de mot de passe pour Identity
-    // Mode development : on assouplit les règles pour faciliter les tests
     options.Password.RequiredLength = 5;
     options.Password.RequireNonAlphanumeric = false;
     options.Password.RequireUppercase = false;
     options.Password.RequireLowercase = false;
     options.Password.RequireDigit = false;
 })
-.AddRoles<IdentityRole>()
 .AddEntityFrameworkStores<AppDbContext>()
 .AddDefaultTokenProviders();
 
-/// <summary>
-/// Configure la validation des tokens JWT.
-/// L'API valide l'authenticité des jetons auprès du serveur Duende spécifié dans Authority.
-/// </summary>
-builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-    .AddJwtBearer(options =>
+// 2. Configuration personnalisée du Cookie généré par Identity pour votre Frontend
+builder.Services.ConfigureApplicationCookie(options =>
+{
+    options.Cookie.Name = "MonApp_Auth_Cookie";
+    options.Cookie.SameSite = SameSiteMode.Strict;   // Protection CSRF absolue
+    options.Cookie.SecurePolicy = CookieSecurePolicy.Always; // HTTPS requis
+    options.Cookie.HttpOnly = true;                  // Invisible pour le JavaScript du Frontend (Sécurité XSS)
+    options.ExpireTimeSpan = TimeSpan.FromMinutes(15); // Si on ne mets pas, par défaut ca dure 7 jours
+    // Conserve le principe du renouvellement automatique à mi-parcours
+    options.SlidingExpiration = true;
+
+    // Empêche ASP.NET de rediriger vers une page HTML /Account/Login si le frontend fait un appel non authentifié
+    options.Events.OnRedirectToLogin = context =>
     {
-        // Duende va fournir lui-même les clés de signature (via l'endpoint OIDC metadata)
-        options.Authority = "https://localhost:7053"; // URL de votre projet Duende
-        options.Audience = "mon_api_resource";        // Enregistré dans Duende
-        options.RequireHttpsMetadata = true;
+        context.Response.StatusCode = StatusCodes.Status401Unauthorized;
+        return Task.CompletedTask;
+    };
 
-        // .NET 10/9 standard pour garder les claims intacts
-        options.MapInboundClaims = false;
-    });
-
-builder.Services.AddAuthorization();
+    // Empêche également la redirection en cas de permissions insuffisantes (403 Forbidden)
+    options.Events.OnRedirectToAccessDenied = context =>
+    {
+        context.Response.StatusCode = StatusCodes.Status403Forbidden;
+        return Task.CompletedTask;
+    };
+});
 
 // Identity services
 builder.Services.AddScoped<IAuthService, AuthService>();
