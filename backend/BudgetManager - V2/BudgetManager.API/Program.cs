@@ -66,7 +66,7 @@ builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options =>
 .AddDefaultTokenProviders();
 
 // 2. Configuration personnalisée du Cookie généré par Identity pour votre Frontend
-// A NOTER QUE C'EST OPTIONELLE.... LA MÉTHODE PasswordSignInAsync UTILIE LE cookie par défaut de Identity.
+// A NOTER QUE C'EST OPTIONELLE.... LA MÉTHODE PasswordSignInAsync UTILISE LE cookie par défaut de Identity.
 // Ici, je fais juste une configuration plus strictre pour le cookie... mais c'est optionnel
 // Voir dans f12 / Application / Storage / Cookies pour voir le cookie généré par Identity!!!
 builder.Services.ConfigureApplicationCookie(options =>
