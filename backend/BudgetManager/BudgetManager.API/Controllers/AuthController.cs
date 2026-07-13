@@ -36,11 +36,11 @@ namespace BudgetManager.API.Controllers
             if (!result.IsSuccess) return Unauthorized(result);
 
             // Le token va s'enregister dans le cookie du navigateur (faire f12 => application => cookies)
-            Response.Cookies.Append("X-Access-Token", result.Token ?? string.Empty, CreateCookieOptions(DateTime.UtcNow.AddMinutes(1)));
+            Response.Cookies.Append("X-Access-Token", result.Token ?? string.Empty, CreateCookieOptions(DateTime.UtcNow.AddMinutes(15)));
 
             var userId = result.UserId;
             var cookieRefreshToken = $"{userId}:{result.RefreshToken}";
-            Response.Cookies.Append("X-Refresh-Token", cookieRefreshToken ?? string.Empty, CreateCookieOptions(DateTime.UtcNow.AddMinutes(5)));
+            Response.Cookies.Append("X-Refresh-Token", cookieRefreshToken ?? string.Empty, CreateCookieOptions(DateTime.UtcNow.AddDays(7)));
 
             return result.IsSuccess ? Ok(new { result.Message }) : Unauthorized(result);
         }

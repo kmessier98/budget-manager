@@ -57,14 +57,7 @@ namespace BudgetManager.Application.Services
             // 1. Générer le jeton d'accès JWT classique
             var token = _authService.GenerateJwtToken(user, roles);
 
-            // 2. Générer un Refresh Token unique et sécurisé
-            var refreshToken = Guid.NewGuid().ToString();
-
-            // 3. Stocker le Refresh Token nativement dans la table AspNetUserTokens d'Identity
-            // "Default" est le fournisseur, "RefreshToken" est le nom de la clé
-            await _userManager.SetAuthenticationTokenAsync(user, "Default", "RefreshToken", refreshToken);
-
-            return new AuthResponseDto(true, user.Id, "Connexion réussie.", token, refreshToken);
+            return new AuthResponseDto(true, user.Id, "Connexion réussie.", token);
         }
 
         public async Task<bool> LogoutAsync(string userId)
@@ -77,33 +70,5 @@ namespace BudgetManager.Application.Services
 
             return result.Succeeded;
         }
-
-        public async Task<AuthResponseDto> RefreshTokensAsync(string userId, string providedRefreshToken)
-        {
-            // 1. Trouver l'utilisateur dans les tables Identity
-            var user = await _userManager.FindByIdAsync(userId);
-            if (user == null)
-                return new AuthResponseDto(false, "Utilisateur introuvable.", null, null);
-
-            // 2. Récupérer le Refresh Token stocké nativement en BDD
-            var storedRefreshToken = await _userManager.GetAuthenticationTokenAsync(user, "Default", "RefreshToken");
-
-            // 3. Valider le token (Est-ce que le cookie correspond à la BDD ?)
-            if (storedRefreshToken == null || storedRefreshToken != providedRefreshToken)
-            {
-                return new AuthResponseDto(false, "Jeton de rafraîchissement invalide ou expiré.", null, null);
-            }
-
-            // 4. Générer le nouveau Jeton d'accès JWT
-            var roles = await _userManager.GetRolesAsync(user);
-            var newAccessToken = _authService.GenerateJwtToken(user, roles);
-
-            // 5. Générer et remplacer le Refresh Token (Rotation de sécurité)
-            var newRefreshToken = Guid.NewGuid().ToString();
-            await _userManager.SetAuthenticationTokenAsync(user, "Default", "RefreshToken", newRefreshToken);
-
-            return new AuthResponseDto(true, userId, "Jetons rafraîchis avec succès.", newAccessToken, newRefreshToken);
-        }
-
     }
 }

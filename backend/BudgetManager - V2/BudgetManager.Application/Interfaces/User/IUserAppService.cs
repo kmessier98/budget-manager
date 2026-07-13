@@ -7,6 +7,5 @@ namespace BudgetManager.Application.Interfaces.User
         public Task<AuthResponseDto> RegisterAsync(RegisterDto dto);
         public Task<AuthResponseDto> LoginAsync(LoginDto dto);
         public Task<bool> LogoutAsync(string userId);
-        public Task<AuthResponseDto> RefreshTokensAsync(string userId, string providedRefreshToken);
     }
 }

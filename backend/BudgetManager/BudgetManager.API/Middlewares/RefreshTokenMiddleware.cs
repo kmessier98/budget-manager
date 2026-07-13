@@ -38,34 +38,31 @@ namespace BudgetManager.API.Middlewares
                         // 3. Appel du service qui vérifie la table AspNetUserTokens d'Identity
                         var refreshResult = await userService.RefreshTokensAsync(userId, dbRefreshToken);
 
-                            if (refreshResult != null && refreshResult.IsSuccess)
-                            {
-                                // 4. Succès : On écrase le header Authorization pour que [Authorize] fonctionne sur la requête actuelle
-                                context.Request.Headers["Authorization"] = $"Bearer {refreshResult.Token}";
+                        if (refreshResult != null && refreshResult.IsSuccess)
+                        {
+                            // 4. Succès : On écrase le header Authorization pour que [Authorize] fonctionne sur la requête actuelle
+                            context.Request.Headers["Authorization"] = $"Bearer {refreshResult.Token}";
 
-                                // 5. Mise à jour des cookies du navigateur avec les nouveaux jetons
-                                var isProd = !_env.IsDevelopment();
+                            // 5. Mise à jour des cookies du navigateur avec les nouveaux jetons
+                            var isProd = !_env.IsDevelopment();
 
-                            // Ré-emballage pour le prochain cycle
-                            var nextCookieRefreshToken = $"{userId}:{refreshResult.RefreshToken}";
+                        // Ré-emballage pour le prochain cycle
+                        var nextCookieRefreshToken = $"{userId}:{refreshResult.RefreshToken}";
 
-                            context.Response.Cookies.Append("X-Access-Token", refreshResult.Token,
-                                    CreateCookieOptions(DateTime.UtcNow.AddMinutes(1), isProd));
+                        context.Response.Cookies.Append("X-Access-Token", refreshResult.Token,
+                                CreateCookieOptions(DateTime.UtcNow.AddMinutes(15), isProd));
 
-                                context.Response.Cookies.Append("X-Refresh-Token", nextCookieRefreshToken,
-                                    CreateCookieOptions(DateTime.UtcNow.AddMinutes(5), isProd));
-                            }
-                            else
-                            {
-                                // Échec du rafraîchissement (Ex: Refresh token réutilisé ou expiré)
-                                // Optionnel : Nettoyer les cookies corrompus pour forcer la reconnexion
-                                context.Response.Cookies.Delete("X-Access-Token");
-                                context.Response.Cookies.Delete("X-Refresh-Token");
-                            }
-
-                        
-                    }
-                      
+                            context.Response.Cookies.Append("X-Refresh-Token", nextCookieRefreshToken,
+                                CreateCookieOptions(DateTime.UtcNow.AddDays(7), isProd));
+                        }
+                        else
+                        {
+                            // Échec du rafraîchissement (Ex: Refresh token réutilisé ou expiré)
+                            // Optionnel : Nettoyer les cookies corrompus pour forcer la reconnexion
+                            context.Response.Cookies.Delete("X-Access-Token");
+                            context.Response.Cookies.Delete("X-Refresh-Token");
+                        }              
+                    }                    
                 }
                 else
                 {
@@ -76,9 +73,7 @@ namespace BudgetManager.API.Middlewares
                     context.Request.Headers["Authorization"] = $"Bearer {accessToken}";
                 }
             }
-
-            
-                               
+                             
              await _next(context);
         }
 

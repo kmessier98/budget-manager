@@ -123,7 +123,6 @@ var app = builder.Build();
 
 // Ajout du middleware au pipeline
 app.UseExceptionHandler();
-app.UseRefreshToken();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
