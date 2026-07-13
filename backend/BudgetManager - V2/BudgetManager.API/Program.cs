@@ -14,18 +14,14 @@ using FluentValidation;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.IdentityModel.Tokens;
 using Scalar.AspNetCore;
-using System.IdentityModel.Tokens.Jwt;
-using System.Security.Claims;
-using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Ajout du service Problem Details standard
 builder.Services.AddProblemDetails();
 // Enregistrement du gestionnaire global
-builder.Services.AddExceptionHandler<GlobalExceptionHandler>(); 
+builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
 
 builder.Services.AddControllers(options =>
 {
@@ -78,13 +74,15 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
     {
         // Duende va fournir lui-même les clés de signature (via l'endpoint OIDC metadata)
-        options.Authority = "https://localhost:5001"; // URL de votre projet Duende
+        options.Authority = "https://localhost:7053"; // URL de votre projet Duende
         options.Audience = "mon_api_resource";        // Enregistré dans Duende
         options.RequireHttpsMetadata = true;
 
         // .NET 10/9 standard pour garder les claims intacts
         options.MapInboundClaims = false;
     });
+
+builder.Services.AddAuthorization();
 
 // Identity services
 builder.Services.AddScoped<IAuthService, AuthService>();
