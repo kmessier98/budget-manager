@@ -68,45 +68,23 @@ builder.Services.AddIdentityCore<ApplicationUser>(options =>
 })
 .AddRoles<IdentityRole>()
 .AddEntityFrameworkStores<AppDbContext>()
-.AddDefaultTokenProviders()
-.AddUserManager<UserManager<ApplicationUser>>() //  OBLIGATOIRE : Enregistre explicitement le UserManager
-.AddSignInManager<SignInManager<ApplicationUser>>();
-// 3. Authentification JWT (Mise à jour .NET 10 standard)
-builder.Services.AddAuthentication(options =>
-{
-    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-})
-.AddJwtBearer(options =>
-{
-    // Keep the claim names exactly as they appear in the token (no surprise remapping).
-    options.MapInboundClaims = false;
-    options.TokenValidationParameters = new TokenValidationParameters
+.AddDefaultTokenProviders();
+
+/// <summary>
+/// Configure la validation des tokens JWT.
+/// L'API valide l'authenticité des jetons auprès du serveur Duende spécifié dans Authority.
+/// </summary>
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+    .AddJwtBearer(options =>
     {
-        ValidateIssuer = true,
-        ValidateAudience = true,
-        ValidateLifetime = true,
-        ValidateIssuerSigningKey = true,
-        ValidIssuer = builder.Configuration["Jwt:Issuer"],
-        ValidAudience = builder.Configuration["Jwt:Audience"],
-        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]!)),
-        ClockSkew = TimeSpan.Zero,
-        NameClaimType = JwtRegisteredClaimNames.Name,
-        RoleClaimType = ClaimTypes.Role
-    };
-    // Important pour que le backend lis le cookie nommé "jwt" et l'utilise comme token pour l'authentification
-    options.Events = new JwtBearerEvents
-    {
-        OnMessageReceived = context =>
-        {
-            if (context.Request.Cookies.TryGetValue("X-Access-Token", out var token))
-            {
-                context.Token = token; 
-            }
-            return Task.CompletedTask;
-        }
-    };
-});
+        // Duende va fournir lui-même les clés de signature (via l'endpoint OIDC metadata)
+        options.Authority = "https://localhost:5001"; // URL de votre projet Duende
+        options.Audience = "mon_api_resource";        // Enregistré dans Duende
+        options.RequireHttpsMetadata = true;
+
+        // .NET 10/9 standard pour garder les claims intacts
+        options.MapInboundClaims = false;
+    });
 
 // Identity services
 builder.Services.AddScoped<IAuthService, AuthService>();
