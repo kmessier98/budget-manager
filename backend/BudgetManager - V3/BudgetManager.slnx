@@ -2,6 +2,7 @@
   <Project Path="BudgetManager.API/BudgetManager.API.csproj" />
   <Project Path="BudgetManager.Application/BudgetManager.Application.csproj" />
   <Project Path="BudgetManager.Domain/BudgetManager.Domain.csproj" />
+  <Project Path="BudgetManager.IdentityServer/BudgetManager.IdentityServer.csproj" Id="906f670f-d819-4eb9-93c2-15b16be5e7df" />
   <Project Path="BudgetManager.Infrastructure/BudgetManager.Infrastructure.csproj" />
   <Project Path="BudgetManager.SharedLibrary/BudgetManager.SharedLibrary.csproj" />
 </Solution>
