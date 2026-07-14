@@ -16,57 +16,14 @@ const router = useRouter();
 
 const { loginUser, error, loading } = useAuthStore();
 
-async function handleSubmit() {
-  await loginUser(form);
 
-  if (error) {
-    console.error("Erreur lors de la connexion:", error);
-  } else {
-    toast.add({
-      severity: "success",
-      summary: "Connexion réussie",
-      detail: "Vous êtes maintenant connecté.",
-      life: 3000,
-    });
-    form.email = "";
-    form.password = "";
-    router.push("/");
-  }
+function redirectionLogin() {
+  window.location.href = "https://localhost:7208/api/auth/login";
 }
 </script>
 
 <template>
-  <div class="container">
-    <div class="form-container">
-      <form @submit.prevent="handleSubmit">
-        <div>
-          <label for="email">Adresse courriel:</label>
-          <input
-            type="email"
-            id="email"
-            v-model="form.email"
-            required
-            autocomplete="off"
-          />
-        </div>
-
-        <div>
-          <label for="password">Mot de passe:</label>
-          <input
-            type="password"
-            id="password"
-            v-model="form.password"
-            required
-            autocomplete="off"
-          />
-        </div>
-        <div class="login-btn"><button type="submit">Se connecter</button></div>
-        <span class="login-link"
-          >Pas encore de compte ? <a href="/register">Inscrivez-vous</a></span
-        >
-      </form>
-    </div>
-  </div>
+  <Button @click="redirectionLogin">Se connecter</Button>
 </template>
 
 <style lang="scss" scoped>

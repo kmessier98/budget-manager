@@ -11,12 +11,44 @@ using BudgetManager.Infrastructure;
 using BudgetManager.Infrastructure.Data;
 using BudgetManager.Infrastructure.Security;
 using FluentValidation;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Scalar.AspNetCore;
 
 var builder = WebApplication.CreateBuilder(args);
+
+// 1. Configuration de l'authentification hybride Cookie + OIDC
+builder.Services.AddAuthentication(options =>
+{
+    options.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+    options.DefaultChallengeScheme = OpenIdConnectDefaults.AuthenticationScheme;
+})
+.AddCookie(CookieAuthenticationDefaults.AuthenticationScheme, options =>
+{
+    options.Cookie.Name = "__Host-BFF-Spa";
+    options.Cookie.SameSite = SameSiteMode.Strict;
+    options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
+    options.Cookie.HttpOnly = true;
+
+    // Gérer le retour non-autorisé pour les requêtes AJAX de Vue
+    options.Events.OnRedirectToLogin = context =>
+    {
+        context.Response.StatusCode = StatusCodes.Status401Unauthorized;
+        return Task.CompletedTask;
+    };
+})
+.AddOpenIdConnect(OpenIdConnectDefaults.AuthenticationScheme, options =>
+{
+    options.Authority = "https://localhost:7053"; // Port de Duende
+    options.ClientId = "vue-bff-client";
+    options.ClientSecret = "secret-tres-robuste";
+    options.ResponseType = "code";
+    options.SaveTokens = true; // Conserve les tokens dans le cookie de session
+    options.GetClaimsFromUserInfoEndpoint = true;
+});
+
 
 // Ajout du service Problem Details standard
 builder.Services.AddProblemDetails();
@@ -65,14 +97,6 @@ builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options =>
 .AddEntityFrameworkStores<AppDbContext>()
 .AddDefaultTokenProviders();
 
-builder.Services
-.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-.AddJwtBearer(options =>
-{
-    options.Authority = "https://localhost:5001"; //PORT du serveur IdentityServer
-    options.Audience = "api";
-    options.RequireHttpsMetadata = false;
-});
 
 // Identity services
 builder.Services.AddScoped<IAuthService, AuthService>();
