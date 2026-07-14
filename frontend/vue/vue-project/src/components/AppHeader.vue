@@ -3,6 +3,10 @@ import logo from "@/assets/images/app-logo.png";
 import { useAuthStore } from "@/features/auth/stores/auth";
 
 const authStore = useAuthStore();
+
+function redirectionLogout() {
+  window.location.href = "https://localhost:7208/api/auth/logout";
+}
 </script>
 
 <template>
@@ -47,7 +51,7 @@ const authStore = useAuthStore();
               class="dropdown-menu dropdown-menu-end"
               aria-labelledby="navbarDropdown"
             >
-              <a class="dropdown-item" href="#" @click="authStore.logout"
+              <a class="dropdown-item" href="#" @click="redirectionLogout"
                 >Déconnexion</a
               >
             </div>
