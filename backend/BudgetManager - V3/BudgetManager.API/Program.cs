@@ -65,33 +65,13 @@ builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options =>
 .AddEntityFrameworkStores<AppDbContext>()
 .AddDefaultTokenProviders();
 
-// 2. Configuration personnalisée du Cookie généré par Identity pour votre Frontend
-// A NOTER QUE C'EST OPTIONELLE.... LA MÉTHODE PasswordSignInAsync UTILISE LE cookie par défaut de Identity.
-// Ici, je fais juste une configuration plus strictre pour le cookie... mais c'est optionnel
-// Voir dans f12 / Application / Storage / Cookies pour voir le cookie généré par Identity!!!
-builder.Services.ConfigureApplicationCookie(options =>
+builder.Services
+.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+.AddJwtBearer(options =>
 {
-    options.Cookie.Name = "MonApp_Auth_Cookie";
-    options.Cookie.SameSite = SameSiteMode.Strict;   // Protection CSRF absolue
-    options.Cookie.SecurePolicy = CookieSecurePolicy.Always; // HTTPS requis
-    options.Cookie.HttpOnly = true;                  // Invisible pour le JavaScript du Frontend (Sécurité XSS)
-    options.ExpireTimeSpan = TimeSpan.FromMinutes(15); // Si on ne mets pas, par défaut ca dure 7 jours
-    // Conserve le principe du renouvellement automatique à mi-parcours
-    options.SlidingExpiration = true;
-
-    // Empêche ASP.NET de rediriger vers une page HTML /Account/Login si le frontend fait un appel non authentifié
-    options.Events.OnRedirectToLogin = context =>
-    {
-        context.Response.StatusCode = StatusCodes.Status401Unauthorized;
-        return Task.CompletedTask;
-    };
-
-    // Empêche également la redirection en cas de permissions insuffisantes (403 Forbidden)
-    options.Events.OnRedirectToAccessDenied = context =>
-    {
-        context.Response.StatusCode = StatusCodes.Status403Forbidden;
-        return Task.CompletedTask;
-    };
+    options.Authority = "https://localhost:5001"; //PORT du serveur IdentityServer
+    options.Audience = "api";
+    options.RequireHttpsMetadata = false;
 });
 
 // Identity services
@@ -100,7 +80,6 @@ builder.Services.AddScoped<UserAppService>();
 
 builder.Services.AddApplicationServices();
 builder.Services.AddInfrastructureService();
-
 
 // On cible l'assembly du validateur pour être sûr de scanner le projet Application
 builder.Services.AddAutoMapper(cfg => { }, typeof(MappingProfile).Assembly);

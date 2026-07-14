@@ -11,16 +11,21 @@
                 new Client
                 {
                     ClientId = "my_frontend_app",
-                     AllowedGrantTypes = GrantTypes.Code,
+                    AllowedGrantTypes = GrantTypes.Code,
                     RequirePkce = true,
                     RequireClientSecret = false,
-                     RedirectUris = { "http://localhost:5173/signin-oidc" },
-                    PostLogoutRedirectUris = { "http://localhost:5173/signout-callback-oidc" },
+                    RedirectUris = { "http://localhost:5173/callback" },
+                    PostLogoutRedirectUris = { "http://localhost:5173/" },
+                    AllowedCorsOrigins =
+                    {
+                        "http://localhost:5173"
+                    },
                     AllowedScopes =
                     {
                         "openid",
                         "profile",
-                        "monprojet.api"  // Doit correspondre exactement à votre ApiScope plus bas !
+                        "monprojet.api",  // Doit correspondre exactement à votre ApiScope plus bas !
+                        "offline_access"
                     },
                     AllowOfflineAccess = true // REQUIS pour activer les Refresh Tokens
                 }
@@ -50,17 +55,6 @@
             {
                 new IdentityResources.OpenId(),
                 new IdentityResources.Profile()
-            };
-
-        public static IEnumerable<TestUser> Users =>
-            new List<TestUser>
-            {
-                new TestUser
-                {
-                    SubjectId="1",
-                    Username="kevin",
-                    Password="Password123!"
-                }
             };
     }
 }
