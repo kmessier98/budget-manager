@@ -47,6 +47,31 @@ builder.Services.AddAuthentication(options =>
     options.ResponseType = "code";
     options.SaveTokens = true; // Conserve les tokens dans le cookie de session
     options.GetClaimsFromUserInfoEndpoint = true;
+
+
+    // Scopes nécessaires
+    options.Scope.Clear();
+    options.Scope.Add("openid");
+    options.Scope.Add("profile");
+    options.Scope.Add("api.read");
+
+    // Configuration de la déconnexion
+    options.SignedOutRedirectUri = "http://localhost:5173/"; // Retour au frontend après déconnexion
+
+    // Gestion des événements OIDC
+    options.Events = new OpenIdConnectEvents
+    {
+        OnRedirectToIdentityProvider = context =>
+        {
+            // Si le paramètre "prompt" est défini dans les propriétés d'authentification, l'ajouter à la requête
+            if (context.Properties.Items.TryGetValue("prompt", out var promptValue))
+            {
+                context.ProtocolMessage.SetParameter("prompt", promptValue);
+            }
+            return Task.CompletedTask;
+        }
+    };
+
 });
 
 

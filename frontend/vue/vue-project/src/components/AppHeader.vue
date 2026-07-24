@@ -4,8 +4,8 @@ import { useAuthStore } from "@/features/auth/stores/auth";
 
 const authStore = useAuthStore();
 
-function redirectionLogout() {
-  window.location.href = "https://localhost:7208/api/auth/logout";
+function handleLogout() {
+  authStore.logout();
 }
 </script>
 
@@ -51,7 +51,7 @@ function redirectionLogout() {
               class="dropdown-menu dropdown-menu-end"
               aria-labelledby="navbarDropdown"
             >
-              <a class="dropdown-item" href="#" @click="redirectionLogout"
+              <a class="dropdown-item" href="#" @click="handleLogout"
                 >Déconnexion</a
               >
             </div>

@@ -13,6 +13,16 @@ builder.Services.AddIdentity<ApplicationUser, IdentityRole>()
     .AddEntityFrameworkStores<AppDbContext>()
     .AddDefaultTokenProviders();
 
+
+builder.Services.ConfigureApplicationCookie(options =>
+{
+    options.Cookie.Name = "idsrv.session";
+    options.Cookie.SameSite = SameSiteMode.Lax;
+    options.Cookie.HttpOnly = true;
+    options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
+});
+
+
 builder.Services.AddIdentityServer()
     .AddInMemoryIdentityResources(new List<IdentityResource>
     {
@@ -29,15 +39,19 @@ builder.Services.AddIdentityServer()
         {
             ClientId = "vue-bff-client",
             ClientSecrets = { new Secret("secret-tres-robuste".Sha256()) },
-            AllowedGrantTypes = GrantTypes.Code, // Flow recommandé et sécurisé
-            
-            // Redirections après login/logout vers l'API (BFF)
+            AllowedGrantTypes = GrantTypes.Code,
+
             RedirectUris = { "https://localhost:7208/signin-oidc" },
             PostLogoutRedirectUris = { "https://localhost:7208/signout-callback-oidc" },
 
             AllowedScopes = { "openid", "profile", "api.read" },
             RequirePkce = true,
-            AllowOfflineAccess = true // Permet les refresh tokens si nécessaire
+
+            // Configuration du logout
+            FrontChannelLogoutUri = "https://localhost:7208/signout-oidc",
+            FrontChannelLogoutSessionRequired = true,
+            BackChannelLogoutUri = "https://localhost:7208/signout-oidc",
+            BackChannelLogoutSessionRequired = true
         }
     })
     .AddDeveloperSigningCredential() // À remplacer en production par un vrai certificat

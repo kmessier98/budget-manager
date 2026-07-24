@@ -27,18 +27,24 @@ namespace BudgetManager.API.Controllers
         }
 
         [HttpGet("login")]
-        public async Task<IActionResult> Login()
+        public IActionResult Login()
         {
-            // Déclenche la redirection vers le serveur Duende 
-            // Une fois connecté, Duende ramène l'utilisateur ici, l'API crée le cookie, puis redirige vers Vue.js
-            return Challenge(new AuthenticationProperties
+            // Force l'utilisateur à re-saisir son mot de passe à chaque connexion
+            // Même si une session Identity Server existe encore côté serveur
+            var properties = new AuthenticationProperties
             {
-                RedirectUri = "http://localhost:5173/" // Retour au frontend après succès
-            }, OpenIdConnectDefaults.AuthenticationScheme);
+                RedirectUri = "http://localhost:5173/",
+                Items =
+                {
+                    { "prompt", "login" }
+                }
+            };
+
+            return Challenge(properties, OpenIdConnectDefaults.AuthenticationScheme);
         }
 
-        [HttpGet("logout")]
-        public async Task<IActionResult> Logout()
+        [HttpPost("logout")]
+        public IActionResult Logout()
         {
             // Supprime le cookie de l'API ET déconnecte la session sur le serveur Duende
             return SignOut(new AuthenticationProperties
