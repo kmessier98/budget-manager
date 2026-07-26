@@ -64,6 +64,7 @@ export const useAuthStore = defineStore("auth", {
         // Problème réseau ou serveur éteint
         this.error = (err as Error).message;
         this.logout();
+        
         // SURTOUT PAS de "throw err;" ici, pour éviter de faire planter le routeur
       } finally {
         this.loading = false;
@@ -71,7 +72,6 @@ export const useAuthStore = defineStore("auth", {
     },
 
     async logout() {
-      const userId = this.user?.id ?? "";
       this.user = null;
       this.isAuthenticated = false;
       this.loading = false;

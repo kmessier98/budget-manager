@@ -3,10 +3,6 @@ import logo from "@/assets/images/app-logo.png";
 import { useAuthStore } from "@/features/auth/stores/auth";
 
 const authStore = useAuthStore();
-
-function handleLogout() {
-  authStore.logout();
-}
 </script>
 
 <template>
@@ -51,7 +47,7 @@ function handleLogout() {
               class="dropdown-menu dropdown-menu-end"
               aria-labelledby="navbarDropdown"
             >
-              <a class="dropdown-item" href="#" @click="handleLogout"
+              <a class="dropdown-item" href="#" @click="authStore.logout"
                 >Déconnexion</a
               >
             </div>
